@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>클릭 플래너</title>
+  <title>클릭 플래너 Pro</title>
   <style>
     :root {
       --bg:#050505; --card-bg:#1c1c1c; --input-bg:#111;
@@ -172,7 +172,7 @@
 </head>
 <body data-theme="dark">
 <header>
-  <h1>클릭 플래너</h1>
+  <h1>클릭 플래너 Pro</h1>
   <p class="subtitle">Live Worship Click Planner — AudioWorklet Edition</p>
   <div class="theme-switcher">
     <button class="theme-btn active" onclick="setTheme('dark',this)">Dark</button>
@@ -235,7 +235,7 @@ class ClickProcessor extends AudioWorkletProcessor {
     const bps=(this._bpm/60)*(this._sub?2:1);
     this._samplesPerBeat=Math.round(sampleRate/bps);
   }
- cess(inputs,outputs,parameters){
+  process(inputs,outputs,parameters){
     if(!this._running) return true;
     const blockSize=(outputs[0][0]?outputs[0][0].length:128);
     let i=0;
