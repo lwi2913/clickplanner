@@ -11,7 +11,6 @@
       --text:#ffffff; --sub-text:#bbbbbb; --border:#484848;
       --seg-bg:#303030; --seg-active:#555;
       --danger:#ff453a; --success:#30d158;
-      --card-max:420px;
     }
     [data-theme="light"] {
       --bg:#f2f2f7; --card-bg:#fff; --input-bg:#fff;
@@ -28,7 +27,7 @@
       transition:background .3s,color .3s;
       min-height:100vh;
     }
-    ::-webkit-scrollbar{width:6px;height:6px;}
+    ::-webkit-scrollbar{width:6px;}
     ::-webkit-scrollbar-track{background:transparent;}
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
@@ -39,9 +38,22 @@
     .theme-btn{border:none;background:transparent;color:var(--sub-text);padding:5px 10px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:800;font-family:inherit;transition:.2s;}
     .theme-btn.active{background:var(--card-bg);color:var(--accent);}
 
-    .input-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;max-width:1800px;margin-left:auto;margin-right:auto;}
+    /* ══ 입력 패널 ══ */
+    .input-panel{
+      background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
+      padding:16px;margin-bottom:20px;max-width:1800px;margin-left:auto;margin-right:auto;
+    }
     .input-panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:8px;}
-    textarea{width:100%;min-height:72px;max-height:180px;background:var(--input-bg);color:var(--text);padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:13px;font-family:inherit;resize:vertical;overflow-y:auto;line-height:1.6;}
+
+    /* 텍스트 에어리어 최대높이 = 카드 2개 너비 기반 (동적으로 JS에서도 조정) */
+    textarea{
+      width:100%;
+      min-height:72px;
+      max-height:var(--ta-max, 360px); /* JS에서 카드 2개 높이로 업데이트 */
+      background:var(--input-bg);color:var(--text);
+      padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+      font-size:13px;font-family:inherit;resize:vertical;overflow-y:auto;line-height:1.6;
+    }
     textarea:focus{outline:none;border-color:var(--accent);}
     textarea::placeholder{color:var(--sub-text);}
     .btn-row{display:flex;gap:8px;margin-top:10px;}
@@ -52,38 +64,23 @@
     .btn-secondary{flex:1;background:transparent;border:2px dashed var(--border);color:var(--sub-text);font-weight:800;border-radius:10px;cursor:pointer;transition:.2s;font-family:inherit;font-size:13px;}
     .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
 
-    /* ═══ 워크스페이스 그리드 ═══
-       모바일(≤768px): 2열 고정
-       데스크톱(>768px): 최대 4열 auto-fill
-    */
+    /* ══ 워크스페이스 그리드 ══ */
     .workspace{
-      display:grid;
-      gap:16px;
-      justify-content:center;
-      max-width:1800px;
-      margin:0 auto;
-      /* 기본: 최대 4열 */
-      grid-template-columns:repeat(auto-fill, minmax(260px, 420px));
+      display:grid;gap:16px;justify-content:center;
+      max-width:1800px;margin:0 auto;
+      grid-template-columns:repeat(auto-fill,minmax(280px,420px));
     }
-    /* 폴더블/태블릿/모바일: 화면 너비 ≤ 800px → 정확히 2열 */
+    /* 폴드 세로 내부 화면 (~800px): 2열 */
     @media(max-width:800px){
-      .workspace{
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .workspace{grid-template-columns:repeat(2,1fr);}
     }
-    /* 매우 좁은 화면(≤ 380px): 1열 */
-    @media(max-width:380px){
-      .workspace{
-        grid-template-columns: 1fr;
-      }
+    /* 폴드 세로보다 2cm 더 작은 폭 (~600px): 1열 */
+    @media(max-width:600px){
+      .workspace{grid-template-columns:1fr;}
     }
 
-    .song-card{
-      background:var(--card-bg);border-radius:18px;overflow:hidden;
-      border:1.5px solid var(--border);position:relative;
-      transition:border-color .06s,box-shadow .2s;
-      width:100%;
-    }
+    /* ══ 카드 ══ */
+    .song-card{background:var(--card-bg);border-radius:18px;overflow:hidden;border:1.5px solid var(--border);position:relative;transition:border-color .06s,box-shadow .2s;width:100%;}
     .song-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.4);}
     .song-card.dragging{opacity:.45;transform:scale(.96);}
     .song-card.drag-over{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,.3);}
@@ -92,19 +89,16 @@
     .song-card.flash-first{background:rgba(255,40,40,.50)!important;border-color:#ff2222!important;box-shadow:0 0 30px rgba(255,40,40,.70),inset 0 0 20px rgba(255,40,40,.32)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
     .song-card.flash-tap{background:rgba(255,205,0,.52)!important;border-color:#ffd700!important;box-shadow:0 0 30px rgba(255,205,0,.65)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
 
+    /* ══ 썸네일 ══ */
     .thumb-section{width:100%;height:108px;position:relative;background:#0a0a0a;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
     [data-theme="light"] .thumb-section{background:#c8c8d0;}
     .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;}
     .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);}
 
-    /* ★ 드래그 핸들 1.5배 확대 */
-    .drag-handle-zone{
-      flex-shrink:0;display:flex;align-items:center;justify-content:center;
-      width:72px; /* 기존 48px → 72px (1.5배) */
-      height:100%;z-index:3;cursor:grab;touch-action:none;
-    }
+    /* 드래그 핸들 1.5배 */
+    .drag-handle-zone{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:72px;height:100%;z-index:3;cursor:grab;touch-action:none;}
     .drag-handle-zone:active{cursor:grabbing;}
-    .drag-handle-icon{color:rgba(255,255,255,.7);font-size:32px;user-select:none;pointer-events:none;} /* 24→32 */
+    .drag-handle-icon{color:rgba(255,255,255,.7);font-size:32px;user-select:none;pointer-events:none;}
     .drag-handle-zone:hover .drag-handle-icon{color:var(--accent);}
     [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.5);}
 
@@ -129,6 +123,7 @@
     .editable-title{font-size:1.1rem;font-weight:900;color:var(--accent);margin-bottom:10px;outline:none;border-radius:6px;padding:2px 4px;transition:background .2s;word-break:break-all;min-height:1.4em;}
     .editable-title:focus{background:var(--seg-bg);}
 
+    /* ══ BPM ══ */
     .bpm-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
     .bpm-wrap{text-align:center;}
     .bpm-val{font-size:3rem;font-weight:900;min-width:90px;text-align:center;outline:none;letter-spacing:-2px;line-height:1;border-radius:8px;padding:2px 4px;transition:background .2s;}
@@ -138,29 +133,69 @@
     .step-btn:hover{background:var(--seg-active);}
     .step-btn:active{transform:scale(.88);background:var(--accent);color:#000;}
 
-    /* 비주얼라이저 */
-    .beat-visualizer{display:flex;width:100%;height:26px;gap:3px;margin-bottom:14px;}
-    .beat-block{flex:1;background:#484848;border-radius:5px;position:relative;overflow:hidden;cursor:pointer;transition:background .08s,box-shadow .08s;}
-    [data-theme="light"] .beat-block{background:#b0b0b8;}
-    .beat-block.state-accent{background:rgba(255,55,55,.22)!important;box-shadow:0 0 0 2.5px #ff3333 inset!important;}
-    .beat-block.state-off{background:#252525!important;opacity:.38;}
-    [data-theme="light"] .beat-block.state-off{background:#c0c0c8!important;opacity:.35;}
-    .beat-block.state-off::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0px,rgba(255,255,255,.07) 2px,transparent 2px,transparent 6px);border-radius:5px;pointer-events:none;}
-    .active-accent{background:var(--accent)!important;box-shadow:0 0 12px var(--accent)!important;}
-
-    .sub-slot{position:absolute;top:0;height:100%;cursor:pointer;transition:background .08s;}
-    .sub-slot:not(:first-child){border-left:1.5px solid var(--card-bg);}
-    .sub-slot.sub-off{background:rgba(0,0,0,.55)!important;opacity:.4;}
-    .sub-slot.sub-active-flash{background:var(--accent)!important;box-shadow:0 0 8px var(--accent)!important;}
-
-    @keyframes redPulse{
-      0%{box-shadow:0 0 0 2.5px #ff3333 inset,0 0 4px rgba(255,51,51,.4);}
-      50%{box-shadow:0 0 0 2.5px #ff5555 inset,0 0 14px rgba(255,51,51,.85),inset 0 0 8px rgba(255,80,80,.45);}
-      100%{box-shadow:0 0 0 2.5px #ff3333 inset,0 0 4px rgba(255,51,51,.4);}
+    /* ══ 비주얼라이저 ══ */
+    .beat-visualizer{display:flex;width:100%;height:28px;gap:3px;margin-bottom:14px;}
+    .beat-block{
+      flex:1;border-radius:6px;position:relative;overflow:hidden;
+      cursor:pointer;transition:background .08s,box-shadow .08s;
+      background:#2a2a2a;
     }
-    .beat-active-red-pulse{animation:redPulse .14s ease-out forwards;}
+    [data-theme="light"] .beat-block{background:#b8b8c0;}
 
-    /* 설정 */
+    /* 기본(state=0): 파랑 */
+    .beat-block.state-normal{
+      background:rgba(0,180,255,.28)!important;
+      box-shadow:0 0 0 2px rgba(0,200,255,.55) inset!important;
+    }
+    /* 강조(state=1): 빨강 */
+    .beat-block.state-accent{
+      background:rgba(255,55,55,.22)!important;
+      box-shadow:0 0 0 2.5px #ff3333 inset!important;
+    }
+    /* 뮤트(state=2): 어둡게 */
+    .beat-block.state-off{
+      background:#1a1a1a!important;
+      opacity:.4;
+    }
+    [data-theme="light"] .beat-block.state-off{background:#c8c8d0!important;opacity:.35;}
+
+    /* 플래시 */
+    .beat-block.flash-blue{
+      background:var(--accent)!important;
+      box-shadow:0 0 14px var(--accent)!important;
+      transition:background 0s,box-shadow 0s!important;
+    }
+    .beat-block.flash-red{
+      background:#ff3333!important;
+      box-shadow:0 0 14px #ff3333!important;
+      transition:background 0s,box-shadow 0s!important;
+    }
+
+    /* ══ Sub 슬롯 ══ */
+    .sub-slot{
+      position:absolute;top:0;height:100%;
+      cursor:pointer;
+      transition:background .08s;
+      /* 기본: 파랑 활성 */
+      background:rgba(0,160,255,.32);
+    }
+    .sub-slot:not(:first-child){border-left:2px solid var(--card-bg);}
+
+    /* 뮤트된 서브 슬롯 */
+    .sub-slot.sub-off{
+      background:rgba(30,30,30,.85)!important;
+      opacity:.38;
+    }
+    [data-theme="light"] .sub-slot.sub-off{background:rgba(200,200,208,.9)!important;}
+
+    /* 서브 슬롯 플래시 */
+    .sub-slot.sub-flash{
+      background:var(--accent)!important;
+      box-shadow:0 0 10px var(--accent)!important;
+      transition:background 0s,box-shadow 0s!important;
+    }
+
+    /* ══ 설정 ══ */
     .setting-group{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
     .setting-row{display:flex;justify-content:space-between;align-items:center;}
     .setting-label{font-size:12px;font-weight:900;letter-spacing:.6px;color:var(--text);min-width:52px;text-transform:uppercase;flex-shrink:0;}
@@ -168,15 +203,16 @@
     .segmented-control{display:flex;background:var(--seg-bg);border-radius:10px;padding:3px;gap:2px;flex:1;margin-left:8px;}
     .seg-btn{
       flex:1;border:none;background:transparent;color:var(--sub-text);
-      padding:7px 2px;border-radius:7px;cursor:pointer;
+      padding:5px 2px;border-radius:7px;cursor:pointer;
       font-size:11px;font-weight:800;font-family:inherit;
       transition:.2s;white-space:nowrap;
       display:flex;align-items:center;justify-content:center;
-      line-height:1.1;min-height:36px;
+      /* ★ 높이 고정으로 SUB 버튼 높이 통일 */
+      height:42px;
     }
     .seg-btn:hover:not(.active){color:var(--text);}
     .seg-btn.active{background:var(--seg-active);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.3);}
-    .seg-btn svg{display:block;}
+    .seg-btn svg{display:block;overflow:visible;}
 
     .vol-container{display:flex;align-items:center;gap:8px;flex:1;margin-left:8px;}
     .mute-btn{background:var(--seg-bg);border:1px solid var(--border);border-radius:8px;font-size:15px;cursor:pointer;color:var(--text);padding:4px 8px;transition:background .2s;}
@@ -184,6 +220,7 @@
     .mute-btn.muted{background:rgba(255,69,58,.22);border-color:var(--danger);}
     input[type="range"]{flex:1;height:5px;cursor:pointer;accent-color:var(--accent);}
 
+    /* ══ 플레이 버튼 ══ */
     .btn-group{display:flex;gap:8px;}
     .btn{flex:1;padding:18px 8px;border-radius:14px;border:none;font-weight:900;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:1.2px;text-transform:uppercase;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:opacity .1s,transform .08s,background .1s,box-shadow .1s;}
     .btn:active{transform:scale(.93);}
@@ -193,9 +230,17 @@
     .btn-play:hover{opacity:.88;}
     .btn-play.active{background:var(--first-beat);box-shadow:0 0 16px rgba(255,51,51,.5);}
 
+    /* ══ 세트리스트 패널 ══ */
     .setlist-panel{max-width:1800px;margin:28px auto 0;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;}
     .setlist-panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:10px;}
-    .setlist-output{width:100%;min-height:90px;max-height:220px;background:var(--input-bg);color:var(--text);padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:12px;font-family:'Malgun Gothic',monospace,sans-serif;resize:vertical;overflow-y:auto;line-height:1.8;margin-top:8px;}
+    .setlist-output{
+      width:100%;min-height:90px;
+      max-height:var(--ta-max,360px);
+      background:var(--input-bg);color:var(--text);
+      padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+      font-size:12px;font-family:'Malgun Gothic',monospace,sans-serif;
+      resize:vertical;overflow-y:auto;line-height:1.8;margin-top:8px;
+    }
     .setlist-output:focus{outline:none;border-color:var(--accent);}
     .empty-state{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--sub-text);}
     .empty-state-icon{font-size:2.8rem;margin-bottom:10px;opacity:.4;}
@@ -207,9 +252,22 @@
       .bpm-val{font-size:2.4rem;}
       .info-section{padding:10px 8px 8px;}
     }
+
+    /* ══ 터치 드래그 자동 스크롤 표시기 ══ */
+    #scroll-zone-top,#scroll-zone-bot{
+      position:fixed;left:0;right:0;height:80px;z-index:8888;
+      pointer-events:none;opacity:0;transition:opacity .2s;
+    }
+    #scroll-zone-top{top:0;background:linear-gradient(to bottom,rgba(0,229,255,.18),transparent);}
+    #scroll-zone-bot{bottom:0;background:linear-gradient(to top,rgba(0,229,255,.18),transparent);}
+    #scroll-zone-top.visible,#scroll-zone-bot.visible{opacity:1;}
   </style>
 </head>
 <body data-theme="dark">
+
+<!-- 터치 드래그 스크롤 존 -->
+<div id="scroll-zone-top"></div>
+<div id="scroll-zone-bot"></div>
 
 <header>
   <h1>클릭 플래너</h1>
@@ -220,7 +278,13 @@
   </div>
   <div class="input-panel" style="margin-top:14px;">
     <div class="input-panel-title">📋 콘티 입력</div>
-    <textarea id="conti-input" placeholder="예시:&#10;1. 시선 https://youtu.be/xxxxxx&#10;2. 주의 이름 높이어&#10;3. 거룩 https://youtu.be/yyyyyy"></textarea>
+    <textarea id="conti-input" placeholder="예시:
+1. 그 이름
+https://youtu.be/xxxxx
+2. 살아계신 주 https://youtu.be/yyyyy
+3. Way Maker + 나의 주
+https://youtu.be/aaaaaa
+https://youtu.be/bbbbbb"></textarea>
     <div class="btn-row">
       <button class="btn-primary" onclick="analyzeConti()">🎼 플래너 생성</button>
       <button class="btn-secondary" onclick="addEmptyCard()">＋ Add Empty</button>
@@ -245,7 +309,7 @@
 'use strict';
 
 /* ══════════════════════════════════════════════
-   AudioWorklet Processor
+   AudioWorklet Processor (Blob URL 방식)
 ══════════════════════════════════════════════ */
 const WORKLET_CODE = `
 class ClickProcessor extends AudioWorkletProcessor {
@@ -298,81 +362,97 @@ class ClickProcessor extends AudioWorkletProcessor {
 registerProcessor('click-processor',ClickProcessor);
 `;
 
-/* ══ 전역 ══ */
-let audioCtx=null;
-let workletReady=false;
-let metros={};
-let globalSongId=0;
-let dragSrcId=null;
-let tapTimesMap={};
-let bpmPressTimer=null;
-let bpmRapidInterval=null;
-let _touchDragId=null,_touchGhost=null,_touchOffX=0,_touchOffY=0;
+/* ══ 전역 상태 ══ */
+let audioCtx = null;
+let workletReady = false;
+let gainMaster = null;       // 마스터 GainNode (증폭용)
+let metros = {};
+let globalSongId = 0;
+let dragSrcId = null;
+let tapTimesMap = {};
+let bpmPressTimer = null;
+let bpmRapidInterval = null;
+let _touchDragId = null, _touchGhost = null, _touchOffX = 0, _touchOffY = 0;
+let _autoScrollRAF = null;
 
 /* ══════════════════════════════════════════════
-   SVG 음표 아이콘
-   크기: 버튼 내부에 깔끔하게 들어가도록 통일
+   SVG 음표 아이콘 (이미지 레퍼런스 기반)
+   - 모든 버튼 높이 42px에 맞는 비율로 설계
+   - 선 굵기·음표 머리 크기 통일
 ══════════════════════════════════════════════ */
 
-/* ♩ 4분음표 */
+/* 공통 색 */
+function nc(active){return active?'var(--text)':'var(--sub-text)';}
+
+/* ♩ 4분음표 — 기둥 + 타원 머리 */
 function svgQuarter(active){
-  const c=active?'var(--text)':'var(--sub-text)';
-  return `<svg width="18" height="26" viewBox="0 0 18 26" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="7" cy="21" rx="6" ry="4" fill="${c}" transform="rotate(-18 7 21)"/>
-    <rect x="12.4" y="3" width="2.2" height="19" rx="1.1" fill="${c}"/>
+  const c=nc(active);
+  return `<svg width="20" height="34" viewBox="0 0 20 34" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="8" cy="27" rx="7" ry="5" fill="${c}" transform="rotate(-16 8 27)"/>
+    <rect x="14" y="4" width="2.5" height="24" rx="1.2" fill="${c}"/>
   </svg>`;
 }
 
-/* ♪ 8분음표 */
+/* ♪ 8분음표 — 기둥 + 꼬리(flag) */
 function svgEighth(active){
-  const c=active?'var(--text)':'var(--sub-text)';
-  return `<svg width="22" height="26" viewBox="0 0 22 26" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="6" cy="21" rx="6" ry="4" fill="${c}" transform="rotate(-18 6 21)"/>
-    <rect x="11.4" y="3" width="2.2" height="19" rx="1.1" fill="${c}"/>
-    <path d="M13.6 3 C13.6 3 21 5.5 20 13 C18 9.5 13.6 9 13.6 9 Z" fill="${c}"/>
+  const c=nc(active);
+  return `<svg width="24" height="34" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="8" cy="27" rx="7" ry="5" fill="${c}" transform="rotate(-16 8 27)"/>
+    <rect x="14" y="4" width="2.5" height="24" rx="1.2" fill="${c}"/>
+    <!-- 꼬리 -->
+    <path d="M16.5 4 C16.5 4 24 8 22 18 C19.5 13 16.5 12 16.5 12 Z" fill="${c}"/>
   </svg>`;
 }
 
-/* ³ 셋잇단 — 8분음표 3개가 보(beam)로 연결, 위에 "3" */
+/*
+  셋잇단 — 참조 이미지 스타일:
+  두 8분음표가 beam 하나로 연결, 위에 "3" + 브래킷 라인
+  (3개를 그리면 너무 좁으므로 참조 이미지처럼 2개 beam + 3 표시)
+*/
 function svgTriplet(active){
-  const c=active?'var(--text)':'var(--sub-text)';
-  /* 음표 3개: x=3, 14, 25  머리 y=20, 기둥 위로 y=5 */
-  return `<svg width="44" height="30" viewBox="0 0 44 30" xmlns="http://www.w3.org/2000/svg">
-    <!-- 연결 보(beam) — 위 -->
-    <rect x="3" y="5" width="38" height="2.5" rx="1.25" fill="${c}"/>
-    <!-- 기둥 3개 -->
-    <rect x="3"  y="5" width="2" height="15" rx="1" fill="${c}"/>
-    <rect x="21" y="5" width="2" height="15" rx="1" fill="${c}"/>
-    <rect x="39" y="5" width="2" height="15" rx="1" fill="${c}"/>
-    <!-- 음표 머리 3개 -->
-    <ellipse cx="5"  cy="20" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 5 20)"/>
-    <ellipse cx="23" cy="20" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 23 20)"/>
-    <ellipse cx="41" cy="20" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 41 20)"/>
-    <!-- "3" 숫자 -->
-    <text x="22" y="4.5" text-anchor="middle" font-size="6" font-weight="900"
-          font-family="Georgia,serif" fill="${c}">3</text>
+  const c=nc(active);
+  return `<svg width="40" height="38" viewBox="0 0 40 38" xmlns="http://www.w3.org/2000/svg">
+    <!-- beam (상단 굵은 보) -->
+    <rect x="2" y="8" width="36" height="3.5" rx="1.75" fill="${c}"/>
+    <!-- 왼쪽 기둥 -->
+    <rect x="2" y="8" width="2.5" height="18" rx="1.2" fill="${c}"/>
+    <!-- 오른쪽 기둥 -->
+    <rect x="35.5" y="8" width="2.5" height="18" rx="1.2" fill="${c}"/>
+    <!-- 음표 머리 왼쪽 -->
+    <ellipse cx="5.5" cy="27" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 5.5 27)"/>
+    <!-- 음표 머리 오른쪽 -->
+    <ellipse cx="36.5" cy="27" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 36.5 27)"/>
+    <!-- 브래킷 왼쪽 선 -->
+    <line x1="2" y1="5.5" x2="15" y2="5.5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- 브래킷 오른쪽 선 -->
+    <line x1="25" y1="5.5" x2="38" y2="5.5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- 숫자 3 -->
+    <text x="20" y="6.5" text-anchor="middle" dominant-baseline="middle"
+          font-size="8" font-weight="900" font-family="Georgia,'Times New Roman',serif"
+          fill="${c}">3</text>
   </svg>`;
 }
 
-/* 𝅘𝅥𝅯 16분음표 4개 연결 (보 2줄) */
+/*
+  16분음표 4개 — 참조 이미지 스타일:
+  위에 두줄 수평 막대(이중 beam), 아래 두 기둥 + 두 음표 머리
+  좀 더 밀도있게 표현
+*/
 function svgSixteenth(active){
-  const c=active?'var(--text)':'var(--sub-text)';
-  /* 음표 4개: x=2,12,22,32 */
-  return `<svg width="46" height="30" viewBox="0 0 46 30" xmlns="http://www.w3.org/2000/svg">
-    <!-- 보 위 (첫번째) -->
-    <rect x="2"  y="4"   width="34" height="2.2" rx="1.1" fill="${c}"/>
-    <!-- 보 아래 (두번째) -->
-    <rect x="2"  y="8.5" width="34" height="2.2" rx="1.1" fill="${c}"/>
-    <!-- 기둥 4개 -->
-    <rect x="2"  y="4" width="2" height="16" rx="1" fill="${c}"/>
-    <rect x="13" y="4" width="2" height="16" rx="1" fill="${c}"/>
-    <rect x="24" y="4" width="2" height="16" rx="1" fill="${c}"/>
-    <rect x="34" y="4" width="2" height="16" rx="1" fill="${c}"/>
-    <!-- 음표 머리 4개 -->
-    <ellipse cx="4"  cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 4 21)"/>
-    <ellipse cx="15" cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 15 21)"/>
-    <ellipse cx="26" cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 26 21)"/>
-    <ellipse cx="36" cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 36 21)"/>
+  const c=nc(active);
+  return `<svg width="40" height="38" viewBox="0 0 40 38" xmlns="http://www.w3.org/2000/svg">
+    <!-- 위 beam 1 -->
+    <rect x="2" y="6" width="36" height="3.5" rx="1.75" fill="${c}"/>
+    <!-- 위 beam 2 (더 짧게) -->
+    <rect x="2" y="12" width="36" height="3.5" rx="1.75" fill="${c}"/>
+    <!-- 왼쪽 기둥 -->
+    <rect x="2" y="6" width="2.5" height="20" rx="1.2" fill="${c}"/>
+    <!-- 오른쪽 기둥 -->
+    <rect x="35.5" y="6" width="2.5" height="20" rx="1.2" fill="${c}"/>
+    <!-- 음표 머리 왼쪽 -->
+    <ellipse cx="5.5" cy="27" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 5.5 27)"/>
+    <!-- 음표 머리 오른쪽 -->
+    <ellipse cx="36.5" cy="27" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 36.5 27)"/>
   </svg>`;
 }
 
@@ -384,43 +464,62 @@ function getSubSvg(div, active){
   return '';
 }
 
-/* ══ AudioContext & Worklet 초기화 ══ */
+/* ══ 텍스트에어리어 최대높이 동적 계산 ══ */
+function updateTextareaMaxHeight(){
+  const cards = document.querySelectorAll('.song-card');
+  if(cards.length>=2){
+    const h = cards[0].offsetHeight + cards[1].offsetHeight + 16; // gap 포함
+    document.documentElement.style.setProperty('--ta-max', h+'px');
+  } else if(cards.length===1){
+    document.documentElement.style.setProperty('--ta-max', (cards[0].offsetHeight*2+16)+'px');
+  } else {
+    document.documentElement.style.setProperty('--ta-max', '360px');
+  }
+}
+
+/* ══ AudioContext & Worklet ══ */
 async function ensureAudio(){
   if(!audioCtx){
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    // 마스터 게인 (1.8 증폭 — 크롬 기본 1.0 한계 이상으로 DynamicsCompressor 우회)
+    gainMaster = audioCtx.createGain();
+    gainMaster.gain.value = 2.2; // 증폭
+    const comp = audioCtx.createDynamicsCompressor();
+    comp.threshold.value = -6;
+    comp.knee.value = 3;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.001;
+    comp.release.value = 0.1;
+    gainMaster.connect(comp);
+    comp.connect(audioCtx.destination);
   }
-  if(audioCtx.state==='suspended'){
-    await audioCtx.resume();
-  }
+  if(audioCtx.state==='suspended') await audioCtx.resume();
   if(!workletReady){
-    const blob=new Blob([WORKLET_CODE],{type:'application/javascript'});
-    const url=URL.createObjectURL(blob);
+    const blob = new Blob([WORKLET_CODE],{type:'application/javascript'});
+    const url = URL.createObjectURL(blob);
     await audioCtx.audioWorklet.addModule(url);
     URL.revokeObjectURL(url);
-    workletReady=true;
+    workletReady = true;
   }
   return audioCtx;
 }
 
-/* ══ 메트로놈 시작 ══ */
+/* ══ 메트로놈 시작/정지 ══ */
 async function startMetro(id){
   const m=metros[id]; if(!m) return;
   try{
-    const ctx=await ensureAudio();
-    const node=new AudioWorkletNode(ctx,'click-processor');
-    node.connect(ctx.destination);
-    m.workletNode=node;
-
-    node.port.onmessage=(e)=>{
+    const ctx = await ensureAudio();
+    const node = new AudioWorkletNode(ctx,'click-processor');
+    node.connect(ctx.destination); // worklet은 destination 직접 (사운드 재생은 별도)
+    m.workletNode = node;
+    node.port.onmessage = (e)=>{
       if(e.data.type!=='beat') return;
       if(!metros[id]?.isPlaying) return;
-      const beatTime=ctx.currentTime+e.data.offsetSec+0.005;
-      handleBeat(id,e.data.slotIdx,beatTime);
+      const beatTime = ctx.currentTime + e.data.offsetSec + 0.005;
+      handleBeat(id, e.data.slotIdx, beatTime);
     };
-
     node.port.postMessage({type:'start',bpm:m.bpm,subDiv:m.subDiv,sig:m.sig});
-    m.isPlaying=true;
-
+    m.isPlaying = true;
     const btn=document.getElementById('p-btn-'+id);
     if(btn){btn.innerText='STOP';btn.classList.add('active');}
   }catch(err){
@@ -428,7 +527,6 @@ async function startMetro(id){
     alert('오디오 시작 실패: '+err.message);
   }
 }
-
 function stopMetro(id){
   const m=metros[id]; if(!m) return;
   if(m.workletNode){
@@ -439,43 +537,52 @@ function stopMetro(id){
   m.isPlaying=false;
   const btn=document.getElementById('p-btn-'+id);
   if(btn){btn.innerText='START';btn.classList.remove('active');}
-  clearViz(id);
-  document.getElementById('card-'+id)?.classList.remove('flash-accent','flash-first');
+  clearVizFlash(id);
 }
-
 function toggleMetro(id){
   if(metros[id]?.isPlaying) stopMetro(id); else startMetro(id);
 }
 
 /* ══ 박자 처리 ══ */
-function handleBeat(id,slotIdx,beatTime){
+function handleBeat(id, slotIdx, beatTime){
   const m=metros[id]; if(!m||!audioCtx) return;
   const ctx=audioCtx;
   const div=m.subDiv;
-  const qIdx=Math.floor(slotIdx/div);
-  const sIdx=slotIdx%div;
+  const qIdx=Math.floor(slotIdx/div); // 메인 비트 인덱스
+  const sIdx=slotIdx%div;             // 서브 슬롯 인덱스
   const isMain=(sIdx===0);
-  const bs=m.blockStates[qIdx]??0;
+  const bs=m.blockStates[qIdx]??0;   // 0=normal(파랑), 1=accent(빨강), 2=off(뮤트)
 
   let isOff=false, isAccent=false;
+
   if(div===1){
-    isOff=(bs===2); isAccent=(bs===1);
+    // 4분음표: 블록 상태만 봄
+    isOff   = (bs===2);
+    isAccent= (bs===1);
   } else {
     if(isMain){
-      isOff=(bs===2); isAccent=(bs===1);
+      // 서브 분할이 있을 때 메인 박자: 블록 상태 따름
+      isOff   = (bs===2);
+      isAccent= (bs===1);
     } else {
-      const ss=m.subStates[qIdx]?.[sIdx]??0;
-      isOff=(ss===1); isAccent=false;
+      // 서브 슬롯: subStates[qIdx][sIdx] 0=on(파랑), 1=off(뮤트)
+      const ss = (m.subStates[qIdx]?.[sIdx]) ?? 0;
+      isOff    = (ss===1);
+      isAccent = false; // 서브는 절대 빨강 없음
     }
   }
 
-  const vol=isMain?m.vol:m.vol*0.38;
-  if(!m.muted&&!isOff) playSound(m.sound,isAccent,vol,beatTime);
+  // 볼륨: 메인은 풀볼륨, 서브는 40%
+  const vol = isMain ? m.vol : m.vol * 0.40;
+  if(!m.muted && !isOff) playSound(m.sound, isAccent, vol, beatTime);
 
-  const delayMs=Math.max(0,(beatTime-ctx.currentTime)*1000);
+  // 시각 플래시 (딜레이 동기)
+  const delayMs = Math.max(0,(beatTime - ctx.currentTime)*1000);
   setTimeout(()=>{
     if(!metros[id]?.isPlaying) return;
-    if(isMain&&!isOff){
+
+    // 카드 전체 플래시 (메인 박자만)
+    if(isMain && !isOff){
       const card=document.getElementById('card-'+id);
       if(card){
         card.classList.remove('flash-accent','flash-first');
@@ -484,32 +591,44 @@ function handleBeat(id,slotIdx,beatTime){
         setTimeout(()=>card.classList.remove('flash-accent','flash-first'),80);
       }
     }
-    clearViz(id);
+
+    // 비주얼라이저 플래시
+    clearVizFlash(id);
     if(!isOff){
       if(div===1){
+        // 4분음표: 메인 블록 플래시
         const blk=document.getElementById('block-'+id+'-'+qIdx);
         if(blk){
-          if(isAccent){
-            blk.classList.add('beat-active-red-pulse');
-            setTimeout(()=>blk.classList.remove('beat-active-red-pulse'),140);
-          } else {
-            blk.classList.add('active-accent');
-          }
+          blk.classList.add(isAccent?'flash-red':'flash-blue');
+          setTimeout(()=>blk.classList.remove('flash-blue','flash-red'),120);
         }
       } else {
-        const subEl=document.getElementById('sub-'+id+'-'+qIdx+'-'+sIdx);
-        if(subEl) subEl.classList.add('sub-active-flash');
+        if(isMain){
+          // 서브 분할 중 메인: 첫 번째 서브슬롯 플래시
+          const subEl=document.getElementById('sub-'+id+'-'+qIdx+'-0');
+          if(subEl){
+            subEl.classList.add('sub-flash');
+            setTimeout(()=>subEl.classList.remove('sub-flash'),120);
+          }
+        } else {
+          // 서브 슬롯 플래시
+          const subEl=document.getElementById('sub-'+id+'-'+qIdx+'-'+sIdx);
+          if(subEl){
+            subEl.classList.add('sub-flash');
+            setTimeout(()=>subEl.classList.remove('sub-flash'),100);
+          }
+        }
       }
     }
-  },delayMs);
+  }, delayMs);
 }
 
-/* ══ 소리 합성 ══ */
-function playSound(type,isHigh,vol,t){
-  if(!audioCtx) return;
-  t=t||audioCtx.currentTime;
-  const gain=audioCtx.createGain();
-  gain.connect(audioCtx.destination);
+/* ══ 소리 합성 (GainNode를 gainMaster에 연결) ══ */
+function playSound(type, isHigh, vol, t){
+  if(!audioCtx||!gainMaster) return;
+  t = t||audioCtx.currentTime;
+  const gain = audioCtx.createGain();
+  gain.connect(gainMaster); // 마스터 게인으로 (증폭 적용)
 
   if(type==='digital'){
     const osc=audioCtx.createOscillator();
@@ -525,40 +644,31 @@ function playSound(type,isHigh,vol,t){
     const data=buf.getChannelData(0);
     for(let k=0;k<bufLen;k++) data[k]=(Math.random()*2-1)*Math.exp(-k/(bufLen*.15));
     const noise=audioCtx.createBufferSource(); noise.buffer=buf;
-    const bp=audioCtx.createBiquadFilter();
-    bp.type='bandpass';bp.frequency.value=isHigh?1600:1100;bp.Q.value=18;
-    const hp=audioCtx.createBiquadFilter();
-    hp.type='highpass';hp.frequency.value=800;
+    const bp=audioCtx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=isHigh?1600:1100;bp.Q.value=18;
+    const hp=audioCtx.createBiquadFilter();hp.type='highpass';hp.frequency.value=800;
     const osc=audioCtx.createOscillator();osc.type='triangle';
     osc.frequency.setValueAtTime(isHigh?1400:950,t);
     osc.frequency.exponentialRampToValueAtTime(200,t+.025);
     const og=audioCtx.createGain();
-    og.gain.setValueAtTime(vol*1.4,t);
-    og.gain.exponentialRampToValueAtTime(0.001,t+.03);
+    og.gain.setValueAtTime(vol*1.4,t);og.gain.exponentialRampToValueAtTime(0.001,t+.03);
     noise.connect(bp);bp.connect(hp);hp.connect(gain);
     osc.connect(og);og.connect(gain);
-    gain.gain.setValueAtTime(vol*2.5,t);
-    gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
-    noise.start(t);noise.stop(t+.07);
-    osc.start(t);osc.stop(t+.035);
+    gain.gain.setValueAtTime(vol*2.5,t);gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
+    noise.start(t);noise.stop(t+.07);osc.start(t);osc.stop(t+.035);
   } else {
     const osc=audioCtx.createOscillator();
-    osc.type='sine';
-    osc.frequency.value=isHigh?1320:880;
+    osc.type='sine';osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
-    gain.gain.setValueAtTime(vol*1.1,t);
-    gain.gain.exponentialRampToValueAtTime(0.001,t+.09);
+    gain.gain.setValueAtTime(vol*1.1,t);gain.gain.exponentialRampToValueAtTime(0.001,t+.09);
     osc.start(t);osc.stop(t+.1);
   }
 }
 
-/* ══ BPM 컨트롤 (더블탭 ±10 제거) ══ */
+/* ══ BPM 컨트롤 (press & hold만) ══ */
 function sendBpm(id){
   const m=metros[id];
   if(m?.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'bpm',bpm:m.bpm});
 }
-
-/* 단순 press & hold만 (더블탭 로직 제거) */
 function onBpmDown(id,delta,e){
   e.stopPropagation();e.preventDefault();
   changeBpm(id,delta);
@@ -580,36 +690,29 @@ function changeBpm(id,delta){
 function commitBpm(id,el){
   const v=parseInt(el.innerText.replace(/\D/g,''));
   metros[id].bpm=isNaN(v)?metros[id].bpm:Math.max(20,Math.min(300,v));
-  el.innerText=metros[id].bpm;
-  sendBpm(id);
+  el.innerText=metros[id].bpm;sendBpm(id);
 }
 function liveUpdateBpm(id,el){
   const raw=el.innerText.replace(/\D/g,'');if(!raw)return;
-  const v=parseInt(raw);
-  if(!isNaN(v)&&v>=20&&v<=300){metros[id].bpm=v;sendBpm(id);}
+  const v=parseInt(raw);if(!isNaN(v)&&v>=20&&v<=300){metros[id].bpm=v;sendBpm(id);}
 }
 
 /* ══ TAP ══ */
 function tapTempo(id){
-  // 오디오 컨텍스트 깨우기 (사용자 제스처)
   ensureAudio().catch(()=>{});
-
   const card=document.getElementById('card-'+id);
   card.classList.remove('flash-tap');void card.offsetWidth;
   card.classList.add('flash-tap');
   setTimeout(()=>card.classList.remove('flash-tap'),90);
-
   const now=performance.now();
   if(!tapTimesMap[id]) tapTimesMap[id]=[];
   const arr=tapTimesMap[id];
   if(arr.length&&now-arr[arr.length-1]>3000) arr.length=0;
   arr.push(now);if(arr.length>8)arr.shift();
   if(arr.length>=2){
-    let sum=0;
-    for(let i=1;i<arr.length;i++) sum+=arr[i]-arr[i-1];
+    let sum=0;for(let i=1;i<arr.length;i++) sum+=arr[i]-arr[i-1];
     metros[id].bpm=Math.max(20,Math.min(300,Math.round(60000/(sum/(arr.length-1)))));
-    document.getElementById('bpm-'+id).innerText=metros[id].bpm;
-    sendBpm(id);
+    document.getElementById('bpm-'+id).innerText=metros[id].bpm;sendBpm(id);
   }
 }
 
@@ -621,30 +724,102 @@ function setTheme(t,btn){
   Object.keys(metros).forEach(id=>updateSubIcons(+id));
 }
 
-/* ══ 유튜브 ID ══ */
+/* ══ 유튜브 ID 추출 ══ */
 function extractVid(url){
   if(!url)return null;
   const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
   return m?m[1]:null;
 }
 
-/* ══ 콘티 파싱 ══ */
+/* ══════════════════════════════════════════════
+   콘티 파싱 알고리즘 (개선판)
+
+   규칙:
+   1. 번호(1. 2. 3. …)로 시작하는 줄 → 새 곡 시작
+   2. URL 줄은 직전 곡에 붙임
+   3. 번호 없는 텍스트 줄은:
+      - 직전 줄이 URL이면 → 같은 곡의 추가 제목(concatenate)
+      - 그냥 텍스트만 있으면 → 직전 곡의 제목에 합산
+   4. 같은 곡에 URL이 2개이상 → "제목 (2)" 형태 카드 추가
+══════════════════════════════════════════════ */
+function parseConti(raw){
+  const urlRe = /(https?:\/\/[^\s]+)/gi;
+  const songs = [];
+  let cur = null;
+
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  for(let i=0;i<lines.length;i++){
+    const line = lines[i];
+    const isUrl = urlRe.test(line); urlRe.lastIndex=0;
+    const numMatch = line.match(/^(\d+)[.$、\s]/);
+
+    if(numMatch){
+      // 새 곡 시작
+      if(cur) songs.push(cur);
+      // 같은 줄에 URL이 있는 경우 처리
+      const inlineUrls = line.match(/(https?:\/\/[^\s]+)/g);
+      const titlePart = line.replace(/^(\d+)[.$、\s]+/,'').replace(/(https?:\/\/[^\s]+)/g,'').trim();
+      cur = { title: titlePart||('Song '+(songs.length+1)), urls: inlineUrls||[] };
+    } else if(isUrl){
+      const urls = line.match(/(https?:\/\/[^\s]+)/g)||[];
+      if(cur){
+        cur.urls.push(...urls);
+      } else {
+        cur = { title:'Song '+(songs.length+1), urls };
+      }
+    } else {
+      // 순수 텍스트 줄
+      if(cur){
+        // 직전 곡의 제목을 보강 (예: 번호 뒤 줄바꿈 후 제목)
+        if(!cur.title||cur.title.startsWith('Song ')){
+          cur.title = line;
+        } else {
+          cur.title += ' ' + line;
+        }
+      } else {
+        cur = { title:line, urls:[] };
+      }
+    }
+  }
+  if(cur) songs.push(cur);
+
+  // URL 2개 이상인 경우 → 카드 분리 (제목에 (2) 붙임)
+  const result=[];
+  songs.forEach(s=>{
+    if(s.urls.length===0){
+      result.push({title:s.title, vId:null});
+    } else if(s.urls.length===1){
+      result.push({title:s.title, vId:extractVid(s.urls[0])});
+    } else {
+      // 2개 이상
+      s.urls.forEach((url,idx)=>{
+        const suffix = idx===0?'':` (${idx+1})`;
+        result.push({title:s.title+suffix, vId:extractVid(url)});
+      });
+    }
+  });
+  return result;
+}
+
 function analyzeConti(){
   const text=document.getElementById('conti-input').value.trim();if(!text)return;
   Object.keys(metros).forEach(id=>{if(metros[id].isPlaying)stopMetro(+id);});
   metros={};tapTimesMap={};globalSongId=0;
   document.getElementById('workspace').innerHTML='';
-  const urlRe=/(https?:\/\/[^\s]+)/gi;
-  text.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{
-    const um=line.match(urlRe),rawUrl=um?um[0]:null;
-    const vId=rawUrl?extractVid(rawUrl):null;
-    const title=line.replace(urlRe,'').trim().replace(/\s+/g,' ').trim()||('Song '+(globalSongId+1));
+  const items=parseConti(text);
+  items.forEach(item=>{
     globalSongId++;
-    createCard(globalSongId,title,vId);
+    createCard(globalSongId,item.title,item.vId);
   });
   renderEmptyState();
+  setTimeout(updateTextareaMaxHeight,300);
 }
-function addEmptyCard(){removeEmptyState();globalSongId++;createCard(globalSongId,'Song '+globalSongId,null);}
+function addEmptyCard(){
+  removeEmptyState();globalSongId++;
+  createCard(globalSongId,'Song '+globalSongId,null);
+  setTimeout(updateTextareaMaxHeight,300);
+}
 function removeEmptyState(){document.querySelector('.empty-state')?.remove();}
 function renderEmptyState(){
   const ws=document.getElementById('workspace');
@@ -676,7 +851,7 @@ function buildThumb(id,vId){
   } else {
     if(center){
       const wrap=document.createElement('div');wrap.className='no-thumb-content';
-      wrap.innerHTML=`<span class="no-thumb-label">No Link</span><input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크 붙여넣기..."><button class="link-apply-btn">적용</button>`;
+      wrap.innerHTML=`<span class="no-thumb-label">No Link</span><input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크..."><button class="link-apply-btn">적용</button>`;
       wrap.querySelector('input').addEventListener('pointerdown',e=>e.stopPropagation());
       wrap.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter')applyLink(id);e.stopPropagation();});
       wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
@@ -695,8 +870,10 @@ function applyLink(id){
 /* ══ 상태 초기화 ══ */
 function initStates(id){
   const m=metros[id];
+  // blockStates: 0=normal(파랑), 1=accent(빨강), 2=off(뮤트)
   m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
-  m.subStates=Array.from({length:m.sig},()=>new Array(4).fill(0));
+  // subStates: 0=on(파랑), 1=off(뮤트)
+  m.subStates=Array.from({length:m.sig},()=>new Array(16).fill(0));
 }
 
 /* ══ 카드 생성 ══ */
@@ -704,7 +881,7 @@ function createCard(id,title,vId){
   removeEmptyState();
   metros[id]={
     isPlaying:false,bpm:120,sig:4,subDiv:1,
-    vol:.6,muted:false,sound:'digital',
+    vol:.7,muted:false,sound:'digital',
     workletNode:null,vId:vId||null,
     blockStates:[],subStates:[]
   };
@@ -764,7 +941,7 @@ function createCard(id,title,vId){
           <span class="setting-label">Volume</span>
           <div class="vol-container">
             <button class="mute-btn" id="mute-${id}">🔊</button>
-            <input type="range" min="0" max="1" step="0.05" value="0.6" id="vol-${id}">
+            <input type="range" min="0" max="1" step="0.05" value="0.7" id="vol-${id}">
           </div>
         </div>
       </div>
@@ -779,15 +956,16 @@ function createCard(id,title,vId){
   updateSubIcons(id);
   renderViz(id);
   bindEvents(card,id);
+  setTimeout(updateTextareaMaxHeight,200);
 }
 
-/* ══ Sub SVG 아이콘 주입 ══ */
+/* ══ Sub 아이콘 업데이트 ══ */
 function updateSubIcons(id){
   const seg=document.getElementById('sub-seg-'+id);if(!seg)return;
   const m=metros[id];if(!m)return;
   seg.querySelectorAll('.seg-btn').forEach(btn=>{
     const div=+btn.dataset.div;
-    btn.innerHTML=getSubSvg(div,div===m.subDiv);
+    btn.innerHTML=getSubSvg(div, div===m.subDiv);
   });
 }
 
@@ -801,8 +979,7 @@ function bindEvents(card,id){
   minus.addEventListener('pointerdown',e=>onBpmDown(id,-1,e));
   plus.addEventListener('pointerdown',e=>onBpmDown(id,+1,e));
   ['pointerup','pointercancel','pointerleave'].forEach(ev=>{
-    minus.addEventListener(ev,onBpmUp);
-    plus.addEventListener(ev,onBpmUp);
+    minus.addEventListener(ev,onBpmUp);plus.addEventListener(ev,onBpmUp);
   });
 
   const bpmEl=card.querySelector('#bpm-'+id);
@@ -841,13 +1018,13 @@ function bindEvents(card,id){
   initDrag(card,id);
 }
 
-/* ══ 삭제 / 복제 ══ */
+/* ══ 삭제/복제 ══ */
 function deleteCard(id){
   if(metros[id]?.isPlaying)stopMetro(id);
   delete metros[id];delete tapTimesMap[id];
   const el=document.getElementById('card-'+id);if(!el)return;
   el.style.cssText+='transition:opacity .18s,transform .18s;opacity:0;transform:scale(.92);';
-  setTimeout(()=>{el.remove();renderEmptyState();},200);
+  setTimeout(()=>{el.remove();renderEmptyState();updateTextareaMaxHeight();},200);
 }
 function duplicateCard(srcId){
   const m=metros[srcId];if(!m)return;
@@ -861,14 +1038,16 @@ function duplicateCard(srcId){
   document.getElementById('beat-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===nm.sig));
   document.getElementById('sound-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.sound===nm.sound));
   document.getElementById('vol-'+nid).value=nm.vol;
-  updateSubIcons(nid);
-  renderViz(nid);
+  updateSubIcons(nid);renderViz(nid);
 }
 
-/* ══ DRAG & DROP ══ */
+/* ══════════════════════════════════════════════
+   드래그 & 드롭 (터치 자동 스크롤 포함)
+══════════════════════════════════════════════ */
 function initDrag(card,id){
   const handle=document.getElementById('handle-'+id);
 
+  // 마우스 드래그
   handle.addEventListener('mousedown',()=>card.setAttribute('draggable','true'));
   document.addEventListener('mouseup',()=>{
     document.querySelectorAll('.song-card').forEach(c=>c.setAttribute('draggable','false'));
@@ -876,12 +1055,10 @@ function initDrag(card,id){
   card.addEventListener('dragstart',e=>{
     if(card.getAttribute('draggable')!=='true'){e.preventDefault();return;}
     dragSrcId=id;card.classList.add('dragging');
-    e.dataTransfer.effectAllowed='move';
-    activateDim(id);
+    e.dataTransfer.effectAllowed='move';activateDim(id);
   });
   card.addEventListener('dragend',()=>{
-    card.setAttribute('draggable','false');
-    card.classList.remove('dragging');
+    card.setAttribute('draggable','false');card.classList.remove('dragging');
     deactivateDim();
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
   });
@@ -894,7 +1071,7 @@ function initDrag(card,id){
     reorder(dragSrcId,tgt);dragSrcId=null;
   });
 
-  // 터치
+  /* 터치 드래그 + 자동 스크롤 */
   handle.addEventListener('touchstart',e=>{
     e.stopPropagation();
     if(_touchDragId!=null)return;
@@ -904,10 +1081,11 @@ function initDrag(card,id){
     _touchOffX=t.clientX-rect.left;_touchOffY=t.clientY-rect.top;
     _touchGhost=card.cloneNode(true);
     _touchGhost.id='touch-ghost';
-    _touchGhost.style.cssText=`position:fixed;pointer-events:none;z-index:9999;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;opacity:.78;transform:scale(1.04) rotate(1.5deg);border:2px solid var(--accent);box-shadow:0 12px 40px rgba(0,0,0,.6);border-radius:18px;overflow:hidden;transition:none;`;
+    _touchGhost.style.cssText=`position:fixed;pointer-events:none;z-index:9999;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;opacity:.78;transform:scale(1.04) rotate(1.2deg);border:2px solid var(--accent);box-shadow:0 12px 40px rgba(0,0,0,.6);border-radius:18px;overflow:hidden;transition:none;`;
     document.body.appendChild(_touchGhost);
     card.classList.add('dragging');
     activateDim(id);
+    startAutoScroll();
   },{passive:true});
 
   handle.addEventListener('touchmove',e=>{
@@ -916,6 +1094,8 @@ function initDrag(card,id){
     const t=e.touches[0];
     _touchGhost.style.left=(t.clientX-_touchOffX)+'px';
     _touchGhost.style.top=(t.clientY-_touchOffY)+'px';
+    // 자동 스크롤 방향 업데이트
+    updateAutoScroll(t.clientY);
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
@@ -925,6 +1105,7 @@ function initDrag(card,id){
   handle.addEventListener('touchend',e=>{
     if(_touchDragId!==id)return;
     e.stopPropagation();
+    stopAutoScroll();
     const t=e.changedTouches[0];
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
@@ -934,6 +1115,43 @@ function initDrag(card,id){
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
     deactivateDim();
   },{passive:true});
+}
+
+/* 터치 드래그 자동 스크롤 */
+let _autoScrollDir = 0; // -1:위, 0:없음, 1:아래
+const SCROLL_ZONE = 100; // px
+const SCROLL_SPEED = 8;  // px per frame
+
+function startAutoScroll(){
+  if(_autoScrollRAF) return;
+  function frame(){
+    if(_touchDragId==null){stopAutoScroll();return;}
+    if(_autoScrollDir!==0) window.scrollBy(0, _autoScrollDir*SCROLL_SPEED);
+    _autoScrollRAF=requestAnimationFrame(frame);
+  }
+  _autoScrollRAF=requestAnimationFrame(frame);
+}
+function stopAutoScroll(){
+  if(_autoScrollRAF){cancelAnimationFrame(_autoScrollRAF);_autoScrollRAF=null;}
+  _autoScrollDir=0;
+  document.getElementById('scroll-zone-top').classList.remove('visible');
+  document.getElementById('scroll-zone-bot').classList.remove('visible');
+}
+function updateAutoScroll(clientY){
+  const vh=window.innerHeight;
+  if(clientY<SCROLL_ZONE){
+    _autoScrollDir=-1;
+    document.getElementById('scroll-zone-top').classList.add('visible');
+    document.getElementById('scroll-zone-bot').classList.remove('visible');
+  } else if(clientY>vh-SCROLL_ZONE){
+    _autoScrollDir=1;
+    document.getElementById('scroll-zone-bot').classList.add('visible');
+    document.getElementById('scroll-zone-top').classList.remove('visible');
+  } else {
+    _autoScrollDir=0;
+    document.getElementById('scroll-zone-top').classList.remove('visible');
+    document.getElementById('scroll-zone-bot').classList.remove('visible');
+  }
 }
 
 function reorder(srcId,tgtId){
@@ -951,34 +1169,31 @@ function deactivateDim(){
   document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-dim'));
 }
 
-/* ══ 설정 ══ */
+/* ══ 설정 변경 ══ */
 function setBeat(id,val,btnEl){
   const m=metros[id];
-  m.sig=val;
-  initStates(id);
+  m.sig=val;initStates(id);
   document.getElementById('beat-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   btnEl.classList.add('active');
   renderViz(id);
   if(m.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'sig',sig:val});
 }
-
 function setSubDiv(id,div){
   const m=metros[id];if(!m)return;
   m.subDiv=div;
-  m.subStates=Array.from({length:m.sig},()=>new Array(4).fill(0));
+  // subStates 초기화 (모두 on=0)
+  m.subStates=Array.from({length:m.sig},()=>new Array(16).fill(0));
   document.getElementById('sub-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sub-seg-'+id).querySelector(`[data-div="${div}"]`)?.classList.add('active');
   updateSubIcons(id);
   renderViz(id);
   if(m.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'subDiv',subDiv:div});
 }
-
 function setSound(id,val,btnEl){
   metros[id].sound=val;
   document.getElementById('sound-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   btnEl.classList.add('active');
 }
-
 function toggleMute(id){
   metros[id].muted=!metros[id].muted;
   const btn=document.getElementById('mute-'+id);
@@ -986,53 +1201,66 @@ function toggleMute(id){
   btn.innerText=metros[id].muted?'🔇':'🔊';
 }
 
-/* ══ 비주얼라이저 ══ */
+/* ══ 비주얼라이저 렌더링 ══ */
 function renderViz(id){
   const m=metros[id];
   const viz=document.getElementById('viz-'+id);if(!viz)return;
   viz.innerHTML='';
+
   for(let i=0;i<m.sig;i++){
     const b=document.createElement('div');
+    b.id='block-'+id+'-'+i;
+
     const bs=m.blockStates[i]??0;
-    let cls='beat-block';
-    if(bs===1)cls+=' state-accent';
-    else if(bs===2)cls+=' state-off';
-    b.className=cls;b.id='block-'+id+'-'+i;
+    b.className='beat-block '+(bs===0?'state-normal':bs===1?'state-accent':'state-off');
 
     if(m.subDiv>1){
+      // 서브 분할 모드: 블록 위에 서브 슬롯 오버레이
       for(let s=0;s<m.subDiv;s++){
-        const ss=m.subStates[i]?.[s]??0;
+        const ss=(m.subStates[i]?.[s])??0;
         const el=document.createElement('div');
         el.className='sub-slot'+(ss===1?' sub-off':'');
         el.id='sub-'+id+'-'+i+'-'+s;
         el.style.left=(s/m.subDiv*100)+'%';
         el.style.width=(100/m.subDiv)+'%';
         const _s=s;
-        el.addEventListener('click',e=>{e.stopPropagation();cycleSubState(id,i,_s);});
+        el.addEventListener('click',e=>{
+          e.stopPropagation();
+          // 서브 슬롯 클릭: 0↔1 토글 (on/off)
+          m.subStates[i][_s]=(m.subStates[i][_s]===0)?1:0;
+          renderViz(id);
+        });
         b.appendChild(el);
       }
+      // 블록 자체 클릭(서브 슬롯 없는 영역): 블록 state 순환
+      b.addEventListener('click',e=>{
+        if(e.target===b) cycleBlockState(id,i);
+      });
+    } else {
+      // 4분음표 모드: 블록 클릭 → state 순환
+      b.addEventListener('click',()=>cycleBlockState(id,i));
     }
-    b.addEventListener('click',e=>{if(e.target===b)cycleBlockState(id,i);});
     viz.appendChild(b);
   }
 }
 
 function cycleBlockState(id,i){
+  // 0(파랑) → 1(빨강) → 2(뮤트) → 0
   metros[id].blockStates[i]=(metros[id].blockStates[i]+1)%3;
   renderViz(id);
 }
-function cycleSubState(id,i,s){
-  metros[id].subStates[i][s]=(metros[id].subStates[i][s]+1)%2;
-  renderViz(id);
-}
-function clearViz(id){
-  document.querySelectorAll('#viz-'+id+' .beat-block').forEach(b=>
-    b.classList.remove('active-accent','beat-active-red-pulse'));
-  document.querySelectorAll('#viz-'+id+' .sub-slot').forEach(b=>
-    b.classList.remove('sub-active-flash'));
+
+/* 플래시 전용 클리어 (상태 CSS는 유지) */
+function clearVizFlash(id){
+  document.querySelectorAll(`#viz-${id} .beat-block`).forEach(b=>{
+    b.classList.remove('flash-blue','flash-red');
+  });
+  document.querySelectorAll(`#viz-${id} .sub-slot`).forEach(b=>{
+    b.classList.remove('sub-flash');
+  });
 }
 
-/* ══ 세트리스트 ══ */
+/* ══ 세트리스트 추출 ══ */
 function extractSetlist(){
   const cards=document.getElementById('workspace').querySelectorAll('.song-card');
   if(!cards.length){document.getElementById('setlist-output').value='카드가 없습니다.';return;}
@@ -1049,6 +1277,9 @@ function extractSetlist(){
 function escHtml(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// 윈도우 리사이즈 시 textarea max-height 재계산
+window.addEventListener('resize',updateTextareaMaxHeight);
 </script>
 </body>
 </html>
