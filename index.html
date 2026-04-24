@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>클릭 플래너 Pro</title>
+  <title>클릭 플래너</title>
   <style>
     :root {
       --bg:#050505; --card-bg:#1c1c1c; --input-bg:#111;
@@ -31,13 +31,15 @@
     ::-webkit-scrollbar{width:6px;height:6px;}
     ::-webkit-scrollbar-track{background:transparent;}
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-    header{text-align:center;margin-bottom:24px;position:relative;max-width:900px;margin-left:auto;margin-right:auto;}
+
+    header{text-align:center;margin-bottom:24px;position:relative;max-width:1800px;margin-left:auto;margin-right:auto;}
     h1{color:var(--accent);font-size:2rem;font-weight:900;margin-bottom:4px;}
     .subtitle{color:var(--sub-text);font-size:12px;margin-bottom:16px;}
     .theme-switcher{position:absolute;top:0;right:0;background:var(--seg-bg);padding:4px;border-radius:10px;display:flex;gap:3px;}
     .theme-btn{border:none;background:transparent;color:var(--sub-text);padding:5px 10px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:800;font-family:inherit;transition:.2s;}
     .theme-btn.active{background:var(--card-bg);color:var(--accent);}
-    .input-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto;}
+
+    .input-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;max-width:1800px;margin-left:auto;margin-right:auto;}
     .input-panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:8px;}
     textarea{width:100%;min-height:72px;max-height:180px;background:var(--input-bg);color:var(--text);padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:13px;font-family:inherit;resize:vertical;overflow-y:auto;line-height:1.6;}
     textarea:focus{outline:none;border-color:var(--accent);}
@@ -49,19 +51,38 @@
     [data-theme="light"] .btn-primary{color:#fff;}
     .btn-secondary{flex:1;background:transparent;border:2px dashed var(--border);color:var(--sub-text);font-weight:800;border-radius:10px;cursor:pointer;transition:.2s;font-family:inherit;font-size:13px;}
     .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* ═══ 워크스페이스 그리드 ═══
+       모바일(≤768px): 2열 고정
+       데스크톱(>768px): 최대 4열 auto-fill
+    */
     .workspace{
       display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(min(300px,calc(50% - 10px)),var(--card-max)));
       gap:16px;
       justify-content:center;
-      max-width:900px;
+      max-width:1800px;
       margin:0 auto;
+      /* 기본: 최대 4열 */
+      grid-template-columns:repeat(auto-fill, minmax(260px, 420px));
     }
+    /* 폴더블/태블릿/모바일: 화면 너비 ≤ 800px → 정확히 2열 */
+    @media(max-width:800px){
+      .workspace{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* 매우 좁은 화면(≤ 380px): 1열 */
+    @media(max-width:380px){
+      .workspace{
+        grid-template-columns: 1fr;
+      }
+    }
+
     .song-card{
       background:var(--card-bg);border-radius:18px;overflow:hidden;
       border:1.5px solid var(--border);position:relative;
       transition:border-color .06s,box-shadow .2s;
-      max-width:var(--card-max);width:100%;
+      width:100%;
     }
     .song-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.4);}
     .song-card.dragging{opacity:.45;transform:scale(.96);}
@@ -69,21 +90,24 @@
     .song-card.drag-dim{opacity:.35;transform:scale(.93);transition:opacity .18s,transform .18s;}
     .song-card.flash-accent{background:rgba(0,229,255,.44)!important;border-color:var(--accent)!important;box-shadow:0 0 30px rgba(0,229,255,.65),inset 0 0 20px rgba(0,229,255,.28)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
     .song-card.flash-first{background:rgba(255,40,40,.50)!important;border-color:#ff2222!important;box-shadow:0 0 30px rgba(255,40,40,.70),inset 0 0 20px rgba(255,40,40,.32)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
-    .song-card.flash-tap{background:rgba(255,205,0,.52)!important;border-color:#ffd700!important;box-shadow:0 0 30px rgba(255,205,0,.65),inset 0 0 20px rgba(255,205,0,.28)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
-    [data-theme="light"] .song-card.flash-accent{background:rgba(0,122,255,.28)!important;box-shadow:0 0 24px rgba(0,122,255,.5)!important;}
-    [data-theme="light"] .song-card.flash-first{background:rgba(255,40,40,.26)!important;box-shadow:0 0 24px rgba(255,40,40,.5)!important;}
+    .song-card.flash-tap{background:rgba(255,205,0,.52)!important;border-color:#ffd700!important;box-shadow:0 0 30px rgba(255,205,0,.65)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
+
     .thumb-section{width:100%;height:108px;position:relative;background:#0a0a0a;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
     [data-theme="light"] .thumb-section{background:#c8c8d0;}
     .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;}
     .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);}
+
+    /* ★ 드래그 핸들 1.5배 확대 */
     .drag-handle-zone{
       flex-shrink:0;display:flex;align-items:center;justify-content:center;
-      width:54px;height:100%;z-index:3;cursor:grab;touch-action:none;
+      width:72px; /* 기존 48px → 72px (1.5배) */
+      height:100%;z-index:3;cursor:grab;touch-action:none;
     }
     .drag-handle-zone:active{cursor:grabbing;}
-    .drag-handle-icon{color:rgba(255,255,255,.7);font-size:24px;user-select:none;pointer-events:none;}
+    .drag-handle-icon{color:rgba(255,255,255,.7);font-size:32px;user-select:none;pointer-events:none;} /* 24→32 */
     .drag-handle-zone:hover .drag-handle-icon{color:var(--accent);}
     [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.5);}
+
     .thumb-center{flex:1;min-width:0;display:flex;align-items:center;padding:0 6px;z-index:2;position:relative;}
     .thumb-actions{display:flex;gap:5px;z-index:4;padding-right:8px;flex-shrink:0;}
     .thumb-btn{background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1;}
@@ -100,18 +124,22 @@
     [data-theme="light"] .link-input-inline{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.2);color:#111;}
     .link-apply-btn{flex-shrink:0;background:var(--accent);color:#000;border:none;border-radius:7px;padding:5px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:inherit;}
     [data-theme="light"] .link-apply-btn{color:#fff;}
-    .info-section{padding:14px 14px 12px;cursor:default;user-select:none;}
-    .editable-title{font-size:1.2rem;font-weight:900;color:var(--accent);margin-bottom:12px;outline:none;border-radius:6px;padding:2px 4px;transition:background .2s;word-break:break-all;min-height:1.4em;}
+
+    .info-section{padding:12px 12px 10px;cursor:default;user-select:none;}
+    .editable-title{font-size:1.1rem;font-weight:900;color:var(--accent);margin-bottom:10px;outline:none;border-radius:6px;padding:2px 4px;transition:background .2s;word-break:break-all;min-height:1.4em;}
     .editable-title:focus{background:var(--seg-bg);}
-    .bpm-ctrl{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;}
+
+    .bpm-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
     .bpm-wrap{text-align:center;}
-    .bpm-val{font-size:3.4rem;font-weight:900;min-width:100px;text-align:center;outline:none;letter-spacing:-2px;line-height:1;border-radius:8px;padding:2px 4px;transition:background .2s;}
+    .bpm-val{font-size:3rem;font-weight:900;min-width:90px;text-align:center;outline:none;letter-spacing:-2px;line-height:1;border-radius:8px;padding:2px 4px;transition:background .2s;}
     .bpm-val:focus{background:var(--seg-bg);}
     .bpm-unit{font-size:10px;font-weight:800;color:var(--sub-text);letter-spacing:2px;margin-top:2px;}
-    .step-btn{width:48px;height:48px;border-radius:12px;border:none;background:var(--seg-bg);color:var(--text);font-size:24px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .1s;user-select:none;touch-action:none;}
+    .step-btn{width:44px;height:44px;border-radius:12px;border:none;background:var(--seg-bg);color:var(--text);font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .1s;user-select:none;touch-action:none;}
     .step-btn:hover{background:var(--seg-active);}
     .step-btn:active{transform:scale(.88);background:var(--accent);color:#000;}
-    .beat-visualizer{display:flex;width:100%;height:24px;gap:3px;margin-bottom:16px;}
+
+    /* 비주얼라이저 */
+    .beat-visualizer{display:flex;width:100%;height:26px;gap:3px;margin-bottom:14px;}
     .beat-block{flex:1;background:#484848;border-radius:5px;position:relative;overflow:hidden;cursor:pointer;transition:background .08s,box-shadow .08s;}
     [data-theme="light"] .beat-block{background:#b0b0b8;}
     .beat-block.state-accent{background:rgba(255,55,55,.22)!important;box-shadow:0 0 0 2.5px #ff3333 inset!important;}
@@ -119,60 +147,72 @@
     [data-theme="light"] .beat-block.state-off{background:#c0c0c8!important;opacity:.35;}
     .beat-block.state-off::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0px,rgba(255,255,255,.07) 2px,transparent 2px,transparent 6px);border-radius:5px;pointer-events:none;}
     .active-accent{background:var(--accent)!important;box-shadow:0 0 12px var(--accent)!important;}
-    .active-red{background:#ff3333!important;box-shadow:0 0 14px #ff3333!important;}
-    .sub-block{position:absolute;top:0;width:50%;height:100%;background:transparent;cursor:pointer;}
-    .sub-left{left:0;border-right:1px solid var(--card-bg);}
-    .sub-right{right:0;}
-    .sub-block.state-off{background:rgba(0,0,0,.52)!important;opacity:.42;}
+
+    .sub-slot{position:absolute;top:0;height:100%;cursor:pointer;transition:background .08s;}
+    .sub-slot:not(:first-child){border-left:1.5px solid var(--card-bg);}
+    .sub-slot.sub-off{background:rgba(0,0,0,.55)!important;opacity:.4;}
+    .sub-slot.sub-active-flash{background:var(--accent)!important;box-shadow:0 0 8px var(--accent)!important;}
+
     @keyframes redPulse{
-      0%  {box-shadow:0 0 0 2.5px #ff3333 inset,0 0 4px rgba(255,51,51,.4);}
-      50% {box-shadow:0 0 0 2.5px #ff5555 inset,0 0 14px rgba(255,51,51,.85),inset 0 0 8px rgba(255,80,80,.45);}
+      0%{box-shadow:0 0 0 2.5px #ff3333 inset,0 0 4px rgba(255,51,51,.4);}
+      50%{box-shadow:0 0 0 2.5px #ff5555 inset,0 0 14px rgba(255,51,51,.85),inset 0 0 8px rgba(255,80,80,.45);}
       100%{box-shadow:0 0 0 2.5px #ff3333 inset,0 0 4px rgba(255,51,51,.4);}
     }
-    .beat-block.state-accent.beat-active-flash{animation:redPulse .12s ease-out forwards;}
-    .setting-group{display:flex;flex-direction:column;gap:11px;margin-bottom:14px;}
+    .beat-active-red-pulse{animation:redPulse .14s ease-out forwards;}
+
+    /* 설정 */
+    .setting-group{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
     .setting-row{display:flex;justify-content:space-between;align-items:center;}
-    .setting-label{font-size:13px;font-weight:900;letter-spacing:.6px;color:var(--text);min-width:56px;text-transform:uppercase;}
-    .segmented-control{display:flex;background:var(--seg-bg);border-radius:10px;padding:3px;gap:2px;flex:1;margin-left:10px;}
-    .seg-btn{flex:1;border:none;background:transparent;color:var(--sub-text);padding:7px 0;border-radius:7px;cursor:pointer;font-size:12px;font-weight:800;font-family:inherit;transition:.2s;}
+    .setting-label{font-size:12px;font-weight:900;letter-spacing:.6px;color:var(--text);min-width:52px;text-transform:uppercase;flex-shrink:0;}
+
+    .segmented-control{display:flex;background:var(--seg-bg);border-radius:10px;padding:3px;gap:2px;flex:1;margin-left:8px;}
+    .seg-btn{
+      flex:1;border:none;background:transparent;color:var(--sub-text);
+      padding:7px 2px;border-radius:7px;cursor:pointer;
+      font-size:11px;font-weight:800;font-family:inherit;
+      transition:.2s;white-space:nowrap;
+      display:flex;align-items:center;justify-content:center;
+      line-height:1.1;min-height:36px;
+    }
     .seg-btn:hover:not(.active){color:var(--text);}
     .seg-btn.active{background:var(--seg-active);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.3);}
-    .switch{position:relative;display:inline-block;width:58px;height:32px;}
-    .switch input{opacity:0;width:0;height:0;}
-    .slider{position:absolute;cursor:pointer;inset:0;background:var(--seg-bg);border:1px solid var(--border);transition:.28s;border-radius:32px;}
-    .slider:before{position:absolute;content:"";height:24px;width:24px;left:3px;bottom:3px;background:white;transition:.28s cubic-bezier(.4,1.4,.6,1);border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3);}
-    input:checked+.slider{background:var(--accent);border-color:var(--accent);}
-    input:checked+.slider:before{transform:translateX(26px);}
-    .vol-container{display:flex;align-items:center;gap:8px;flex:1;margin-left:10px;}
+    .seg-btn svg{display:block;}
+
+    .vol-container{display:flex;align-items:center;gap:8px;flex:1;margin-left:8px;}
     .mute-btn{background:var(--seg-bg);border:1px solid var(--border);border-radius:8px;font-size:15px;cursor:pointer;color:var(--text);padding:4px 8px;transition:background .2s;}
     .mute-btn:hover{background:var(--seg-active);}
     .mute-btn.muted{background:rgba(255,69,58,.22);border-color:var(--danger);}
     input[type="range"]{flex:1;height:5px;cursor:pointer;accent-color:var(--accent);}
+
     .btn-group{display:flex;gap:8px;}
-    .btn{flex:1;padding:20px 8px;border-radius:14px;border:none;font-weight:900;font-size:1rem;cursor:pointer;font-family:inherit;letter-spacing:1.2px;text-transform:uppercase;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:opacity .1s,transform .08s,background .1s,box-shadow .1s;}
+    .btn{flex:1;padding:18px 8px;border-radius:14px;border:none;font-weight:900;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:1.2px;text-transform:uppercase;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:opacity .1s,transform .08s,background .1s,box-shadow .1s;}
     .btn:active{transform:scale(.93);}
     .btn-tap{background:var(--seg-bg);color:var(--text);border:1.5px solid var(--border);}
     .btn-tap:active{background:rgba(255,205,0,.6)!important;border-color:#ffd700!important;color:#000!important;}
     .btn-play{background:#1a7fff;color:#fff;}
     .btn-play:hover{opacity:.88;}
     .btn-play.active{background:var(--first-beat);box-shadow:0 0 16px rgba(255,51,51,.5);}
-    .setlist-panel{max-width:900px;margin:28px auto 0;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;}
+
+    .setlist-panel{max-width:1800px;margin:28px auto 0;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;}
     .setlist-panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:10px;}
     .setlist-output{width:100%;min-height:90px;max-height:220px;background:var(--input-bg);color:var(--text);padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:12px;font-family:'Malgun Gothic',monospace,sans-serif;resize:vertical;overflow-y:auto;line-height:1.8;margin-top:8px;}
     .setlist-output:focus{outline:none;border-color:var(--accent);}
     .empty-state{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--sub-text);}
     .empty-state-icon{font-size:2.8rem;margin-bottom:10px;opacity:.4;}
     .empty-state-text{font-size:13px;font-weight:700;opacity:.6;line-height:1.7;}
+
     @media(max-width:400px){
       h1{font-size:1.5rem;}
       .theme-switcher{position:static;margin:0 auto 12px;width:fit-content;}
-      .bpm-val{font-size:2.8rem;}
+      .bpm-val{font-size:2.4rem;}
+      .info-section{padding:10px 8px 8px;}
     }
   </style>
 </head>
 <body data-theme="dark">
+
 <header>
-  <h1>클릭 플래너 Pro</h1>
+  <h1>클릭 플래너</h1>
   <p class="subtitle">Live Worship Click Planner — AudioWorklet Edition</p>
   <div class="theme-switcher">
     <button class="theme-btn active" onclick="setTheme('dark',this)">Dark</button>
@@ -180,7 +220,7 @@
   </div>
   <div class="input-panel" style="margin-top:14px;">
     <div class="input-panel-title">📋 콘티 입력</div>
-    <textarea id="conti-input" placeholder="예시:&#10;1. 시선 https://youtu.be/xxxxxx&#10;2. 주의 이름 높이어&#10;3. 거룩 https://youtu.be/yyyyyy&#10;&#10;번호+제목 또는 번호+제목+링크 형식 후 [플래너 생성]"></textarea>
+    <textarea id="conti-input" placeholder="예시:&#10;1. 시선 https://youtu.be/xxxxxx&#10;2. 주의 이름 높이어&#10;3. 거룩 https://youtu.be/yyyyyy"></textarea>
     <div class="btn-row">
       <button class="btn-primary" onclick="analyzeConti()">🎼 플래너 생성</button>
       <button class="btn-secondary" onclick="addEmptyCard()">＋ Add Empty</button>
@@ -204,50 +244,52 @@
 <script>
 'use strict';
 
+/* ══════════════════════════════════════════════
+   AudioWorklet Processor
+══════════════════════════════════════════════ */
 const WORKLET_CODE = `
 class ClickProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
-    this._bpm=120; this._sub=false; this._sig=4;
-    this._running=false; this._beatIdx=0;
-    this._countdown=0; this._samplesPerBeat=0;
-    this.port.onmessage = (e)=>{
+    this._bpm=120; this._subDiv=1; this._sig=4;
+    this._running=false; this._slotIdx=0; this._countdown=0;
+    this._samplesPerBeat=0;
+    this.port.onmessage = (e) => {
       const d=e.data;
       if(d.type==='start'){
-        this._bpm=d.bpm; this._sub=d.sub; this._sig=d.sig;
-        this._running=true; this._beatIdx=0; this._countdown=0;
+        this._bpm=d.bpm; this._subDiv=d.subDiv; this._sig=d.sig;
+        this._running=true; this._slotIdx=0; this._countdown=0;
         this._updateSPB();
       } else if(d.type==='stop'){
-        this._running=false; this._beatIdx=0;
+        this._running=false; this._slotIdx=0;
       } else if(d.type==='bpm'){
         this._bpm=d.bpm; this._updateSPB();
         if(this._countdown>this._samplesPerBeat) this._countdown=this._samplesPerBeat;
-      } else if(d.type==='sub'){
-        this._sub=d.sub; this._updateSPB();
-        const total=this._sub?this._sig*2:this._sig;
-        this._beatIdx=this._beatIdx%total;
+      } else if(d.type==='subDiv'){
+        this._subDiv=d.subDiv; this._updateSPB();
+        const total=this._sig*this._subDiv;
+        this._slotIdx=this._slotIdx%total;
       } else if(d.type==='sig'){
-        this._sig=d.sig; this._beatIdx=0; this._updateSPB();
+        this._sig=d.sig; this._slotIdx=0; this._updateSPB();
       }
     };
   }
   _updateSPB(){
-    const bps=(this._bpm/60)*(this._sub?2:1);
+    const bps=(this._bpm/60)*this._subDiv;
     this._samplesPerBeat=Math.round(sampleRate/bps);
   }
-  process(inputs,outputs,parameters){
+  process(inputs,outputs){
     if(!this._running) return true;
-    const blockSize=(outputs[0][0]?outputs[0][0].length:128);
+    const bs=(outputs[0][0]?outputs[0][0].length:128);
     let i=0;
-    while(i<blockSize){
+    while(i<bs){
       if(this._countdown<=0){
-        const offsetSec=i/sampleRate;
-        this.port.postMessage({type:'beat',beatIdx:this._beatIdx,offsetSec});
-        const total=this._sub?this._sig*2:this._sig;
-        this._beatIdx=(this._beatIdx+1)%total;
+        this.port.postMessage({type:'beat',slotIdx:this._slotIdx,offsetSec:i/sampleRate});
+        const total=this._sig*this._subDiv;
+        this._slotIdx=(this._slotIdx+1)%total;
         this._countdown=this._samplesPerBeat;
       }
-      const step=Math.min(this._countdown,blockSize-i);
+      const step=Math.min(this._countdown,bs-i);
       this._countdown-=step; i+=step;
     }
     return true;
@@ -256,81 +298,180 @@ class ClickProcessor extends AudioWorkletProcessor {
 registerProcessor('click-processor',ClickProcessor);
 `;
 
-let audioCtx=null, workletReady=false;
+/* ══ 전역 ══ */
+let audioCtx=null;
+let workletReady=false;
 let metros={};
 let globalSongId=0;
 let dragSrcId=null;
 let tapTimesMap={};
 let bpmPressTimer=null;
 let bpmRapidInterval=null;
-let bpmLastTap={};
+let _touchDragId=null,_touchGhost=null,_touchOffX=0,_touchOffY=0;
 
-async function getAudioCtx(){
-  if(audioCtx){ if(audioCtx.state==='suspended') await audioCtx.resume(); return audioCtx; }
-  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  const blob=new Blob([WORKLET_CODE],{type:'application/javascript'});
-  const url=URL.createObjectURL(blob);
-  await audioCtx.audioWorklet.addModule(url);
-  URL.revokeObjectURL(url);
-  workletReady=true;
+/* ══════════════════════════════════════════════
+   SVG 음표 아이콘
+   크기: 버튼 내부에 깔끔하게 들어가도록 통일
+══════════════════════════════════════════════ */
+
+/* ♩ 4분음표 */
+function svgQuarter(active){
+  const c=active?'var(--text)':'var(--sub-text)';
+  return `<svg width="18" height="26" viewBox="0 0 18 26" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="7" cy="21" rx="6" ry="4" fill="${c}" transform="rotate(-18 7 21)"/>
+    <rect x="12.4" y="3" width="2.2" height="19" rx="1.1" fill="${c}"/>
+  </svg>`;
+}
+
+/* ♪ 8분음표 */
+function svgEighth(active){
+  const c=active?'var(--text)':'var(--sub-text)';
+  return `<svg width="22" height="26" viewBox="0 0 22 26" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="6" cy="21" rx="6" ry="4" fill="${c}" transform="rotate(-18 6 21)"/>
+    <rect x="11.4" y="3" width="2.2" height="19" rx="1.1" fill="${c}"/>
+    <path d="M13.6 3 C13.6 3 21 5.5 20 13 C18 9.5 13.6 9 13.6 9 Z" fill="${c}"/>
+  </svg>`;
+}
+
+/* ³ 셋잇단 — 8분음표 3개가 보(beam)로 연결, 위에 "3" */
+function svgTriplet(active){
+  const c=active?'var(--text)':'var(--sub-text)';
+  /* 음표 3개: x=3, 14, 25  머리 y=20, 기둥 위로 y=5 */
+  return `<svg width="44" height="30" viewBox="0 0 44 30" xmlns="http://www.w3.org/2000/svg">
+    <!-- 연결 보(beam) — 위 -->
+    <rect x="3" y="5" width="38" height="2.5" rx="1.25" fill="${c}"/>
+    <!-- 기둥 3개 -->
+    <rect x="3"  y="5" width="2" height="15" rx="1" fill="${c}"/>
+    <rect x="21" y="5" width="2" height="15" rx="1" fill="${c}"/>
+    <rect x="39" y="5" width="2" height="15" rx="1" fill="${c}"/>
+    <!-- 음표 머리 3개 -->
+    <ellipse cx="5"  cy="20" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 5 20)"/>
+    <ellipse cx="23" cy="20" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 23 20)"/>
+    <ellipse cx="41" cy="20" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 41 20)"/>
+    <!-- "3" 숫자 -->
+    <text x="22" y="4.5" text-anchor="middle" font-size="6" font-weight="900"
+          font-family="Georgia,serif" fill="${c}">3</text>
+  </svg>`;
+}
+
+/* 𝅘𝅥𝅯 16분음표 4개 연결 (보 2줄) */
+function svgSixteenth(active){
+  const c=active?'var(--text)':'var(--sub-text)';
+  /* 음표 4개: x=2,12,22,32 */
+  return `<svg width="46" height="30" viewBox="0 0 46 30" xmlns="http://www.w3.org/2000/svg">
+    <!-- 보 위 (첫번째) -->
+    <rect x="2"  y="4"   width="34" height="2.2" rx="1.1" fill="${c}"/>
+    <!-- 보 아래 (두번째) -->
+    <rect x="2"  y="8.5" width="34" height="2.2" rx="1.1" fill="${c}"/>
+    <!-- 기둥 4개 -->
+    <rect x="2"  y="4" width="2" height="16" rx="1" fill="${c}"/>
+    <rect x="13" y="4" width="2" height="16" rx="1" fill="${c}"/>
+    <rect x="24" y="4" width="2" height="16" rx="1" fill="${c}"/>
+    <rect x="34" y="4" width="2" height="16" rx="1" fill="${c}"/>
+    <!-- 음표 머리 4개 -->
+    <ellipse cx="4"  cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 4 21)"/>
+    <ellipse cx="15" cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 15 21)"/>
+    <ellipse cx="26" cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 26 21)"/>
+    <ellipse cx="36" cy="21" rx="4.5" ry="3" fill="${c}" transform="rotate(-15 36 21)"/>
+  </svg>`;
+}
+
+function getSubSvg(div, active){
+  if(div===1) return svgQuarter(active);
+  if(div===2) return svgEighth(active);
+  if(div===3) return svgTriplet(active);
+  if(div===4) return svgSixteenth(active);
+  return '';
+}
+
+/* ══ AudioContext & Worklet 초기화 ══ */
+async function ensureAudio(){
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  }
+  if(audioCtx.state==='suspended'){
+    await audioCtx.resume();
+  }
+  if(!workletReady){
+    const blob=new Blob([WORKLET_CODE],{type:'application/javascript'});
+    const url=URL.createObjectURL(blob);
+    await audioCtx.audioWorklet.addModule(url);
+    URL.revokeObjectURL(url);
+    workletReady=true;
+  }
   return audioCtx;
 }
 
+/* ══ 메트로놈 시작 ══ */
 async function startMetro(id){
-  const ctx=await getAudioCtx();
-  const m=metros[id];
-  const node=new AudioWorkletNode(ctx,'click-processor');
-  m.workletNode=node;
-  node.connect(ctx.destination);
-  node.port.onmessage=(e)=>{
-    if(e.data.type!=='beat') return;
-    if(!metros[id]||!metros[id].isPlaying) return;
-    const beatTime=ctx.currentTime+e.data.offsetSec+0.005;
-    handleBeat(id,e.data.beatIdx,beatTime);
-  };
-  node.port.postMessage({type:'start',bpm:m.bpm,sub:m.sub,sig:m.sig});
-  m.isPlaying=true; m.beatIdx=0;
-  const btn=document.getElementById('p-btn-'+id);
-  if(btn){btn.innerText='STOP';btn.classList.add('active');}
+  const m=metros[id]; if(!m) return;
+  try{
+    const ctx=await ensureAudio();
+    const node=new AudioWorkletNode(ctx,'click-processor');
+    node.connect(ctx.destination);
+    m.workletNode=node;
+
+    node.port.onmessage=(e)=>{
+      if(e.data.type!=='beat') return;
+      if(!metros[id]?.isPlaying) return;
+      const beatTime=ctx.currentTime+e.data.offsetSec+0.005;
+      handleBeat(id,e.data.slotIdx,beatTime);
+    };
+
+    node.port.postMessage({type:'start',bpm:m.bpm,subDiv:m.subDiv,sig:m.sig});
+    m.isPlaying=true;
+
+    const btn=document.getElementById('p-btn-'+id);
+    if(btn){btn.innerText='STOP';btn.classList.add('active');}
+  }catch(err){
+    console.error('startMetro error:',err);
+    alert('오디오 시작 실패: '+err.message);
+  }
 }
 
 function stopMetro(id){
   const m=metros[id]; if(!m) return;
   if(m.workletNode){
     m.workletNode.port.postMessage({type:'stop'});
-    m.workletNode.disconnect(); m.workletNode=null;
+    try{m.workletNode.disconnect();}catch(e){}
+    m.workletNode=null;
   }
-  m.isPlaying=false; m.beatIdx=0;
+  m.isPlaying=false;
   const btn=document.getElementById('p-btn-'+id);
   if(btn){btn.innerText='START';btn.classList.remove('active');}
   clearViz(id);
-  const card=document.getElementById('card-'+id);
-  if(card) card.classList.remove('flash-accent','flash-first');
+  document.getElementById('card-'+id)?.classList.remove('flash-accent','flash-first');
 }
 
 function toggleMetro(id){
-  const m=metros[id]; if(!m) return;
-  if(m.isPlaying) stopMetro(id); else startMetro(id);
+  if(metros[id]?.isPlaying) stopMetro(id); else startMetro(id);
 }
 
-function handleBeat(id,rawBeatIdx,beatTime){
-  const m=metros[id]; if(!m) return;
+/* ══ 박자 처리 ══ */
+function handleBeat(id,slotIdx,beatTime){
+  const m=metros[id]; if(!m||!audioCtx) return;
   const ctx=audioCtx;
-  const isMain=m.sub?(rawBeatIdx%2===0):true;
-  const qIdx=m.sub?Math.floor(rawBeatIdx/2):rawBeatIdx;
-  let isOff, isAccent;
-  if(m.sub){
-    const subSlot=isMain?0:1;
-    const ss=m.subStates[qIdx]?.[subSlot]??0;
-    isOff=(ss===1);
-    isAccent=false;
+  const div=m.subDiv;
+  const qIdx=Math.floor(slotIdx/div);
+  const sIdx=slotIdx%div;
+  const isMain=(sIdx===0);
+  const bs=m.blockStates[qIdx]??0;
+
+  let isOff=false, isAccent=false;
+  if(div===1){
+    isOff=(bs===2); isAccent=(bs===1);
   } else {
-    const blockState=m.blockStates[qIdx]??0;
-    isOff=(blockState===2);
-    isAccent=(blockState===1);
+    if(isMain){
+      isOff=(bs===2); isAccent=(bs===1);
+    } else {
+      const ss=m.subStates[qIdx]?.[sIdx]??0;
+      isOff=(ss===1); isAccent=false;
+    }
   }
-  const isHigh=isAccent;
-  if(!m.muted&&!isOff) playSound(m.sound,isHigh,isMain?m.vol:m.vol*0.32,beatTime);
+
+  const vol=isMain?m.vol:m.vol*0.38;
+  if(!m.muted&&!isOff) playSound(m.sound,isAccent,vol,beatTime);
+
   const delayMs=Math.max(0,(beatTime-ctx.currentTime)*1000);
   setTimeout(()=>{
     if(!metros[id]?.isPlaying) return;
@@ -345,145 +486,161 @@ function handleBeat(id,rawBeatIdx,beatTime){
     }
     clearViz(id);
     if(!isOff){
-      if(!m.sub){
+      if(div===1){
         const blk=document.getElementById('block-'+id+'-'+qIdx);
         if(blk){
           if(isAccent){
-            blk.classList.add('beat-active-flash');
-            setTimeout(()=>blk.classList.remove('beat-active-flash'),130);
+            blk.classList.add('beat-active-red-pulse');
+            setTimeout(()=>blk.classList.remove('beat-active-red-pulse'),140);
           } else {
             blk.classList.add('active-accent');
           }
         }
       } else {
-        const side=isMain?'L':'R';
-        document.getElementById('sub-'+id+'-'+qIdx+'-'+side)?.classList.add('active-accent');
+        const subEl=document.getElementById('sub-'+id+'-'+qIdx+'-'+sIdx);
+        if(subEl) subEl.classList.add('sub-active-flash');
       }
     }
   },delayMs);
 }
 
+/* ══ 소리 합성 ══ */
 function playSound(type,isHigh,vol,t){
-  const ctx=audioCtx; if(!ctx) return;
-  t=t||ctx.currentTime;
-  const gain=ctx.createGain(); gain.connect(ctx.destination);
+  if(!audioCtx) return;
+  t=t||audioCtx.currentTime;
+  const gain=audioCtx.createGain();
+  gain.connect(audioCtx.destination);
+
   if(type==='digital'){
-    const osc=ctx.createOscillator();
+    const osc=audioCtx.createOscillator();
     osc.type='square';
     osc.frequency.setValueAtTime(isHigh?1050:720,t);
     osc.connect(gain);
     gain.gain.setValueAtTime(vol*.5,t);
     gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
-    osc.start(t); osc.stop(t+.07);
+    osc.start(t);osc.stop(t+.07);
   } else if(type==='wood'){
-    const bufLen=Math.floor(ctx.sampleRate*.07);
-    const buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
+    const bufLen=Math.floor(audioCtx.sampleRate*.07);
+    const buf=audioCtx.createBuffer(1,bufLen,audioCtx.sampleRate);
     const data=buf.getChannelData(0);
     for(let k=0;k<bufLen;k++) data[k]=(Math.random()*2-1)*Math.exp(-k/(bufLen*.15));
-    const noise=ctx.createBufferSource(); noise.buffer=buf;
-    const bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=isHigh?1600:1100; bp.Q.value=18;
-    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=800;
-    const osc=ctx.createOscillator(); osc.type='triangle';
+    const noise=audioCtx.createBufferSource(); noise.buffer=buf;
+    const bp=audioCtx.createBiquadFilter();
+    bp.type='bandpass';bp.frequency.value=isHigh?1600:1100;bp.Q.value=18;
+    const hp=audioCtx.createBiquadFilter();
+    hp.type='highpass';hp.frequency.value=800;
+    const osc=audioCtx.createOscillator();osc.type='triangle';
     osc.frequency.setValueAtTime(isHigh?1400:950,t);
     osc.frequency.exponentialRampToValueAtTime(200,t+.025);
-    const og=ctx.createGain();
-    og.gain.setValueAtTime(vol*1.4,t); og.gain.exponentialRampToValueAtTime(0.001,t+.03);
-    noise.connect(bp); bp.connect(hp); hp.connect(gain);
-    osc.connect(og); og.connect(gain);
-    gain.gain.setValueAtTime(vol*2.5,t); gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
-    noise.start(t); noise.stop(t+.07); osc.start(t); osc.stop(t+.035);
+    const og=audioCtx.createGain();
+    og.gain.setValueAtTime(vol*1.4,t);
+    og.gain.exponentialRampToValueAtTime(0.001,t+.03);
+    noise.connect(bp);bp.connect(hp);hp.connect(gain);
+    osc.connect(og);og.connect(gain);
+    gain.gain.setValueAtTime(vol*2.5,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
+    noise.start(t);noise.stop(t+.07);
+    osc.start(t);osc.stop(t+.035);
   } else {
-    const osc=ctx.createOscillator(); osc.type='sine';
+    const osc=audioCtx.createOscillator();
+    osc.type='sine';
     osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
-    gain.gain.setValueAtTime(vol*1.1,t); gain.gain.exponentialRampToValueAtTime(0.001,t+.09);
-    osc.start(t); osc.stop(t+.1);
+    gain.gain.setValueAtTime(vol*1.1,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+.09);
+    osc.start(t);osc.stop(t+.1);
   }
 }
 
-function sendBpmToWorklet(id){
+/* ══ BPM 컨트롤 (더블탭 ±10 제거) ══ */
+function sendBpm(id){
   const m=metros[id];
   if(m?.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'bpm',bpm:m.bpm});
 }
 
-function onBpmPointerDown(id,delta,e){
-  e.stopPropagation();
-  const now=performance.now();
-  if(bpmLastTap[id]&&now-bpmLastTap[id]<400){
-    bpmLastTap[id]=0;
-    changeBpm(id,delta*10);
-    return;
-  }
-  bpmLastTap[id]=now;
+/* 단순 press & hold만 (더블탭 로직 제거) */
+function onBpmDown(id,delta,e){
+  e.stopPropagation();e.preventDefault();
   changeBpm(id,delta);
   bpmPressTimer=setTimeout(()=>{
     bpmRapidInterval=setInterval(()=>changeBpm(id,delta),60);
-  },700);
+  },600);
 }
-function onBpmPointerUp(){
-  clearTimeout(bpmPressTimer); bpmPressTimer=null;
-  clearInterval(bpmRapidInterval); bpmRapidInterval=null;
+function onBpmUp(){
+  clearTimeout(bpmPressTimer);bpmPressTimer=null;
+  clearInterval(bpmRapidInterval);bpmRapidInterval=null;
 }
 function changeBpm(id,delta){
   if(!metros[id]) return;
   metros[id].bpm=Math.max(20,Math.min(300,metros[id].bpm+delta));
-  const el=document.getElementById('bpm-'+id); if(el) el.innerText=metros[id].bpm;
-  sendBpmToWorklet(id);
+  const el=document.getElementById('bpm-'+id);
+  if(el) el.innerText=metros[id].bpm;
+  sendBpm(id);
 }
 function commitBpm(id,el){
   const v=parseInt(el.innerText.replace(/\D/g,''));
   metros[id].bpm=isNaN(v)?metros[id].bpm:Math.max(20,Math.min(300,v));
-  el.innerText=metros[id].bpm; sendBpmToWorklet(id);
+  el.innerText=metros[id].bpm;
+  sendBpm(id);
 }
 function liveUpdateBpm(id,el){
-  const raw=el.innerText.replace(/\D/g,''); if(!raw) return;
+  const raw=el.innerText.replace(/\D/g,'');if(!raw)return;
   const v=parseInt(raw);
-  if(!isNaN(v)&&v>=20&&v<=300){metros[id].bpm=v;sendBpmToWorklet(id);}
+  if(!isNaN(v)&&v>=20&&v<=300){metros[id].bpm=v;sendBpm(id);}
 }
 
+/* ══ TAP ══ */
 function tapTempo(id){
-  getAudioCtx();
+  // 오디오 컨텍스트 깨우기 (사용자 제스처)
+  ensureAudio().catch(()=>{});
+
   const card=document.getElementById('card-'+id);
-  card.classList.remove('flash-tap'); void card.offsetWidth;
+  card.classList.remove('flash-tap');void card.offsetWidth;
   card.classList.add('flash-tap');
   setTimeout(()=>card.classList.remove('flash-tap'),90);
+
   const now=performance.now();
   if(!tapTimesMap[id]) tapTimesMap[id]=[];
   const arr=tapTimesMap[id];
   if(arr.length&&now-arr[arr.length-1]>3000) arr.length=0;
-  arr.push(now); if(arr.length>8) arr.shift();
+  arr.push(now);if(arr.length>8)arr.shift();
   if(arr.length>=2){
     let sum=0;
     for(let i=1;i<arr.length;i++) sum+=arr[i]-arr[i-1];
     metros[id].bpm=Math.max(20,Math.min(300,Math.round(60000/(sum/(arr.length-1)))));
     document.getElementById('bpm-'+id).innerText=metros[id].bpm;
-    sendBpmToWorklet(id);
+    sendBpm(id);
   }
 }
 
+/* ══ 테마 ══ */
 function setTheme(t,btn){
   document.body.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  Object.keys(metros).forEach(id=>updateSubIcons(+id));
 }
 
+/* ══ 유튜브 ID ══ */
 function extractVid(url){
-  if(!url) return null;
+  if(!url)return null;
   const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
   return m?m[1]:null;
 }
 
+/* ══ 콘티 파싱 ══ */
 function analyzeConti(){
-  const text=document.getElementById('conti-input').value.trim(); if(!text) return;
-  Object.keys(metros).forEach(id=>{if(metros[id].isPlaying) stopMetro(+id);});
-  metros={}; tapTimesMap={}; globalSongId=0;
+  const text=document.getElementById('conti-input').value.trim();if(!text)return;
+  Object.keys(metros).forEach(id=>{if(metros[id].isPlaying)stopMetro(+id);});
+  metros={};tapTimesMap={};globalSongId=0;
   document.getElementById('workspace').innerHTML='';
   const urlRe=/(https?:\/\/[^\s]+)/gi;
   text.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{
-    const um=line.match(urlRe), rawUrl=um?um[0]:null;
+    const um=line.match(urlRe),rawUrl=um?um[0]:null;
     const vId=rawUrl?extractVid(rawUrl):null;
     const title=line.replace(urlRe,'').trim().replace(/\s+/g,' ').trim()||('Song '+(globalSongId+1));
-    globalSongId++; createCard(globalSongId,title,vId);
+    globalSongId++;
+    createCard(globalSongId,title,vId);
   });
   renderEmptyState();
 }
@@ -495,33 +652,33 @@ function renderEmptyState(){
     ws.innerHTML='<div class="empty-state"><div class="empty-state-icon">🎹</div><div class="empty-state-text">카드가 없습니다.<br>[+ Add Empty]로 카드를 추가하세요.</div></div>';
 }
 
+/* ══ 썸네일 ══ */
 function buildThumb(id,vId){
   metros[id].vId=vId||null;
-  const section=document.getElementById('thumb-'+id); if(!section) return;
+  const section=document.getElementById('thumb-'+id);if(!section)return;
   section.querySelectorAll('img,.thumb-overlay').forEach(el=>el.remove());
-  const center=section.querySelector('.thumb-center'); if(center) center.innerHTML='';
-  section.querySelector('.link-btn')?.remove();
+  const center=section.querySelector('.thumb-center');if(center)center.innerHTML='';
   if(vId){
     const img=document.createElement('img');
     const urls=['hqdefault','mqdefault','default'].map(q=>`https://img.youtube.com/vi/${vId}/${q}.jpg`);
-    let ti=0; img.src=urls[0]; img.alt=''; img.draggable=false;
-    img.onerror=function(){if(++ti<urls.length) this.src=urls[ti];};
+    let ti=0;img.src=urls[0];img.alt='';img.draggable=false;
+    img.onerror=function(){if(++ti<urls.length)this.src=urls[ti];};
     section.insertBefore(img,section.firstChild);
-    const ov=document.createElement('div'); ov.className='thumb-overlay';
+    const ov=document.createElement('div');ov.className='thumb-overlay';
     section.insertBefore(ov,section.querySelector('.drag-handle-zone'));
     if(center){
       const lb=document.createElement('button');
-      lb.className='thumb-btn link-btn'; lb.textContent='▶ Link';
+      lb.className='thumb-btn link-btn';lb.textContent='▶ Link';
       lb.onclick=e=>{e.stopPropagation();window.open('https://www.youtube.com/watch?v='+vId,'_blank');};
       lb.addEventListener('pointerdown',e=>e.stopPropagation());
       center.appendChild(lb);
     }
   } else {
     if(center){
-      const wrap=document.createElement('div'); wrap.className='no-thumb-content';
+      const wrap=document.createElement('div');wrap.className='no-thumb-content';
       wrap.innerHTML=`<span class="no-thumb-label">No Link</span><input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크 붙여넣기..."><button class="link-apply-btn">적용</button>`;
       wrap.querySelector('input').addEventListener('pointerdown',e=>e.stopPropagation());
-      wrap.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter') applyLink(id); e.stopPropagation();});
+      wrap.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter')applyLink(id);e.stopPropagation();});
       wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
       wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
       center.appendChild(wrap);
@@ -529,25 +686,33 @@ function buildThumb(id,vId){
   }
 }
 function applyLink(id){
-  const inp=document.getElementById('linkinput-'+id); if(!inp) return;
+  const inp=document.getElementById('linkinput-'+id);if(!inp)return;
   const vId=extractVid(inp.value.trim());
   if(!vId){inp.style.borderColor='#ff453a';setTimeout(()=>inp.style.borderColor='',1800);return;}
   buildThumb(id,vId);
 }
 
-function initBlockStates(id){
+/* ══ 상태 초기화 ══ */
+function initStates(id){
   const m=metros[id];
   m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
-  m.subStates=Array.from({length:m.sig},()=>[0,0]);
+  m.subStates=Array.from({length:m.sig},()=>new Array(4).fill(0));
 }
 
+/* ══ 카드 생성 ══ */
 function createCard(id,title,vId){
   removeEmptyState();
-  metros[id]={isPlaying:false,bpm:120,sig:4,sub:false,vol:.6,muted:false,sound:'digital',beatIdx:0,workletNode:null,vId:vId||null};
-  initBlockStates(id);
+  metros[id]={
+    isPlaying:false,bpm:120,sig:4,subDiv:1,
+    vol:.6,muted:false,sound:'digital',
+    workletNode:null,vId:vId||null,
+    blockStates:[],subStates:[]
+  };
+  initStates(id);
+
   const ws=document.getElementById('workspace');
   const card=document.createElement('div');
-  card.className='song-card'; card.id='card-'+id;
+  card.className='song-card';card.id='card-'+id;
   card.innerHTML=`
     <div class="thumb-section" id="thumb-${id}">
       <div class="drag-handle-zone" id="handle-${id}"><span class="drag-handle-icon">⠿</span></div>
@@ -570,6 +735,15 @@ function createCard(id,title,vId){
       <div class="beat-visualizer" id="viz-${id}"></div>
       <div class="setting-group">
         <div class="setting-row">
+          <span class="setting-label">Sub</span>
+          <div class="segmented-control" id="sub-seg-${id}">
+            <button class="seg-btn active" data-div="1" title="4분음표"></button>
+            <button class="seg-btn" data-div="2" title="8분음표"></button>
+            <button class="seg-btn" data-div="3" title="셋잇단"></button>
+            <button class="seg-btn" data-div="4" title="16분음표"></button>
+          </div>
+        </div>
+        <div class="setting-row">
           <span class="setting-label">Meter</span>
           <div class="segmented-control" id="beat-seg-${id}">
             <button class="seg-btn" data-beat="1">1/1</button>
@@ -577,10 +751,6 @@ function createCard(id,title,vId){
             <button class="seg-btn active" data-beat="4">4/4</button>
             <button class="seg-btn" data-beat="6">6/8</button>
           </div>
-        </div>
-        <div class="setting-row">
-          <span class="setting-label">Sub</span>
-          <label class="switch"><input type="checkbox" id="sub-chk-${id}"><span class="slider"></span></label>
         </div>
         <div class="setting-row">
           <span class="setting-label">Sound</span>
@@ -603,68 +773,99 @@ function createCard(id,title,vId){
         <button class="btn btn-play" id="p-btn-${id}">START</button>
       </div>
     </div>`;
+
   ws.appendChild(card);
   buildThumb(id,vId);
+  updateSubIcons(id);
   renderViz(id);
-  bindCardEvents(card,id);
+  bindEvents(card,id);
 }
 
-function bindCardEvents(card,id){
-  card.querySelector('.del-btn') .addEventListener('click',e=>{e.stopPropagation();deleteCard(id);});
-  card.querySelector('.copy-btn').addEventListener('click',e=>{e.stopPropagation();duplicateCard(id);});
-  const minus=card.querySelector('#bpm-minus-'+id);
-  const plus =card.querySelector('#bpm-plus-'+id);
-  minus.addEventListener('pointerdown',e=>onBpmPointerDown(id,-1,e));
-  plus .addEventListener('pointerdown',e=>onBpmPointerDown(id,+1,e));
-  ['pointerup','pointercancel','pointerleave'].forEach(ev=>{
-    minus.addEventListener(ev,onBpmPointerUp);
-    plus .addEventListener(ev,onBpmPointerUp);
+/* ══ Sub SVG 아이콘 주입 ══ */
+function updateSubIcons(id){
+  const seg=document.getElementById('sub-seg-'+id);if(!seg)return;
+  const m=metros[id];if(!m)return;
+  seg.querySelectorAll('.seg-btn').forEach(btn=>{
+    const div=+btn.dataset.div;
+    btn.innerHTML=getSubSvg(div,div===m.subDiv);
   });
+}
+
+/* ══ 이벤트 바인딩 ══ */
+function bindEvents(card,id){
+  card.querySelector('.del-btn').addEventListener('click',e=>{e.stopPropagation();deleteCard(id);});
+  card.querySelector('.copy-btn').addEventListener('click',e=>{e.stopPropagation();duplicateCard(id);});
+
+  const minus=card.querySelector('#bpm-minus-'+id);
+  const plus=card.querySelector('#bpm-plus-'+id);
+  minus.addEventListener('pointerdown',e=>onBpmDown(id,-1,e));
+  plus.addEventListener('pointerdown',e=>onBpmDown(id,+1,e));
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>{
+    minus.addEventListener(ev,onBpmUp);
+    plus.addEventListener(ev,onBpmUp);
+  });
+
   const bpmEl=card.querySelector('#bpm-'+id);
   bpmEl.addEventListener('blur',()=>commitBpm(id,bpmEl));
   bpmEl.addEventListener('input',()=>liveUpdateBpm(id,bpmEl));
   bpmEl.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();bpmEl.blur();}e.stopPropagation();});
   bpmEl.addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('#beat-seg-'+id).addEventListener('click',e=>{const b=e.target.closest('.seg-btn');if(b) setBeat(id,+b.dataset.beat,b);});
-  card.querySelector('#sub-chk-'+id).addEventListener('change',e=>toggleSub(id,e.target.checked));
-  card.querySelector('#sound-seg-'+id).addEventListener('click',e=>{const b=e.target.closest('.seg-btn');if(b) setSound(id,b.dataset.sound,b);});
+
+  card.querySelector('#sub-seg-'+id).addEventListener('click',e=>{
+    const b=e.target.closest('.seg-btn');if(!b)return;
+    setSubDiv(id,+b.dataset.div);
+  });
+  card.querySelector('#beat-seg-'+id).addEventListener('click',e=>{
+    const b=e.target.closest('.seg-btn');if(!b)return;
+    setBeat(id,+b.dataset.beat,b);
+  });
+  card.querySelector('#sound-seg-'+id).addEventListener('click',e=>{
+    const b=e.target.closest('.seg-btn');if(!b)return;
+    setSound(id,b.dataset.sound,b);
+  });
+
   card.querySelector('#vol-'+id).addEventListener('input',e=>{metros[id].vol=+e.target.value;});
   card.querySelector('#mute-'+id).addEventListener('click',()=>toggleMute(id));
-  card.querySelector('#tap-btn-'+id).addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();tapTempo(id);});
-  card.querySelector('#p-btn-'+id).addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();toggleMetro(id);});
-  card.querySelector('.info-section')      .addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('#thumb-center-'+id)  .addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('.thumb-actions')     .addEventListener('pointerdown',e=>e.stopPropagation());
+
+  card.querySelector('#tap-btn-'+id).addEventListener('pointerdown',e=>{
+    e.preventDefault();e.stopPropagation();tapTempo(id);
+  });
+  card.querySelector('#p-btn-'+id).addEventListener('pointerdown',e=>{
+    e.preventDefault();e.stopPropagation();toggleMetro(id);
+  });
+
+  card.querySelector('.info-section').addEventListener('pointerdown',e=>e.stopPropagation());
+  card.querySelector('#thumb-center-'+id).addEventListener('pointerdown',e=>e.stopPropagation());
+  card.querySelector('.thumb-actions').addEventListener('pointerdown',e=>e.stopPropagation());
+
   initDrag(card,id);
 }
 
+/* ══ 삭제 / 복제 ══ */
 function deleteCard(id){
-  if(metros[id]?.isPlaying) stopMetro(id);
-  delete metros[id]; delete tapTimesMap[id];
-  const el=document.getElementById('card-'+id); if(!el) return;
+  if(metros[id]?.isPlaying)stopMetro(id);
+  delete metros[id];delete tapTimesMap[id];
+  const el=document.getElementById('card-'+id);if(!el)return;
   el.style.cssText+='transition:opacity .18s,transform .18s;opacity:0;transform:scale(.92);';
   setTimeout(()=>{el.remove();renderEmptyState();},200);
 }
 function duplicateCard(srcId){
-  const m=metros[srcId]; if(!m) return;
-  globalSongId++; const nid=globalSongId;
-  createCard(nid,(document.getElementById('title-'+srcId).innerText.trim()||'Song')+' (copy)',m.vId||null);
+  const m=metros[srcId];if(!m)return;
+  globalSongId++;const nid=globalSongId;
+  createCard(nid,(document.getElementById('title-'+srcId)?.innerText.trim()||'Song')+' (copy)',m.vId||null);
   const nm=metros[nid];
-  Object.assign(nm,{bpm:m.bpm,sig:m.sig,sub:m.sub,vol:m.vol,sound:m.sound});
+  Object.assign(nm,{bpm:m.bpm,sig:m.sig,subDiv:m.subDiv,vol:m.vol,sound:m.sound});
   nm.blockStates=[...m.blockStates];
   nm.subStates=m.subStates.map(s=>[...s]);
   document.getElementById('bpm-'+nid).innerText=nm.bpm;
   document.getElementById('beat-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===nm.sig));
-  const sc=document.getElementById('sub-chk-'+nid); if(sc) sc.checked=nm.sub;
   document.getElementById('sound-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.sound===nm.sound));
-  const vr=document.getElementById('vol-'+nid); if(vr) vr.value=nm.vol;
+  document.getElementById('vol-'+nid).value=nm.vol;
+  updateSubIcons(nid);
   renderViz(nid);
 }
 
-let _touchDragId=null;
-let _touchGhost=null;
-let _touchOffX=0,_touchOffY=0;
-
+/* ══ DRAG & DROP ══ */
 function initDrag(card,id){
   const handle=document.getElementById('handle-'+id);
 
@@ -674,123 +875,110 @@ function initDrag(card,id){
   });
   card.addEventListener('dragstart',e=>{
     if(card.getAttribute('draggable')!=='true'){e.preventDefault();return;}
-    dragSrcId=id; card.classList.add('dragging');
+    dragSrcId=id;card.classList.add('dragging');
     e.dataTransfer.effectAllowed='move';
-    activateDragDim(id);
+    activateDim(id);
   });
   card.addEventListener('dragend',()=>{
     card.setAttribute('draggable','false');
     card.classList.remove('dragging');
-    deactivateDragDim();
+    deactivateDim();
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
   });
-  card.addEventListener('dragover',e=>{
-    e.preventDefault();
-    if(+card.id.replace('card-','')!==dragSrcId) card.classList.add('drag-over');
-  });
+  card.addEventListener('dragover',e=>{e.preventDefault();if(+card.id.replace('card-','')!==dragSrcId)card.classList.add('drag-over');});
   card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
   card.addEventListener('drop',e=>{
-    e.preventDefault(); card.classList.remove('drag-over');
+    e.preventDefault();card.classList.remove('drag-over');
     const tgt=+card.id.replace('card-','');
-    if(dragSrcId==null||dragSrcId===tgt) return;
-    reorderCards(dragSrcId,tgt);
-    dragSrcId=null;
+    if(dragSrcId==null||dragSrcId===tgt)return;
+    reorder(dragSrcId,tgt);dragSrcId=null;
   });
 
+  // 터치
   handle.addEventListener('touchstart',e=>{
     e.stopPropagation();
-    if(_touchDragId!=null) return;
+    if(_touchDragId!=null)return;
     _touchDragId=id;
     const t=e.touches[0];
     const rect=card.getBoundingClientRect();
-    _touchOffX=t.clientX-rect.left;
-    _touchOffY=t.clientY-rect.top;
+    _touchOffX=t.clientX-rect.left;_touchOffY=t.clientY-rect.top;
     _touchGhost=card.cloneNode(true);
     _touchGhost.id='touch-ghost';
-    _touchGhost.style.cssText=`
-      position:fixed;pointer-events:none;z-index:9999;
-      width:${rect.width}px;
-      left:${rect.left}px;top:${rect.top}px;
-      opacity:.78;transform:scale(1.04) rotate(1.5deg);
-      border:2px solid var(--accent);box-shadow:0 12px 40px rgba(0,0,0,.6);
-      border-radius:18px;overflow:hidden;transition:none;
-    `;
+    _touchGhost.style.cssText=`position:fixed;pointer-events:none;z-index:9999;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;opacity:.78;transform:scale(1.04) rotate(1.5deg);border:2px solid var(--accent);box-shadow:0 12px 40px rgba(0,0,0,.6);border-radius:18px;overflow:hidden;transition:none;`;
     document.body.appendChild(_touchGhost);
     card.classList.add('dragging');
-    activateDragDim(id);
+    activateDim(id);
   },{passive:true});
 
   handle.addEventListener('touchmove',e=>{
-    if(_touchDragId!==id||!_touchGhost) return;
+    if(_touchDragId!==id||!_touchGhost)return;
     e.preventDefault();
     const t=e.touches[0];
     _touchGhost.style.left=(t.clientX-_touchOffX)+'px';
-    _touchGhost.style.top =(t.clientY-_touchOffY)+'px';
+    _touchGhost.style.top=(t.clientY-_touchOffY)+'px';
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
-    if(overCard&&overCard.id!=='card-'+id) overCard.classList.add('drag-over');
+    if(overCard&&overCard.id!=='card-'+id)overCard.classList.add('drag-over');
   },{passive:false});
 
   handle.addEventListener('touchend',e=>{
-    if(_touchDragId!==id) return;
+    if(_touchDragId!==id)return;
     e.stopPropagation();
     const t=e.changedTouches[0];
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
-    if(overCard&&overCard.id!=='card-'+id){
-      const tgt=+overCard.id.replace('card-','');
-      reorderCards(id,tgt);
-    }
-    _touchGhost?.remove(); _touchGhost=null;
-    _touchDragId=null;
+    if(overCard&&overCard.id!=='card-'+id)reorder(id,+overCard.id.replace('card-',''));
+    _touchGhost?.remove();_touchGhost=null;_touchDragId=null;
     document.getElementById('card-'+id)?.classList.remove('dragging');
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
-    deactivateDragDim();
+    deactivateDim();
   },{passive:true});
 }
 
-function reorderCards(srcId,tgtId){
+function reorder(srcId,tgtId){
   const ws=document.getElementById('workspace');
   const sc=document.getElementById('card-'+srcId);
   const tc=document.getElementById('card-'+tgtId);
-  if(!sc||!tc) return;
+  if(!sc||!tc)return;
   const all=[...ws.querySelectorAll('.song-card')];
   ws.insertBefore(sc,all.indexOf(sc)<all.indexOf(tc)?tc.nextSibling:tc);
 }
-function activateDragDim(srcId){
-  document.querySelectorAll('.song-card').forEach(c=>{
-    if(c.id!=='card-'+srcId) c.classList.add('drag-dim');
-  });
+function activateDim(srcId){
+  document.querySelectorAll('.song-card').forEach(c=>{if(c.id!=='card-'+srcId)c.classList.add('drag-dim');});
 }
-function deactivateDragDim(){
+function deactivateDim(){
   document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-dim'));
 }
 
+/* ══ 설정 ══ */
 function setBeat(id,val,btnEl){
-  const m=metros[id]; m.sig=val; m.beatIdx=0;
-  initBlockStates(id);
+  const m=metros[id];
+  m.sig=val;
+  initStates(id);
   document.getElementById('beat-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
-  btnEl.classList.add('active'); renderViz(id);
-  if(m.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'sig',sig:val});
+  btnEl.classList.add('active');
+  renderViz(id);
+  if(m.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'sig',sig:val});
 }
+
+function setSubDiv(id,div){
+  const m=metros[id];if(!m)return;
+  m.subDiv=div;
+  m.subStates=Array.from({length:m.sig},()=>new Array(4).fill(0));
+  document.getElementById('sub-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sub-seg-'+id).querySelector(`[data-div="${div}"]`)?.classList.add('active');
+  updateSubIcons(id);
+  renderViz(id);
+  if(m.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'subDiv',subDiv:div});
+}
+
 function setSound(id,val,btnEl){
   metros[id].sound=val;
   document.getElementById('sound-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   btnEl.classList.add('active');
 }
-function toggleSub(id,checked){
-  const m=metros[id]; m.sub=checked;
-  if(checked){
-    for(let i=0;i<m.sig;i++){
-      const bs=m.blockStates[i];
-      m.subStates[i][0]=(bs===2)?1:0;
-      m.subStates[i][1]=0;
-    }
-  }
-  renderViz(id);
-  if(m.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'sub',sub:checked});
-}
+
 function toggleMute(id){
   metros[id].muted=!metros[id].muted;
   const btn=document.getElementById('mute-'+id);
@@ -798,58 +986,63 @@ function toggleMute(id){
   btn.innerText=metros[id].muted?'🔇':'🔊';
 }
 
-function getBlockStateClass(st){ return st===1?'state-accent':st===2?'state-off':''; }
-
+/* ══ 비주얼라이저 ══ */
 function renderViz(id){
   const m=metros[id];
-  const viz=document.getElementById('viz-'+id); if(!viz) return;
+  const viz=document.getElementById('viz-'+id);if(!viz)return;
   viz.innerHTML='';
   for(let i=0;i<m.sig;i++){
     const b=document.createElement('div');
-    const stC=getBlockStateClass(m.blockStates[i]);
-    b.className='beat-block'+(stC?' '+stC:'');
-    b.id='block-'+id+'-'+i;
-    if(m.sub){
-      for(let s=0;s<2;s++){
-        const ss=m.subStates[i][s];
+    const bs=m.blockStates[i]??0;
+    let cls='beat-block';
+    if(bs===1)cls+=' state-accent';
+    else if(bs===2)cls+=' state-off';
+    b.className=cls;b.id='block-'+id+'-'+i;
+
+    if(m.subDiv>1){
+      for(let s=0;s<m.subDiv;s++){
+        const ss=m.subStates[i]?.[s]??0;
         const el=document.createElement('div');
-        el.className='sub-block '+(s===0?'sub-left':'sub-right');
-        el.id='sub-'+id+'-'+i+'-'+(s===0?'L':'R');
-        if(ss===1) el.classList.add('state-off');
-        const si=s;
-        el.addEventListener('click',e=>{e.stopPropagation();cycleSubState(id,i,si);});
+        el.className='sub-slot'+(ss===1?' sub-off':'');
+        el.id='sub-'+id+'-'+i+'-'+s;
+        el.style.left=(s/m.subDiv*100)+'%';
+        el.style.width=(100/m.subDiv)+'%';
+        const _s=s;
+        el.addEventListener('click',e=>{e.stopPropagation();cycleSubState(id,i,_s);});
         b.appendChild(el);
       }
-    } else {
-      b.addEventListener('click',()=>cycleBlockState(id,i));
     }
+    b.addEventListener('click',e=>{if(e.target===b)cycleBlockState(id,i);});
     viz.appendChild(b);
   }
 }
+
 function cycleBlockState(id,i){
   metros[id].blockStates[i]=(metros[id].blockStates[i]+1)%3;
-  const b=document.getElementById('block-'+id+'-'+i); if(!b) return;
-  b.className='beat-block';
-  const stC=getBlockStateClass(metros[id].blockStates[i]);
-  if(stC) b.classList.add(stC);
+  renderViz(id);
 }
-function cycleSubState(id,i,side){
-  metros[id].subStates[i][side]=(metros[id].subStates[i][side]+1)%2;
+function cycleSubState(id,i,s){
+  metros[id].subStates[i][s]=(metros[id].subStates[i][s]+1)%2;
   renderViz(id);
 }
 function clearViz(id){
-  document.querySelectorAll('#viz-'+id+' .beat-block').forEach(b=>b.classList.remove('active-accent','active-red','beat-active-flash'));
-  document.querySelectorAll('#viz-'+id+' .sub-block') .forEach(b=>b.classList.remove('active-accent','active-red'));
+  document.querySelectorAll('#viz-'+id+' .beat-block').forEach(b=>
+    b.classList.remove('active-accent','beat-active-red-pulse'));
+  document.querySelectorAll('#viz-'+id+' .sub-slot').forEach(b=>
+    b.classList.remove('sub-active-flash'));
 }
 
+/* ══ 세트리스트 ══ */
 function extractSetlist(){
   const cards=document.getElementById('workspace').querySelectorAll('.song-card');
   if(!cards.length){document.getElementById('setlist-output').value='카드가 없습니다.';return;}
   const bl={1:'1/1',3:'3/4',4:'4/4',6:'6/8'};
+  const sl={1:'4분음표',2:'8분음표',3:'셋잇단',4:'16분음표'};
   document.getElementById('setlist-output').value=[...cards].map(c=>{
-    const id=+c.id.replace('card-',''); const m=metros[id]; if(!m) return '';
-    return (document.getElementById('title-'+id)?.innerText||'제목없음').trim()+
-      '  —  BPM: '+m.bpm+' | 박자: '+(bl[m.sig]||'4/4')+(m.sub?' (8분음표)':'');
+    const id=+c.id.replace('card-','');const m=metros[id];if(!m)return'';
+    return(document.getElementById('title-'+id)?.innerText||'제목없음').trim()+
+      '  —  BPM: '+m.bpm+' | 박자: '+(bl[m.sig]||'4/4')+
+      (m.subDiv>1?' ('+sl[m.subDiv]+')':'');
   }).filter(Boolean).join('\n');
 }
 
