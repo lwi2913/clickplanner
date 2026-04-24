@@ -11,6 +11,7 @@
       --text:#ffffff; --sub-text:#bbbbbb; --border:#484848;
       --seg-bg:#303030; --seg-active:#555;
       --danger:#ff453a; --success:#30d158;
+      --card-w:320px;
     }
     [data-theme="light"] {
       --bg:#f2f2f7; --card-bg:#fff; --input-bg:#fff;
@@ -32,32 +33,41 @@
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
     /* ══ 헤더 ══ */
-    header{text-align:center;margin-bottom:24px;position:relative;max-width:1800px;margin-left:auto;margin-right:auto;}
+    header{
+      text-align:center;margin-bottom:24px;position:relative;
+      max-width:var(--panel-maxw, 680px);
+      margin-left:auto;margin-right:auto;
+    }
     h1{color:var(--accent);font-size:2rem;font-weight:900;margin-bottom:4px;}
     .subtitle{color:var(--sub-text);font-size:12px;margin-bottom:16px;}
-    .theme-switcher{position:absolute;top:0;right:0;background:var(--seg-bg);padding:4px;border-radius:10px;display:flex;gap:3px;}
+    .theme-switcher{
+      position:absolute;top:0;right:0;
+      background:var(--seg-bg);padding:4px;border-radius:10px;display:flex;gap:3px;
+    }
     .theme-btn{border:none;background:transparent;color:var(--sub-text);padding:5px 10px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:800;font-family:inherit;transition:.2s;}
     .theme-btn.active{background:var(--card-bg);color:var(--accent);}
 
-    /* ══ 입력 패널 ══ */
-    .input-panel{
+    /* ══ 입력 패널 / 세트리스트 패널 공통 ══ */
+    .top-panel{
       background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
-      padding:16px;margin-bottom:20px;
-      max-width:1800px;margin-left:auto;margin-right:auto;
+      padding:16px;
+      /* JS로 max-width 설정 */
+      max-width:var(--panel-maxw, 680px);
+      width:100%;
+      margin:0 auto 20px;
     }
-    .input-panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:8px;}
+    .panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:8px;}
+
     textarea{
       width:100%;min-height:72px;
-      /* 최대 높이: 카드 2개 (JS에서 업데이트) */
-      max-height:var(--ta-max,360px);
-      /* 최대 너비: 카드 2개 너비 (JS에서 업데이트) */
-      max-width:var(--ta-maxw,100%);
+      max-height:360px;
       background:var(--input-bg);color:var(--text);
       padding:10px 12px;border-radius:10px;border:1px solid var(--border);
       font-size:13px;font-family:inherit;resize:vertical;overflow-y:auto;line-height:1.6;
     }
     textarea:focus{outline:none;border-color:var(--accent);}
     textarea::placeholder{color:var(--sub-text);}
+
     .btn-row{display:flex;gap:8px;margin-top:10px;}
     .btn-primary{flex:2;background:var(--accent);color:#000;font-weight:900;font-size:14px;padding:11px;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s,transform .1s;font-family:inherit;}
     .btn-primary:hover{opacity:.85;}
@@ -66,7 +76,7 @@
     .btn-secondary{flex:1;background:transparent;border:2px dashed var(--border);color:var(--sub-text);font-weight:800;border-radius:10px;cursor:pointer;transition:.2s;font-family:inherit;font-size:13px;}
     .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
 
-    /* ══ 워크스페이스 그리드 ══ */
+    /* ══ 워크스페이스 ══ */
     .workspace{
       display:grid;gap:16px;justify-content:center;
       max-width:1800px;margin:0 auto;
@@ -90,11 +100,20 @@
     [data-theme="light"] .thumb-section{background:#c8c8d0;}
     .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;}
     .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);}
-    .drag-handle-zone{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:72px;height:100%;z-index:3;cursor:grab;touch-action:none;}
+
+    /* ★ 드래그 핸들: cursor grab 명확히 */
+    .drag-handle-zone{
+      flex-shrink:0;display:flex;align-items:center;justify-content:center;
+      width:52px;height:100%;z-index:10;
+      cursor:grab;
+      user-select:none;-webkit-user-select:none;
+      touch-action:none;
+    }
     .drag-handle-zone:active{cursor:grabbing;}
-    .drag-handle-icon{color:rgba(255,255,255,.7);font-size:32px;user-select:none;pointer-events:none;}
+    .drag-handle-icon{color:rgba(255,255,255,.75);font-size:28px;user-select:none;pointer-events:none;line-height:1;}
     .drag-handle-zone:hover .drag-handle-icon{color:var(--accent);}
-    [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.5);}
+    [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.55);}
+
     .thumb-center{flex:1;min-width:0;display:flex;align-items:center;padding:0 6px;z-index:2;position:relative;}
     .thumb-actions{display:flex;gap:5px;z-index:4;padding-right:8px;flex-shrink:0;}
     .thumb-btn{background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1;}
@@ -112,8 +131,8 @@
     [data-theme="light"] .link-apply-btn{color:#fff;}
 
     /* ══ 카드 정보 ══ */
-    .info-section{padding:12px 12px 10px;cursor:default;user-select:none;}
-    .editable-title{font-size:1.1rem;font-weight:900;color:var(--accent);margin-bottom:10px;outline:none;border-radius:6px;padding:2px 4px;transition:background .2s;word-break:break-all;min-height:1.4em;}
+    .info-section{padding:12px 12px 10px;}
+    .editable-title{font-size:1.05rem;font-weight:900;color:var(--accent);margin-bottom:10px;outline:none;border-radius:6px;padding:2px 4px;transition:background .2s;word-break:break-all;min-height:1.4em;}
     .editable-title:focus{background:var(--seg-bg);}
     .bpm-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
     .bpm-wrap{text-align:center;}
@@ -127,100 +146,44 @@
     /* ══ 비주얼라이저 ══ */
     .beat-visualizer{display:flex;width:100%;height:28px;gap:3px;margin-bottom:14px;}
 
-    /* 블럭 기본 상태: 회색빛 (존재감 있는 기본) */
     .beat-block{
-      flex:1;border-radius:6px;position:relative;overflow:hidden;
-      cursor:pointer;
-      /* 기본(normal): 연한 회색 테두리, 반투명 회색 배경 */
+      flex:1;border-radius:6px;position:relative;overflow:hidden;cursor:pointer;
       background:rgba(120,120,130,.18);
       box-shadow:0 0 0 1.5px rgba(160,160,170,.35) inset;
-      transition:background .12s, box-shadow .12s;
+      transition:background .12s,box-shadow .12s;
     }
     [data-theme="light"] .beat-block{
       background:rgba(100,100,110,.12);
       box-shadow:0 0 0 1.5px rgba(100,100,110,.3) inset;
     }
-
-    /* 강조(accent): 빨간 테두리만 추가 */
     .beat-block.state-accent{
       background:rgba(255,55,55,.10)!important;
       box-shadow:0 0 0 2.5px #ff3333 inset!important;
     }
-
-    /* 비활성(off): 빗금 + 연한 테두리 */
     .beat-block.state-off{
       background:transparent!important;
       box-shadow:0 0 0 1.5px rgba(130,130,140,.3) inset!important;
     }
     .beat-block.state-off::after{
       content:'';position:absolute;inset:0;border-radius:6px;pointer-events:none;
-      background:repeating-linear-gradient(
-        45deg,
-        rgba(140,140,150,.18) 0px,
-        rgba(140,140,150,.18) 1.5px,
-        transparent 1.5px,
-        transparent 7px
-      );
+      background:repeating-linear-gradient(45deg,rgba(140,140,150,.18) 0px,rgba(140,140,150,.18) 1.5px,transparent 1.5px,transparent 7px);
     }
     [data-theme="light"] .beat-block.state-off::after{
-      background:repeating-linear-gradient(
-        45deg,
-        rgba(80,80,90,.15) 0px,
-        rgba(80,80,90,.15) 1.5px,
-        transparent 1.5px,
-        transparent 7px
-      );
+      background:repeating-linear-gradient(45deg,rgba(80,80,90,.15) 0px,rgba(80,80,90,.15) 1.5px,transparent 1.5px,transparent 7px);
     }
-
-    /* 재생 중 파란 플래시 */
-    .beat-block.flash-blue{
-      background:var(--accent)!important;
-      box-shadow:0 0 16px var(--accent)!important;
-      transition:background 0s,box-shadow 0s!important;
-    }
-    /* 재생 중 빨간 플래시 */
-    .beat-block.flash-red{
-      background:#ff3333!important;
-      box-shadow:0 0 16px #ff3333!important;
-      transition:background 0s,box-shadow 0s!important;
-    }
+    .beat-block.flash-blue{background:var(--accent)!important;box-shadow:0 0 16px var(--accent)!important;transition:background 0s,box-shadow 0s!important;}
+    .beat-block.flash-red{background:#ff3333!important;box-shadow:0 0 16px #ff3333!important;transition:background 0s,box-shadow 0s!important;}
 
     /* ══ Sub 슬롯 ══ */
     .sub-slot{
-      position:absolute;top:0;height:100%;
-      cursor:pointer;
-      background:rgba(120,120,130,.22);
-      transition:background .08s;
+      position:absolute;top:0;height:100%;cursor:pointer;
+      background:rgba(120,120,130,.22);transition:background .08s;
     }
     .sub-slot:not(:first-child){border-left:2px solid var(--card-bg);}
-
-    /* 강조 서브슬롯 (메인 박자가 accent인 경우의 첫 슬롯) */
-    .sub-slot.sub-accent{
-      background:rgba(255,55,55,.12)!important;
-      box-shadow:0 0 0 2px #ff3333 inset!important;
-    }
-
-    /* 비활성 서브슬롯 */
-    .sub-slot.sub-off{
-      background:transparent!important;
-    }
-    .sub-slot.sub-off::after{
-      content:'';position:absolute;inset:0;pointer-events:none;
-      background:repeating-linear-gradient(
-        45deg,
-        rgba(140,140,150,.18) 0px,
-        rgba(140,140,150,.18) 1.5px,
-        transparent 1.5px,
-        transparent 7px
-      );
-    }
-
-    /* 재생 중 서브슬롯 플래시 */
-    .sub-slot.sub-flash{
-      background:var(--accent)!important;
-      box-shadow:0 0 10px var(--accent)!important;
-      transition:background 0s,box-shadow 0s!important;
-    }
+    .sub-slot.sub-accent{background:rgba(255,55,55,.12)!important;box-shadow:0 0 0 2px #ff3333 inset!important;}
+    .sub-slot.sub-off{background:transparent!important;}
+    .sub-slot.sub-off::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(45deg,rgba(140,140,150,.18) 0px,rgba(140,140,150,.18) 1.5px,transparent 1.5px,transparent 7px);}
+    .sub-slot.sub-flash{background:var(--accent)!important;box-shadow:0 0 10px var(--accent)!important;transition:background 0s,box-shadow 0s!important;}
 
     /* ══ 설정 ══ */
     .setting-group{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
@@ -233,7 +196,7 @@
       font-size:11px;font-weight:800;font-family:inherit;
       transition:.2s;white-space:nowrap;
       display:flex;align-items:center;justify-content:center;
-      height:42px;
+      height:42px;min-width:0;
     }
     .seg-btn:hover:not(.active){color:var(--text);}
     .seg-btn.active{background:var(--seg-active);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.3);}
@@ -252,37 +215,10 @@
     .btn-play:hover{opacity:.88;}
     .btn-play.active{background:var(--first-beat);box-shadow:0 0 16px rgba(255,51,51,.5);}
 
-    /* ══ 세트리스트 ══ */
-    .setlist-panel{max-width:1800px;margin:28px auto 0;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:16px;}
-    .setlist-panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:10px;}
-    .setlist-output{
-      width:100%;min-height:90px;
-      max-height:var(--ta-max,360px);
-      max-width:var(--ta-maxw,100%);
-      background:var(--input-bg);color:var(--text);
-      padding:10px 12px;border-radius:10px;border:1px solid var(--border);
-      font-size:12px;font-family:'Malgun Gothic',monospace,sans-serif;
-      resize:vertical;overflow-y:auto;line-height:1.8;margin-top:8px;
-    }
-    .setlist-output:focus{outline:none;border-color:var(--accent);}
-
-    .empty-state{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--sub-text);}
-    .empty-state-icon{font-size:2.8rem;margin-bottom:10px;opacity:.4;}
-    .empty-state-text{font-size:13px;font-weight:700;opacity:.6;line-height:1.7;}
-
-    /* ══ 커스텀 confirm 다이얼로그 ══ */
-    .modal-overlay{
-      position:fixed;inset:0;background:rgba(0,0,0,.72);
-      z-index:99999;display:flex;align-items:center;justify-content:center;
-      animation:fadeIn .15s ease;
-    }
+    /* ══ 모달 ══ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease;}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .modal-box{
-      background:var(--card-bg);border:1.5px solid var(--border);border-radius:20px;
-      padding:28px 24px 20px;max-width:320px;width:90%;text-align:center;
-      box-shadow:0 20px 60px rgba(0,0,0,.7);
-      animation:popIn .18s cubic-bezier(.34,1.56,.64,1);
-    }
+    .modal-box{background:var(--card-bg);border:1.5px solid var(--border);border-radius:20px;padding:28px 24px 20px;max-width:320px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7);animation:popIn .18s cubic-bezier(.34,1.56,.64,1);}
     @keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
     .modal-icon{font-size:2.2rem;margin-bottom:12px;}
     .modal-title{font-size:1rem;font-weight:900;margin-bottom:8px;color:var(--text);}
@@ -295,14 +231,19 @@
     .modal-btn-confirm{background:var(--danger);color:#fff;}
     .modal-btn-confirm:hover{opacity:.85;}
 
-    /* ══ 자동 스크롤 존 표시 ══ */
-    #scroll-zone-top,#scroll-zone-bot{
-      position:fixed;left:0;right:0;height:80px;z-index:8888;
-      pointer-events:none;opacity:0;transition:opacity .2s;
-    }
+    /* ══ 자동 스크롤 존 ══ */
+    #scroll-zone-top,#scroll-zone-bot{position:fixed;left:0;right:0;height:80px;z-index:8888;pointer-events:none;opacity:0;transition:opacity .2s;}
     #scroll-zone-top{top:0;background:linear-gradient(to bottom,rgba(0,229,255,.22),transparent);}
     #scroll-zone-bot{bottom:0;background:linear-gradient(to top,rgba(0,229,255,.22),transparent);}
     #scroll-zone-top.visible,#scroll-zone-bot.visible{opacity:1;}
+
+    /* ══ 세트리스트 ══ */
+    .setlist-output{width:100%;min-height:90px;max-height:360px;background:var(--input-bg);color:var(--text);padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:12px;font-family:'Malgun Gothic',monospace,sans-serif;resize:vertical;overflow-y:auto;line-height:1.8;margin-top:8px;}
+    .setlist-output:focus{outline:none;border-color:var(--accent);}
+
+    .empty-state{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--sub-text);}
+    .empty-state-icon{font-size:2.8rem;margin-bottom:10px;opacity:.4;}
+    .empty-state-text{font-size:13px;font-weight:700;opacity:.6;line-height:1.7;}
 
     @media(max-width:400px){
       h1{font-size:1.5rem;}
@@ -317,6 +258,7 @@
 <div id="scroll-zone-top"></div>
 <div id="scroll-zone-bot"></div>
 
+<!-- ══ 콘티 입력 패널 ══ -->
 <header>
   <h1>클릭 플래너</h1>
   <p class="subtitle">Live Worship Click Planner — AudioWorklet Edition</p>
@@ -324,22 +266,18 @@
     <button class="theme-btn active" onclick="setTheme('dark',this)">Dark</button>
     <button class="theme-btn" onclick="setTheme('light',this)">Light</button>
   </div>
-  <div class="input-panel" style="margin-top:14px;">
-    <div class="input-panel-title">📋 콘티 입력</div>
-    <textarea id="conti-input" placeholder="예시:
-1. 그 이름
-https://youtu.be/xxxxx
-2. 살아계신 주 https://youtu.be/yyyyy
-3. Way Maker + 나의 주
-https://youtu.be/aaaaaa
-https://youtu.be/bbbbbb"></textarea>
-    <div class="btn-row">
-      <button class="btn-primary" onclick="analyzeConti()">🎼 플래너 생성</button>
-      <button class="btn-secondary" onclick="addEmptyCard()">＋ Add Empty</button>
-    </div>
-  </div>
 </header>
 
+<div class="top-panel" id="input-panel">
+  <div class="panel-title">📋 콘티 입력</div>
+  <textarea id="conti-input" placeholder="예시:&#10;1. 그 이름&#10;https://youtu.be/xxxxx&#10;2. 살아계신 주 https://youtu.be/yyyyy&#10;3. Way Maker + 나의 주&#10;https://youtu.be/aaaaaa&#10;https://youtu.be/bbbbbb"></textarea>
+  <div class="btn-row">
+    <button class="btn-primary" onclick="analyzeConti()">🎼 플래너 생성</button>
+    <button class="btn-secondary" onclick="addEmptyCard()">＋ Add Empty</button>
+  </div>
+</div>
+
+<!-- ══ 워크스페이스 ══ -->
 <div class="workspace" id="workspace">
   <div class="empty-state">
     <div class="empty-state-icon">🎹</div>
@@ -347,8 +285,9 @@ https://youtu.be/bbbbbb"></textarea>
   </div>
 </div>
 
-<div class="setlist-panel">
-  <div class="setlist-panel-title">📤 세트리스트 추출</div>
+<!-- ══ 세트리스트 패널 ══ -->
+<div class="top-panel" id="setlist-panel" style="margin-top:28px;">
+  <div class="panel-title">📤 세트리스트 추출</div>
   <button class="btn-primary" style="width:100%;padding:11px;" onclick="extractSetlist()">Setlist 텍스트로 요약 추출하기</button>
   <textarea class="setlist-output" id="setlist-output" readonly placeholder="추출된 세트리스트가 여기에 표시됩니다..."></textarea>
 </div>
@@ -356,9 +295,9 @@ https://youtu.be/bbbbbb"></textarea>
 <script>
 'use strict';
 
-/* ══════════════════════════════════════════════
+/* ══════════════════════════════════════════
    AudioWorklet Processor
-══════════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const WORKLET_CODE = `
 class ClickProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -417,121 +356,191 @@ let tapTimesMap={}, bpmPressTimer=null, bpmRapidInterval=null;
 let _touchDragId=null, _touchGhost=null, _touchOffX=0, _touchOffY=0;
 let _autoScrollRAF=null, _autoScrollDir=0;
 let _mouseDragging=false, _mouseDragId=null;
+let _mouseGhost=null, _mouseGhostOffX=0, _mouseGhostOffY=0;
 
-const SCROLL_ZONE=100, SCROLL_SPEED_TOUCH=8, SCROLL_SPEED_MOUSE=10;
+const SCROLL_ZONE=100, SCROLL_SPEED=10;
 
-/* ══════════════════════════════════════════════
-   SVG 음표 아이콘
-   ★ 셋잇단: 8분음표 3개 + beam + 숫자3 + 브래킷
-   ★ 16분음표: 4개 콩나물 + 이중 beam
-══════════════════════════════════════════════ */
-function nc(active){return active?'var(--text)':'var(--sub-text)';}
+/* ══ Voice 발음 데이터 ══ */
+const VOICE_BEATS = {
+  1:['One'], 2:['One','Two'], 3:['One','Two','Three'],
+  4:['One','Two','Three','Four'], 6:['One','Two','Three','Four','Five','Six']
+};
+// sub syllables: [beat_idx][sub_idx] → string to speak
+// div=2 (8th):   "One", "and"
+// div=3 (triplet):"One", "ti", "ta"
+// div=4 (16th):  "One", "e", "and", "a"
+const VOICE_SUB = {
+  2: ['','and'],
+  3: ['','ti','ta'],
+  4: ['','e','and','a']
+};
+
+/* ══ Web Speech ══ */
+let speechSynth = window.speechSynthesis || null;
+let voiceCache = null;
+function getVoice(){
+  if(voiceCache) return voiceCache;
+  if(!speechSynth) return null;
+  const voices = speechSynth.getVoices();
+  // 영어 음성 우선
+  voiceCache = voices.find(v=>v.lang.startsWith('en-US')&&v.localService) ||
+               voices.find(v=>v.lang.startsWith('en')) ||
+               (voices.length?voices[0]:null);
+  return voiceCache;
+}
+if(speechSynth) speechSynth.onvoiceschanged = ()=>{ voiceCache=null; getVoice(); };
+
+// 음성 큐 (겹침 방지용 — 메트로놈 박자는 정확한 타이밍 필요하므로 AudioBuffer로 구현)
+// Voice 사운드: TTS 대신 AudioContext로 직접 음절을 합성
+// → 실시간 TTS는 지연이 커서 메트로놈에 부적합.
+// → Web Speech API를 최소 지연으로 사용 (utterance.rate 높임)
+const voiceQueue = [];
+let voicePlaying = false;
+function speakBeat(text, time){
+  // time은 audioCtx currentTime. 딜레이 계산 후 setTimeout
+  if(!speechSynth) return;
+  const delayMs = Math.max(0,(time - audioCtx.currentTime)*1000);
+  setTimeout(()=>{
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 2.8; u.pitch = 1.1; u.volume = 1;
+    const v = getVoice();
+    if(v) u.voice = v;
+    u.lang = 'en-US';
+    speechSynth.cancel();
+    speechSynth.speak(u);
+  }, delayMs);
+}
+
+/* ══ 패널 너비 제한: 카드 2개 너비 ══ */
+function updatePanelWidth(){
+  const cards=[...document.querySelectorAll('.song-card')];
+  let maxW = '680px'; // 기본값
+  if(cards.length>=2){
+    const w = cards[0].offsetWidth + cards[1].offsetWidth + 16;
+    maxW = w+'px';
+  } else if(cards.length===1){
+    const w = cards[0].offsetWidth * 2 + 16;
+    maxW = w+'px';
+  }
+  document.documentElement.style.setProperty('--panel-maxw', maxW);
+  // header, input-panel, setlist-panel 모두 적용
+  ['input-panel','setlist-panel'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.style.maxWidth=maxW; }
+  });
+  const hdr=document.querySelector('header');
+  if(hdr) hdr.style.maxWidth=maxW;
+}
+
+/* ══════════════════════════════════
+   SVG 음표
+══════════════════════════════════ */
+function nc(active){ return active?'var(--text)':'var(--sub-text)'; }
 
 /* ♩ 4분음표 */
 function svgQuarter(active){
   const c=nc(active);
-  return `<svg width="18" height="34" viewBox="0 0 18 34" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="7" cy="27" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 7 27)"/>
-    <rect x="12.5" y="4" width="2.4" height="23" rx="1.2" fill="${c}"/>
+  return `<svg width="18" height="36" viewBox="0 0 18 36" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="7" cy="29" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 7 29)"/>
+    <rect x="12.5" y="5" width="2.4" height="24" rx="1.2" fill="${c}"/>
   </svg>`;
 }
 
 /* ♪ 8분음표 */
 function svgEighth(active){
   const c=nc(active);
-  return `<svg width="24" height="34" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="7" cy="27" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 7 27)"/>
-    <rect x="12.5" y="4" width="2.4" height="23" rx="1.2" fill="${c}"/>
-    <path d="M14.9 4 C14.9 4 23 7.5 21.5 17.5 C19 13 14.9 12 14.9 12 Z" fill="${c}"/>
+  return `<svg width="26" height="36" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="7" cy="29" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 7 29)"/>
+    <rect x="12.5" y="5" width="2.4" height="24" rx="1.2" fill="${c}"/>
+    <path d="M14.9 5 C14.9 5 24 8.5 22.5 19 C20 14.5 14.9 13 14.9 13 Z" fill="${c}"/>
   </svg>`;
 }
 
 /*
-  ♩♩♩ 셋잇단: 8분음표 3개가 하나의 beam(보)으로 연결
-  - 3개 음표 머리 (아래)
-  - 3개 기둥 (위로)
-  - 1개 굵은 beam (상단 가로)
-  - 숫자 "3" + 좌우 브래킷
+  ♩♩♩ 셋잇단
+  - 3개 8분음표 (머리+기둥) 균등 배치
+  - 단일 beam (상단 가로)
+  - 브래킷(좌우 수직 꺾임선) + 중앙 숫자 "3"
 */
 function svgTriplet(active){
   const c=nc(active);
-  // x 위치: 4, 22, 40 (3개 균등 배치)
-  // 기둥 상단 y=9, beam y=9
-  // 음표 머리 y=26
-  return `<svg width="52" height="38" viewBox="0 0 52 38" xmlns="http://www.w3.org/2000/svg">
-    <!-- beam 1줄 (8분음표용) -->
-    <rect x="4" y="9" width="44" height="3" rx="1.5" fill="${c}"/>
+  // 전체 너비 54, 높이 42
+  // 음표 x: 5, 24, 43 → 기둥 우측 x: 7.2, 26.2, 45.2
+  // 기둥 상단 y=11, 하단 y=27
+  // beam y=11~14
+  // 음표 머리 cy=29
+  // 브래킷: y=4 ~ y=9 (기둥 위에 공간)
+  return `<svg width="54" height="42" viewBox="0 0 54 42" xmlns="http://www.w3.org/2000/svg">
+    <!-- beam (8분음표용 단일 보) -->
+    <rect x="5" y="11" width="42" height="3" rx="1.5" fill="${c}"/>
     <!-- 기둥 3개 -->
-    <rect x="4"  y="9" width="2.2" height="17" rx="1.1" fill="${c}"/>
-    <rect x="23" y="9" width="2.2" height="17" rx="1.1" fill="${c}"/>
-    <rect x="42" y="9" width="2.2" height="17" rx="1.1" fill="${c}"/>
+    <rect x="5"  y="11" width="2.4" height="18" rx="1.2" fill="${c}"/>
+    <rect x="24" y="11" width="2.4" height="18" rx="1.2" fill="${c}"/>
+    <rect x="43" y="11" width="2.4" height="18" rx="1.2" fill="${c}"/>
     <!-- 음표 머리 3개 -->
-    <ellipse cx="6"  cy="27" rx="6"   ry="4.2" fill="${c}" transform="rotate(-16 6 27)"/>
-    <ellipse cx="25" cy="27" rx="6"   ry="4.2" fill="${c}" transform="rotate(-16 25 27)"/>
-    <ellipse cx="44" cy="27" rx="6"   ry="4.2" fill="${c}" transform="rotate(-16 44 27)"/>
-    <!-- 브래킷 왼쪽 선 -->
-    <line x1="4"  y1="5.5" x2="19" y2="5.5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- 브래킷 오른쪽 선 -->
-    <line x1="33" y1="5.5" x2="48" y2="5.5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- 숫자 3 -->
-    <text x="26" y="7.5" text-anchor="middle" dominant-baseline="middle"
-      font-size="8.5" font-weight="900"
-      font-family="Georgia,'Times New Roman',serif" fill="${c}">3</text>
+    <ellipse cx="7"  cy="30" rx="6.2" ry="4.3" fill="${c}" transform="rotate(-16 7 30)"/>
+    <ellipse cx="26" cy="30" rx="6.2" ry="4.3" fill="${c}" transform="rotate(-16 26 30)"/>
+    <ellipse cx="45" cy="30" rx="6.2" ry="4.3" fill="${c}" transform="rotate(-16 45 30)"/>
+    <!-- 브래킷 왼쪽 수직 -->
+    <line x1="5" y1="9" x2="5" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- 브래킷 왼쪽 수평 -->
+    <line x1="5" y1="5" x2="19" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- 브래킷 오른쪽 수직 -->
+    <line x1="47" y1="9" x2="47" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- 브래킷 오른쪽 수평 -->
+    <line x1="47" y1="5" x2="33" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- 숫자 "3": 브래킷 중앙 명확히 -->
+    <text x="26" y="5.5"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      font-size="9"
+      font-weight="900"
+      font-family="'Georgia','Times New Roman',serif"
+      fill="${c}"
+      style="paint-order:stroke;stroke:var(--card-bg);stroke-width:3;stroke-linejoin:round;"
+    >3</text>
   </svg>`;
 }
 
 /*
-  ♬♬ 16분음표: 4개 콩나물 + 이중 beam (2줄)
-  - 4개 음표 머리
-  - 4개 기둥
-  - 2줄 굵은 beam
+  ♬♬ 16분음표: 4개 콩나물 + 이중 beam
+  - 정갈하게: 균등 간격, 깔끔한 이중 보
 */
 function svgSixteenth(active){
   const c=nc(active);
-  // x 위치: 4, 17, 30, 43
-  return `<svg width="54" height="38" viewBox="0 0 54 38" xmlns="http://www.w3.org/2000/svg">
+  // 전체 너비 56, 높이 38
+  // 기둥 x: 4, 18, 32, 46
+  // 기둥 top y=7, bottom y=25
+  // beam1 y=7, beam2 y=12.5
+  // 음표 머리 cy=27
+  return `<svg width="56" height="38" viewBox="0 0 56 38" xmlns="http://www.w3.org/2000/svg">
     <!-- beam 1 (상단) -->
-    <rect x="4" y="6"   width="41" height="2.8" rx="1.4" fill="${c}"/>
+    <rect x="4" y="7"    width="44" height="3"   rx="1.5" fill="${c}"/>
     <!-- beam 2 (하단) -->
-    <rect x="4" y="11.5" width="41" height="2.8" rx="1.4" fill="${c}"/>
+    <rect x="4" y="13.5" width="44" height="3"   rx="1.5" fill="${c}"/>
     <!-- 기둥 4개 -->
-    <rect x="4"  y="6" width="2.2" height="19" rx="1.1" fill="${c}"/>
-    <rect x="17" y="6" width="2.2" height="19" rx="1.1" fill="${c}"/>
-    <rect x="30" y="6" width="2.2" height="19" rx="1.1" fill="${c}"/>
-    <rect x="43" y="6" width="2.2" height="19" rx="1.1" fill="${c}"/>
+    <rect x="4"  y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
+    <rect x="18" y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
+    <rect x="32" y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
+    <rect x="46" y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
     <!-- 음표 머리 4개 -->
-    <ellipse cx="6"  cy="26" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 6 26)"/>
-    <ellipse cx="19" cy="26" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 19 26)"/>
-    <ellipse cx="32" cy="26" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 32 26)"/>
-    <ellipse cx="45" cy="26" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 45 26)"/>
+    <ellipse cx="6"  cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 6 27)"/>
+    <ellipse cx="20" cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 20 27)"/>
+    <ellipse cx="34" cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 34 27)"/>
+    <ellipse cx="48" cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 48 27)"/>
   </svg>`;
 }
 
 function getSubSvg(div,active){
-  if(div===1)return svgQuarter(active);
-  if(div===2)return svgEighth(active);
-  if(div===3)return svgTriplet(active);
-  if(div===4)return svgSixteenth(active);
+  if(div===1) return svgQuarter(active);
+  if(div===2) return svgEighth(active);
+  if(div===3) return svgTriplet(active);
+  if(div===4) return svgSixteenth(active);
   return '';
 }
 
-/* ══ textarea / setlist 최대 높이·너비 ══ */
-function updateTextareaLimits(){
-  const cards=[...document.querySelectorAll('.song-card')];
-  let maxH=360, maxW='100%';
-  if(cards.length>=2){
-    maxH=cards[0].offsetHeight+cards[1].offsetHeight+16;
-    maxW=(cards[0].offsetWidth*2+16)+'px';
-  } else if(cards.length===1){
-    maxH=cards[0].offsetHeight*2+16;
-    maxW=(cards[0].offsetWidth*2+16)+'px';
-  }
-  document.documentElement.style.setProperty('--ta-max',maxH+'px');
-  document.documentElement.style.setProperty('--ta-maxw',maxW);
-}
-
-/* ══ localStorage 영속성 ══ */
-const LS_KEY='clickplanner_v3';
+/* ══ localStorage ══ */
+const LS_KEY='clickplanner_v4';
 function saveState(){
   try{
     const cards=[...document.querySelectorAll('.song-card')];
@@ -540,7 +549,7 @@ function saveState(){
       theme:document.body.getAttribute('data-theme'),
       cards:cards.map(card=>{
         const id=+card.id.replace('card-','');
-        const m=metros[id];if(!m)return null;
+        const m=metros[id]; if(!m) return null;
         return{
           id,
           title:document.getElementById('title-'+id)?.innerText||'',
@@ -555,11 +564,12 @@ function saveState(){
     localStorage.setItem(LS_KEY,JSON.stringify(data));
   }catch(e){console.warn('saveState:',e);}
 }
+function autosave(){ saveState(); }
 
 function loadState(){
   try{
     const raw=localStorage.getItem(LS_KEY);
-    if(!raw)return false;
+    if(!raw) return false;
     const data=JSON.parse(raw);
     if(data.theme){
       document.body.setAttribute('data-theme',data.theme);
@@ -569,40 +579,37 @@ function loadState(){
     }
     if(data.conti) document.getElementById('conti-input').value=data.conti;
     if(data.cards?.length){
-      metros={};tapTimesMap={};
+      metros={}; tapTimesMap={};
       document.getElementById('workspace').innerHTML='';
       let maxId=0;
-      data.cards.forEach(c=>{
-        if(c.id>maxId)maxId=c.id;
-        createCardFromData(c);
-      });
+      data.cards.forEach(c=>{ if(c.id>maxId) maxId=c.id; createCardFromData(c); });
       globalSongId=maxId;
       renderEmptyState();
-      setTimeout(updateTextareaLimits,300);
+      setTimeout(updatePanelWidth,300);
     }
     return true;
-  }catch(e){console.warn('loadState:',e);return false;}
+  }catch(e){ console.warn('loadState:',e); return false; }
 }
 
 function createCardFromData(c){
   removeEmptyState();
   metros[c.id]={
-    isPlaying:false,bpm:c.bpm,sig:c.sig,subDiv:c.subDiv,
-    vol:c.vol,muted:c.muted,sound:c.sound,
-    workletNode:null,vId:c.vId||null,
+    isPlaying:false, bpm:c.bpm, sig:c.sig, subDiv:c.subDiv,
+    vol:c.vol, muted:c.muted, sound:c.sound,
+    workletNode:null, vId:c.vId||null,
     blockStates:[...c.blockStates],
     subStates:c.subStates.map(a=>[...a])
   };
   const ws=document.getElementById('workspace');
   const card=document.createElement('div');
-  card.className='song-card';card.id='card-'+c.id;
-  card.innerHTML=cardHTML(c.id,c.title);
+  card.className='song-card'; card.id='card-'+c.id;
+  card.innerHTML=cardHTML(c.id, c.title);
   ws.appendChild(card);
-  buildThumb(c.id,c.vId);
+  buildThumb(c.id, c.vId);
   updateSubIcons(c.id);
   renderViz(c.id);
-  bindEvents(card,c.id);
-  // UI 동기화
+  bindEvents(card, c.id);
+  // 동기화
   document.getElementById('bpm-'+c.id).innerText=c.bpm;
   document.getElementById('beat-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===c.sig));
   document.getElementById('sub-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.div===c.subDiv));
@@ -610,12 +617,9 @@ function createCardFromData(c){
   document.getElementById('vol-'+c.id).value=c.vol;
   if(c.muted){
     const btn=document.getElementById('mute-'+c.id);
-    if(btn){btn.classList.add('muted');btn.innerText='🔇';}
+    if(btn){ btn.classList.add('muted'); btn.innerText='🔇'; }
   }
 }
-
-/* 자동 저장: 주요 변경 시 */
-function autosave(){saveState();}
 
 /* ══ AudioContext ══ */
 async function ensureAudio(){
@@ -624,88 +628,91 @@ async function ensureAudio(){
     gainMaster=audioCtx.createGain();
     gainMaster.gain.value=2.2;
     const comp=audioCtx.createDynamicsCompressor();
-    comp.threshold.value=-6;comp.knee.value=3;comp.ratio.value=4;
-    comp.attack.value=0.001;comp.release.value=0.1;
-    gainMaster.connect(comp);comp.connect(audioCtx.destination);
+    comp.threshold.value=-6; comp.knee.value=3; comp.ratio.value=4;
+    comp.attack.value=0.001; comp.release.value=0.1;
+    gainMaster.connect(comp); comp.connect(audioCtx.destination);
   }
-  if(audioCtx.state==='suspended')await audioCtx.resume();
+  if(audioCtx.state==='suspended') await audioCtx.resume();
   if(!workletReady){
     const blob=new Blob([WORKLET_CODE],{type:'application/javascript'});
     const url=URL.createObjectURL(blob);
     await audioCtx.audioWorklet.addModule(url);
-    URL.revokeObjectURL(url);workletReady=true;
+    URL.revokeObjectURL(url); workletReady=true;
   }
   return audioCtx;
 }
 
 /* ══ 메트로놈 ══ */
 async function startMetro(id){
-  const m=metros[id];if(!m)return;
+  const m=metros[id]; if(!m) return;
   try{
     const ctx=await ensureAudio();
     const node=new AudioWorkletNode(ctx,'click-processor');
     node.connect(ctx.destination);
     m.workletNode=node;
     node.port.onmessage=(e)=>{
-      if(e.data.type!=='beat')return;
-      if(!metros[id]?.isPlaying)return;
+      if(e.data.type!=='beat') return;
+      if(!metros[id]?.isPlaying) return;
       const beatTime=ctx.currentTime+e.data.offsetSec+0.005;
-      handleBeat(id,e.data.slotIdx,beatTime);
+      handleBeat(id, e.data.slotIdx, beatTime);
     };
     node.port.postMessage({type:'start',bpm:m.bpm,subDiv:m.subDiv,sig:m.sig});
     m.isPlaying=true;
     const btn=document.getElementById('p-btn-'+id);
-    if(btn){btn.innerText='STOP';btn.classList.add('active');}
+    if(btn){ btn.innerText='STOP'; btn.classList.add('active'); }
     autosave();
-  }catch(err){
-    console.error('startMetro:',err);
-    alert('오디오 시작 실패: '+err.message);
-  }
+  }catch(err){ console.error('startMetro:',err); alert('오디오 시작 실패: '+err.message); }
 }
 function stopMetro(id){
-  const m=metros[id];if(!m)return;
+  const m=metros[id]; if(!m) return;
   if(m.workletNode){
     m.workletNode.port.postMessage({type:'stop'});
-    try{m.workletNode.disconnect();}catch(e){}
+    try{ m.workletNode.disconnect(); }catch(e){}
     m.workletNode=null;
   }
   m.isPlaying=false;
   const btn=document.getElementById('p-btn-'+id);
-  if(btn){btn.innerText='START';btn.classList.remove('active');}
+  if(btn){ btn.innerText='START'; btn.classList.remove('active'); }
   clearVizFlash(id);
 }
 function toggleMetro(id){
-  if(metros[id]?.isPlaying)stopMetro(id);else startMetro(id);
+  if(metros[id]?.isPlaying) stopMetro(id); else startMetro(id);
 }
 
 /* ══ 박자 처리 ══ */
-function handleBeat(id,slotIdx,beatTime){
-  const m=metros[id];if(!m||!audioCtx)return;
+function handleBeat(id, slotIdx, beatTime){
+  const m=metros[id]; if(!m||!audioCtx) return;
   const ctx=audioCtx;
   const div=m.subDiv;
   const qIdx=Math.floor(slotIdx/div);
   const sIdx=slotIdx%div;
   const isMain=(sIdx===0);
-  const bs=m.blockStates[qIdx]??0; // 0=normal, 1=accent, 2=off
+  const bs=m.blockStates[qIdx]??0;
 
   let isOff=false, isAccent=false;
   if(div===1){
-    isOff=(bs===2);isAccent=(bs===1);
+    isOff=(bs===2); isAccent=(bs===1);
   } else {
     if(isMain){
-      isOff=(bs===2);isAccent=(bs===1);
+      isOff=(bs===2); isAccent=(bs===1);
     } else {
       const ss=(m.subStates[qIdx]?.[sIdx])??0;
-      isOff=(ss===1);isAccent=false;
+      isOff=(ss===1); isAccent=false;
     }
   }
 
-  const vol=isMain?m.vol:m.vol*0.40;
-  if(!m.muted&&!isOff)playSound(m.sound,isAccent,vol,beatTime);
+  const vol=isMain ? m.vol : m.vol*0.40;
+  if(!m.muted && !isOff){
+    if(m.sound==='voice'){
+      playVoice(m.sig, qIdx, div, sIdx, beatTime);
+    } else {
+      playSound(m.sound, isAccent, vol, beatTime);
+    }
+  }
 
   const delayMs=Math.max(0,(beatTime-ctx.currentTime)*1000);
   setTimeout(()=>{
-    if(!metros[id]?.isPlaying)return;
+    if(!metros[id]?.isPlaying) return;
     if(isMain&&!isOff){
       const card=document.getElementById('card-'+id);
       if(card){
@@ -734,80 +741,131 @@ function handleBeat(id,slotIdx,beatTime){
   },delayMs);
 }
 
+/* ══ Voice 재생 ══ */
+function playVoice(sig, beatIdx, div, subIdx, beatTime){
+  if(!speechSynth) return;
+  const beats=VOICE_BEATS[sig]||VOICE_BEATS[4];
+  const beatWord=beats[beatIdx]||('Beat '+(beatIdx+1));
+  let word='';
+  if(subIdx===0){
+    word=beatWord;
+  } else {
+    const subSyls=VOICE_SUB[div];
+    if(subSyls && subSyls[subIdx]) word=subSyls[subIdx];
+    else word='';
+  }
+  if(!word) return;
+  speakBeat(word, beatTime);
+}
+
 /* ══ 소리 합성 ══ */
-function playSound(type,isHigh,vol,t){
-  if(!audioCtx||!gainMaster)return;
+function playSound(type, isHigh, vol, t){
+  if(!audioCtx||!gainMaster) return;
   t=t||audioCtx.currentTime;
   const gain=audioCtx.createGain();
   gain.connect(gainMaster);
+
   if(type==='digital'){
-    const osc=audioCtx.createOscillator();osc.type='square';
+    const osc=audioCtx.createOscillator(); osc.type='square';
     osc.frequency.setValueAtTime(isHigh?1050:720,t);
     osc.connect(gain);
-    gain.gain.setValueAtTime(vol*.5,t);gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
-    osc.start(t);osc.stop(t+.07);
+    gain.gain.setValueAtTime(vol*.5,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
+    osc.start(t); osc.stop(t+.07);
+
+  } else if(type==='classic'){
+    /* 아날로그 메트로놈 "똑-딱"
+       - 고주파 "딱" 타격음 + 짧은 잔향
+       - 강박(high): 높은 피치 "딱"
+       - 약박(low):  낮은 피치 "똑"
+    */
+    const ctx=audioCtx;
+    const freq=isHigh?1800:1100;
+    const dur=0.055;
+
+    // 타격음 (bandpass noise)
+    const bufLen=Math.floor(ctx.sampleRate*dur);
+    const buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let k=0;k<bufLen;k++){
+      data[k]=(Math.random()*2-1)*Math.exp(-k/(bufLen*0.12));
+    }
+    const noise=ctx.createBufferSource(); noise.buffer=buf;
+    const bp=ctx.createBiquadFilter(); bp.type='bandpass';
+    bp.frequency.value=freq; bp.Q.value=30;
+    noise.connect(bp); bp.connect(gain);
+
+    // 톤 "딱" (짧은 사인파)
+    const osc=ctx.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(freq*0.55,t);
+    osc.frequency.exponentialRampToValueAtTime(freq*0.3,t+0.03);
+    const og=ctx.createGain();
+    og.gain.setValueAtTime(vol*1.0,t);
+    og.gain.exponentialRampToValueAtTime(0.001,t+0.04);
+    osc.connect(og); og.connect(gain);
+
+    gain.gain.setValueAtTime(vol*2.8,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+dur);
+
+    noise.start(t); noise.stop(t+dur);
+    osc.start(t); osc.stop(t+0.05);
+
   } else if(type==='wood'){
     const bufLen=Math.floor(audioCtx.sampleRate*.07);
     const buf=audioCtx.createBuffer(1,bufLen,audioCtx.sampleRate);
     const data=buf.getChannelData(0);
-    for(let k=0;k<bufLen;k++)data[k]=(Math.random()*2-1)*Math.exp(-k/(bufLen*.15));
-    const noise=audioCtx.createBufferSource();noise.buffer=buf;
-    const bp=audioCtx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=isHigh?1600:1100;bp.Q.value=18;
-    const hp=audioCtx.createBiquadFilter();hp.type='highpass';hp.frequency.value=800;
-    const osc=audioCtx.createOscillator();osc.type='triangle';
-    osc.frequency.setValueAtTime(isHigh?1400:950,t);osc.frequency.exponentialRampToValueAtTime(200,t+.025);
+    for(let k=0;k<bufLen;k++) data[k]=(Math.random()*2-1)*Math.exp(-k/(bufLen*.15));
+    const noise=audioCtx.createBufferSource(); noise.buffer=buf;
+    const bp=audioCtx.createBiquadFilter(); bp.type='bandpass';
+    bp.frequency.value=isHigh?1600:1100; bp.Q.value=18;
+    const hp=audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=800;
+    const osc=audioCtx.createOscillator(); osc.type='triangle';
+    osc.frequency.setValueAtTime(isHigh?1400:950,t);
+    osc.frequency.exponentialRampToValueAtTime(200,t+.025);
     const og=audioCtx.createGain();
-    og.gain.setValueAtTime(vol*1.4,t);og.gain.exponentialRampToValueAtTime(0.001,t+.03);
-    noise.connect(bp);bp.connect(hp);hp.connect(gain);osc.connect(og);og.connect(gain);
-    gain.gain.setValueAtTime(vol*2.5,t);gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
-    noise.start(t);noise.stop(t+.07);osc.start(t);osc.stop(t+.035);
-  } else {
-    const osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.value=isHigh?1320:880;
+    og.gain.setValueAtTime(vol*1.4,t);
+    og.gain.exponentialRampToValueAtTime(0.001,t+.03);
+    noise.connect(bp); bp.connect(hp); hp.connect(gain);
+    osc.connect(og); og.connect(gain);
+    gain.gain.setValueAtTime(vol*2.5,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
+    noise.start(t); noise.stop(t+.07);
+    osc.start(t); osc.stop(t+.035);
+
+  } else { // beep → voice에서는 speechSynth 사용, 여기선 sine
+    const osc=audioCtx.createOscillator(); osc.type='sine';
+    osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
-    gain.gain.setValueAtTime(vol*1.1,t);gain.gain.exponentialRampToValueAtTime(0.001,t+.09);
-    osc.start(t);osc.stop(t+.1);
+    gain.gain.setValueAtTime(vol*1.1,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+.09);
+    osc.start(t); osc.stop(t+.1);
   }
 }
 
 /* ══ BPM ══ */
-function sendBpm(id){const m=metros[id];if(m?.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'bpm',bpm:m.bpm});}
-function onBpmDown(id,delta,e){
-  e.stopPropagation();e.preventDefault();
-  changeBpm(id,delta);
-  bpmPressTimer=setTimeout(()=>{bpmRapidInterval=setInterval(()=>changeBpm(id,delta),60);},600);
-}
-function onBpmUp(){clearTimeout(bpmPressTimer);bpmPressTimer=null;clearInterval(bpmRapidInterval);bpmRapidInterval=null;}
-function changeBpm(id,delta){
-  if(!metros[id])return;
-  metros[id].bpm=Math.max(20,Math.min(300,metros[id].bpm+delta));
-  const el=document.getElementById('bpm-'+id);if(el)el.innerText=metros[id].bpm;
-  sendBpm(id);autosave();
-}
-function commitBpm(id,el){
-  const v=parseInt(el.innerText.replace(/\D/g,''));
-  metros[id].bpm=isNaN(v)?metros[id].bpm:Math.max(20,Math.min(300,v));
-  el.innerText=metros[id].bpm;sendBpm(id);autosave();
-}
-function liveUpdateBpm(id,el){
-  const raw=el.innerText.replace(/\D/g,'');if(!raw)return;
-  const v=parseInt(raw);if(!isNaN(v)&&v>=20&&v<=300){metros[id].bpm=v;sendBpm(id);}
-}
+function sendBpm(id){ const m=metros[id]; if(m?.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'bpm',bpm:m.bpm}); }
+function onBpmDown(id,delta,e){ e.stopPropagation(); e.preventDefault(); changeBpm(id,delta); bpmPressTimer=setTimeout(()=>{ bpmRapidInterval=setInterval(()=>changeBpm(id,delta),60); },600); }
+function onBpmUp(){ clearTimeout(bpmPressTimer); bpmPressTimer=null; clearInterval(bpmRapidInterval); bpmRapidInterval=null; }
+function changeBpm(id,delta){ if(!metros[id]) return; metros[id].bpm=Math.max(20,Math.min(300,metros[id].bpm+delta)); const el=document.getElementById('bpm-'+id); if(el) el.innerText=metros[id].bpm; sendBpm(id); autosave(); }
+function commitBpm(id,el){ const v=parseInt(el.innerText.replace(/\D/g,'')); metros[id].bpm=isNaN(v)?metros[id].bpm:Math.max(20,Math.min(300,v)); el.innerText=metros[id].bpm; sendBpm(id); autosave(); }
+function liveUpdateBpm(id,el){ const raw=el.innerText.replace(/\D/g,''); if(!raw) return; const v=parseInt(raw); if(!isNaN(v)&&v>=20&&v<=300){ metros[id].bpm=v; sendBpm(id); } }
 
 /* ══ TAP ══ */
 function tapTempo(id){
   ensureAudio().catch(()=>{});
   const card=document.getElementById('card-'+id);
-  card.classList.remove('flash-tap');void card.offsetWidth;card.classList.add('flash-tap');
+  card.classList.remove('flash-tap'); void card.offsetWidth; card.classList.add('flash-tap');
   setTimeout(()=>card.classList.remove('flash-tap'),90);
   const now=performance.now();
-  if(!tapTimesMap[id])tapTimesMap[id]=[];
+  if(!tapTimesMap[id]) tapTimesMap[id]=[];
   const arr=tapTimesMap[id];
-  if(arr.length&&now-arr[arr.length-1]>3000)arr.length=0;
-  arr.push(now);if(arr.length>8)arr.shift();
+  if(arr.length&&now-arr[arr.length-1]>3000) arr.length=0;
+  arr.push(now); if(arr.length>8) arr.shift();
   if(arr.length>=2){
-    let sum=0;for(let i=1;i<arr.length;i++)sum+=arr[i]-arr[i-1];
+    let sum=0; for(let i=1;i<arr.length;i++) sum+=arr[i]-arr[i-1];
     metros[id].bpm=Math.max(20,Math.min(300,Math.round(60000/(sum/(arr.length-1)))));
-    document.getElementById('bpm-'+id).innerText=metros[id].bpm;sendBpm(id);autosave();
+    document.getElementById('bpm-'+id).innerText=metros[id].bpm;
+    sendBpm(id); autosave();
   }
 }
 
@@ -821,66 +879,58 @@ function setTheme(t,btn){
 }
 
 /* ══ 유튜브 ID ══ */
-function extractVid(url){
-  if(!url)return null;
-  const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
-  return m?m[1]:null;
-}
+function extractVid(url){ if(!url) return null; const m=url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i); return m?m[1]:null; }
 
 /* ══ 콘티 파싱 ══ */
 function parseConti(raw){
   const urlRe=/(https?:\/\/[^\s]+)/gi;
-  const songs=[];let cur=null;
+  const songs=[]; let cur=null;
   const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
   for(let i=0;i<lines.length;i++){
     const line=lines[i];
-    const isUrl=urlRe.test(line);urlRe.lastIndex=0;
+    const isUrl=urlRe.test(line); urlRe.lastIndex=0;
     const numMatch=line.match(/^(\d+)[.$、\s]/);
     if(numMatch){
-      if(cur)songs.push(cur);
+      if(cur) songs.push(cur);
       const inlineUrls=line.match(/(https?:\/\/[^\s]+)/g);
       const titlePart=line.replace(/^(\d+)[.$、\s]+/,'').replace(/(https?:\/\/[^\s]+)/g,'').trim();
       cur={title:titlePart||('Song '+(songs.length+1)),urls:inlineUrls||[]};
     } else if(isUrl){
       const urls=line.match(/(https?:\/\/[^\s]+)/g)||[];
-      if(cur){cur.urls.push(...urls);}
-      else{cur={title:'Song '+(songs.length+1),urls};}
+      if(cur) cur.urls.push(...urls);
+      else cur={title:'Song '+(songs.length+1),urls};
     } else {
-      if(cur){
-        if(!cur.title||cur.title.startsWith('Song '))cur.title=line;
-        else cur.title+=' '+line;
-      } else {cur={title:line,urls:[]};}
+      if(cur){ if(!cur.title||cur.title.startsWith('Song ')) cur.title=line; else cur.title+=' '+line; }
+      else cur={title:line,urls:[]};
     }
   }
-  if(cur)songs.push(cur);
+  if(cur) songs.push(cur);
   const result=[];
   songs.forEach(s=>{
-    if(s.urls.length===0)result.push({title:s.title,vId:null});
-    else if(s.urls.length===1)result.push({title:s.title,vId:extractVid(s.urls[0])});
-    else s.urls.forEach((url,idx)=>{
-      result.push({title:s.title+(idx===0?'':` (${idx+1})`),vId:extractVid(url)});
-    });
+    if(s.urls.length===0) result.push({title:s.title,vId:null});
+    else if(s.urls.length===1) result.push({title:s.title,vId:extractVid(s.urls[0])});
+    else s.urls.forEach((url,idx)=>result.push({title:s.title+(idx===0?'':` (${idx+1})`),vId:extractVid(url)}));
   });
   return result;
 }
 
 function analyzeConti(){
-  const text=document.getElementById('conti-input').value.trim();if(!text)return;
-  Object.keys(metros).forEach(id=>{if(metros[id].isPlaying)stopMetro(+id);});
-  metros={};tapTimesMap={};globalSongId=0;
+  const text=document.getElementById('conti-input').value.trim(); if(!text) return;
+  Object.keys(metros).forEach(id=>{ if(metros[id].isPlaying) stopMetro(+id); });
+  metros={}; tapTimesMap={}; globalSongId=0;
   document.getElementById('workspace').innerHTML='';
   const items=parseConti(text);
-  items.forEach(item=>{globalSongId++;createCard(globalSongId,item.title,item.vId);});
+  items.forEach(item=>{ globalSongId++; createCard(globalSongId, item.title, item.vId); });
   renderEmptyState();
-  setTimeout(updateTextareaLimits,300);
+  setTimeout(updatePanelWidth,300);
   autosave();
 }
 function addEmptyCard(){
-  removeEmptyState();globalSongId++;
-  createCard(globalSongId,'Song '+globalSongId,null);
-  setTimeout(updateTextareaLimits,300);autosave();
+  removeEmptyState(); globalSongId++;
+  createCard(globalSongId, 'Song '+globalSongId, null);
+  setTimeout(updatePanelWidth,300); autosave();
 }
-function removeEmptyState(){document.querySelector('.empty-state')?.remove();}
+function removeEmptyState(){ document.querySelector('.empty-state')?.remove(); }
 function renderEmptyState(){
   const ws=document.getElementById('workspace');
   if(!ws.querySelector('.song-card'))
@@ -890,29 +940,29 @@ function renderEmptyState(){
 /* ══ 썸네일 ══ */
 function buildThumb(id,vId){
   metros[id].vId=vId||null;
-  const section=document.getElementById('thumb-'+id);if(!section)return;
+  const section=document.getElementById('thumb-'+id); if(!section) return;
   section.querySelectorAll('img,.thumb-overlay').forEach(el=>el.remove());
-  const center=section.querySelector('.thumb-center');if(center)center.innerHTML='';
+  const center=section.querySelector('.thumb-center'); if(center) center.innerHTML='';
   if(vId){
     const img=document.createElement('img');
     const urls=['hqdefault','mqdefault','default'].map(q=>`https://img.youtube.com/vi/${vId}/${q}.jpg`);
-    let ti=0;img.src=urls[0];img.alt='';img.draggable=false;
-    img.onerror=function(){if(++ti<urls.length)this.src=urls[ti];};
+    let ti=0; img.src=urls[0]; img.alt=''; img.draggable=false;
+    img.onerror=function(){ if(++ti<urls.length) this.src=urls[ti]; };
     section.insertBefore(img,section.firstChild);
-    const ov=document.createElement('div');ov.className='thumb-overlay';
+    const ov=document.createElement('div'); ov.className='thumb-overlay';
     section.insertBefore(ov,section.querySelector('.drag-handle-zone'));
     if(center){
-      const lb=document.createElement('button');lb.className='thumb-btn link-btn';lb.textContent='▶ Link';
-      lb.onclick=e=>{e.stopPropagation();window.open('https://www.youtube.com/watch?v='+vId,'_blank');};
+      const lb=document.createElement('button'); lb.className='thumb-btn link-btn'; lb.textContent='▶ Link';
+      lb.onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
       lb.addEventListener('pointerdown',e=>e.stopPropagation());
       center.appendChild(lb);
     }
   } else {
     if(center){
-      const wrap=document.createElement('div');wrap.className='no-thumb-content';
+      const wrap=document.createElement('div'); wrap.className='no-thumb-content';
       wrap.innerHTML=`<span class="no-thumb-label">No Link</span><input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크..."><button class="link-apply-btn">적용</button>`;
       wrap.querySelector('input').addEventListener('pointerdown',e=>e.stopPropagation());
-      wrap.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter')applyLink(id);e.stopPropagation();});
+      wrap.querySelector('input').addEventListener('keydown',e=>{ if(e.key==='Enter') applyLink(id); e.stopPropagation(); });
       wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
       wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
       center.appendChild(wrap);
@@ -920,27 +970,29 @@ function buildThumb(id,vId){
   }
 }
 function applyLink(id){
-  const inp=document.getElementById('linkinput-'+id);if(!inp)return;
+  const inp=document.getElementById('linkinput-'+id); if(!inp) return;
   const vId=extractVid(inp.value.trim());
-  if(!vId){inp.style.borderColor='#ff453a';setTimeout(()=>inp.style.borderColor='',1800);return;}
-  metros[id].vId=vId;buildThumb(id,vId);autosave();
+  if(!vId){ inp.style.borderColor='#ff453a'; setTimeout(()=>inp.style.borderColor='',1800); return; }
+  metros[id].vId=vId; buildThumb(id,vId); autosave();
 }
 
 /* ══ 상태 초기화 ══ */
 function initStates(id){
   const m=metros[id];
-  m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0); // 첫 박만 accent
+  m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
   m.subStates=Array.from({length:m.sig},()=>new Array(16).fill(0));
 }
 
-/* ══ 카드 HTML 템플릿 ══ */
+/* ══ 카드 HTML ══ */
 function cardHTML(id,title){
   return `
     <div class="thumb-section" id="thumb-${id}">
-      <div class="drag-handle-zone" id="handle-${id}"><span class="drag-handle-icon">⠿</span></div>
+      <div class="drag-handle-zone" id="handle-${id}">
+        <span class="drag-handle-icon">⠿</span>
+      </div>
       <div class="thumb-center" id="thumb-center-${id}"></div>
       <div class="thumb-actions">
-        <button class="thumb-btn copy-btn">⎘ Copy</button>
+        <button class="thumb-btn copy-btn">⎘</button>
         <button class="thumb-btn del-btn">✕</button>
       </div>
     </div>
@@ -978,12 +1030,13 @@ function cardHTML(id,title){
           <span class="setting-label">Sound</span>
           <div class="segmented-control" id="sound-seg-${id}">
             <button class="seg-btn active" data-sound="digital">Digital</button>
+            <button class="seg-btn" data-sound="classic">Classic</button>
             <button class="seg-btn" data-sound="wood">Wood</button>
-            <button class="seg-btn" data-sound="beep">Beep</button>
+            <button class="seg-btn" data-sound="voice">Voice</button>
           </div>
         </div>
         <div class="setting-row">
-          <span class="setting-label">Volume</span>
+          <span class="setting-label">Vol</span>
           <div class="vol-container">
             <button class="mute-btn" id="mute-${id}">🔊</button>
             <input type="range" min="0" max="1" step="0.05" value="0.7" id="vol-${id}">
@@ -1001,176 +1054,81 @@ function cardHTML(id,title){
 function createCard(id,title,vId){
   removeEmptyState();
   metros[id]={
-    isPlaying:false,bpm:120,sig:4,subDiv:1,
-    vol:.7,muted:false,sound:'digital',
-    workletNode:null,vId:vId||null,
-    blockStates:[],subStates:[]
+    isPlaying:false, bpm:120, sig:4, subDiv:1,
+    vol:.7, muted:false, sound:'digital',
+    workletNode:null, vId:vId||null,
+    blockStates:[], subStates:[]
   };
   initStates(id);
   const ws=document.getElementById('workspace');
   const card=document.createElement('div');
-  card.className='song-card';card.id='card-'+id;
+  card.className='song-card'; card.id='card-'+id;
   card.innerHTML=cardHTML(id,title);
   ws.appendChild(card);
-  buildThumb(id,vId);updateSubIcons(id);renderViz(id);bindEvents(card,id);
-  setTimeout(updateTextareaLimits,200);
+  buildThumb(id,vId); updateSubIcons(id); renderViz(id); bindEvents(card,id);
+  setTimeout(updatePanelWidth,200);
 }
 
 /* ══ Sub 아이콘 ══ */
 function updateSubIcons(id){
-  const seg=document.getElementById('sub-seg-'+id);if(!seg)return;
-  const m=metros[id];if(!m)return;
+  const seg=document.getElementById('sub-seg-'+id); if(!seg) return;
+  const m=metros[id]; if(!m) return;
   seg.querySelectorAll('.seg-btn').forEach(btn=>{
     const div=+btn.dataset.div;
-    btn.innerHTML=getSubSvg(div,div===m.subDiv);
+    btn.innerHTML=getSubSvg(div, div===m.subDiv);
   });
 }
 
-/* ══ 이벤트 바인딩 ══ */
-function bindEvents(card,id){
-  /* 삭제 버튼 — 확인 다이얼로그 */
-  card.querySelector('.del-btn').addEventListener('click',e=>{
-    e.stopPropagation();
-    const titleEl=document.getElementById('title-'+id);
-    const titleText=titleEl?titleEl.innerText.trim():'이 카드';
-    showConfirm(
-      '🗑️',
-      '카드를 삭제할까요?',
-      `"${titleText}" 을(를)\n정말로 삭제하시겠습니까?`,
-      ()=>deleteCard(id)
-    );
-  });
-  card.querySelector('.copy-btn').addEventListener('click',e=>{e.stopPropagation();duplicateCard(id);});
-
-  const minus=card.querySelector('#bpm-minus-'+id);
-  const plus=card.querySelector('#bpm-plus-'+id);
-  minus.addEventListener('pointerdown',e=>onBpmDown(id,-1,e));
-  plus.addEventListener('pointerdown',e=>onBpmDown(id,+1,e));
-  ['pointerup','pointercancel','pointerleave'].forEach(ev=>{
-    minus.addEventListener(ev,onBpmUp);plus.addEventListener(ev,onBpmUp);
-  });
-
-  const bpmEl=card.querySelector('#bpm-'+id);
-  bpmEl.addEventListener('blur',()=>commitBpm(id,bpmEl));
-  bpmEl.addEventListener('input',()=>liveUpdateBpm(id,bpmEl));
-  bpmEl.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();bpmEl.blur();}e.stopPropagation();});
-  bpmEl.addEventListener('pointerdown',e=>e.stopPropagation());
-
-  card.querySelector('#sub-seg-'+id).addEventListener('click',e=>{
-    const b=e.target.closest('.seg-btn');if(!b)return;
-    setSubDiv(id,+b.dataset.div);
-  });
-  card.querySelector('#beat-seg-'+id).addEventListener('click',e=>{
-    const b=e.target.closest('.seg-btn');if(!b)return;
-    setBeat(id,+b.dataset.beat,b);
-  });
-  card.querySelector('#sound-seg-'+id).addEventListener('click',e=>{
-    const b=e.target.closest('.seg-btn');if(!b)return;
-    setSound(id,b.dataset.sound,b);
-  });
-
-  const volEl=card.querySelector('#vol-'+id);
-  volEl.addEventListener('input',e=>{metros[id].vol=+e.target.value;autosave();});
-  card.querySelector('#mute-'+id).addEventListener('click',()=>toggleMute(id));
-
-  card.querySelector('#tap-btn-'+id).addEventListener('pointerdown',e=>{
-    e.preventDefault();e.stopPropagation();tapTempo(id);
-  });
-  card.querySelector('#p-btn-'+id).addEventListener('pointerdown',e=>{
-    e.preventDefault();e.stopPropagation();toggleMetro(id);
-  });
-
-  card.querySelector('.info-section').addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('#thumb-center-'+id).addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('.thumb-actions').addEventListener('pointerdown',e=>e.stopPropagation());
-
-  /* 제목 변경 저장 */
-  const titleEl=card.querySelector('#title-'+id);
-  titleEl.addEventListener('input',()=>autosave());
-
-  initDrag(card,id);
-}
-
-/* ══ 삭제/복제 ══ */
-function deleteCard(id){
-  if(metros[id]?.isPlaying)stopMetro(id);
-  delete metros[id];delete tapTimesMap[id];
-  const el=document.getElementById('card-'+id);if(!el)return;
-  el.style.cssText+='transition:opacity .18s,transform .18s;opacity:0;transform:scale(.92);';
-  setTimeout(()=>{el.remove();renderEmptyState();updateTextareaLimits();autosave();},200);
-}
-function duplicateCard(srcId){
-  const m=metros[srcId];if(!m)return;
-  globalSongId++;const nid=globalSongId;
-  createCard(nid,(document.getElementById('title-'+srcId)?.innerText.trim()||'Song')+' (copy)',m.vId||null);
-  const nm=metros[nid];
-  Object.assign(nm,{bpm:m.bpm,sig:m.sig,subDiv:m.subDiv,vol:m.vol,sound:m.sound});
-  nm.blockStates=[...m.blockStates];
-  nm.subStates=m.subStates.map(s=>[...s]);
-  document.getElementById('bpm-'+nid).innerText=nm.bpm;
-  document.getElementById('beat-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===nm.sig));
-  document.getElementById('sound-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.sound===nm.sound));
-  document.getElementById('vol-'+nid).value=nm.vol;
-  updateSubIcons(nid);renderViz(nid);autosave();
-}
-
-/* ══════════════════════════════════════════════
-   드래그 & 드롭
-   ★ 마우스 드래그 중 화면 가장자리 → 자동 스크롤
-   ★ 터치 드래그 중 화면 가장자리 → 자동 스크롤
-══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   드래그 & 드롭 (마우스 완전 재구현)
+   ★ mousedown on handle → mousemove로 ghost 이동
+   ★ mouseup → drop 위치 재정렬
+   ★ 가장자리 → 자동 스크롤
+══════════════════════════════════════════ */
 function initDrag(card,id){
   const handle=document.getElementById('handle-'+id);
 
-  /* ── 마우스 드래그 ── */
-  handle.addEventListener('mousedown',e=>{
-    e.preventDefault();
-    card.setAttribute('draggable','true');
-    _mouseDragging=true;
-    _mouseDragId=id;
+  /* ── 마우스 드래그 (HTML5 drag API 대신 직접 구현) ── */
+  handle.addEventListener('mousedown', e=>{
+    if(e.button!==0) return;
+    e.preventDefault(); e.stopPropagation();
+    _mouseDragId=id; _mouseDragging=true;
+
+    // ghost 생성
+    const rect=card.getBoundingClientRect();
+    _mouseGhostOffX=e.clientX-rect.left;
+    _mouseGhostOffY=e.clientY-rect.top;
+    _mouseGhost=card.cloneNode(true);
+    _mouseGhost.id='mouse-ghost';
+    _mouseGhost.style.cssText=`
+      position:fixed;pointer-events:none;z-index:9999;
+      width:${rect.width}px;
+      left:${rect.left}px;top:${rect.top}px;
+      opacity:.78;transform:scale(1.03) rotate(0.8deg);
+      border:2px solid var(--accent);
+      box-shadow:0 12px 40px rgba(0,0,0,.6);
+      border-radius:18px;overflow:hidden;transition:none;
+    `;
+    document.body.appendChild(_mouseGhost);
+    card.classList.add('dragging');
     activateDim(id);
   });
 
-  card.addEventListener('dragstart',e=>{
-    if(card.getAttribute('draggable')!=='true'){e.preventDefault();return;}
-    dragSrcId=id;card.classList.add('dragging');
-    e.dataTransfer.effectAllowed='move';
-    e.dataTransfer.setData('text/plain',String(id));
-  });
-
-  card.addEventListener('dragend',()=>{
-    card.setAttribute('draggable','false');card.classList.remove('dragging');
-    deactivateDim();
-    document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
-    stopAutoScroll();_mouseDragging=false;_mouseDragId=null;
-  });
-  card.addEventListener('dragover',e=>{
-    e.preventDefault();
-    if(+card.id.replace('card-','')!==dragSrcId)card.classList.add('drag-over');
-  });
-  card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
-  card.addEventListener('drop',e=>{
-    e.preventDefault();card.classList.remove('drag-over');
-    const tgt=+card.id.replace('card-','');
-    if(dragSrcId==null||dragSrcId===tgt)return;
-    reorder(dragSrcId,tgt);dragSrcId=null;autosave();
-  });
-
   /* ── 터치 드래그 ── */
-  handle.addEventListener('touchstart',e=>{
-    e.stopPropagation();if(_touchDragId!=null)return;
+  handle.addEventListener('touchstart', e=>{
+    e.stopPropagation(); if(_touchDragId!=null) return;
     _touchDragId=id;
     const t=e.touches[0];
     const rect=card.getBoundingClientRect();
-    _touchOffX=t.clientX-rect.left;_touchOffY=t.clientY-rect.top;
-    _touchGhost=card.cloneNode(true);_touchGhost.id='touch-ghost';
+    _touchOffX=t.clientX-rect.left; _touchOffY=t.clientY-rect.top;
+    _touchGhost=card.cloneNode(true); _touchGhost.id='touch-ghost';
     _touchGhost.style.cssText=`position:fixed;pointer-events:none;z-index:9999;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;opacity:.78;transform:scale(1.04) rotate(1.2deg);border:2px solid var(--accent);box-shadow:0 12px 40px rgba(0,0,0,.6);border-radius:18px;overflow:hidden;transition:none;`;
     document.body.appendChild(_touchGhost);
-    card.classList.add('dragging');activateDim(id);startAutoScroll();
+    card.classList.add('dragging'); activateDim(id); startAutoScroll();
   },{passive:true});
 
-  handle.addEventListener('touchmove',e=>{
-    if(_touchDragId!==id||!_touchGhost)return;
+  handle.addEventListener('touchmove', e=>{
+    if(_touchDragId!==id||!_touchGhost) return;
     e.preventDefault();
     const t=e.touches[0];
     _touchGhost.style.left=(t.clientX-_touchOffX)+'px';
@@ -1179,38 +1137,62 @@ function initDrag(card,id){
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
-    if(overCard&&overCard.id!=='card-'+id)overCard.classList.add('drag-over');
+    if(overCard&&overCard.id!=='card-'+id) overCard.classList.add('drag-over');
   },{passive:false});
 
-  handle.addEventListener('touchend',e=>{
-    if(_touchDragId!==id)return;
-    e.stopPropagation();stopAutoScroll();
+  handle.addEventListener('touchend', e=>{
+    if(_touchDragId!==id) return;
+    e.stopPropagation(); stopAutoScroll();
     const t=e.changedTouches[0];
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
-    if(overCard&&overCard.id!=='card-'+id){reorder(id,+overCard.id.replace('card-',''));autosave();}
-    _touchGhost?.remove();_touchGhost=null;_touchDragId=null;
+    if(overCard&&overCard.id!=='card-'+id){ reorder(id,+overCard.id.replace('card-','')); autosave(); }
+    _touchGhost?.remove(); _touchGhost=null; _touchDragId=null;
     document.getElementById('card-'+id)?.classList.remove('dragging');
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
     deactivateDim();
   },{passive:true});
 }
 
-/* 마우스 드래그 자동 스크롤: dragover 이벤트로 감지 */
-document.addEventListener('dragover',e=>{
-  if(!_mouseDragging)return;
+/* 마우스 전역 이벤트 */
+document.addEventListener('mousemove', e=>{
+  if(!_mouseDragging||!_mouseGhost) return;
+  // ghost 이동
+  _mouseGhost.style.left=(e.clientX-_mouseGhostOffX)+'px';
+  _mouseGhost.style.top=(e.clientY-_mouseGhostOffY)+'px';
+  // drag-over 표시
+  _mouseGhost.style.display='none';
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  _mouseGhost.style.display='';
+  document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
+  const overCard=el?.closest('.song-card');
+  if(overCard&&overCard.id!=='card-'+_mouseDragId) overCard.classList.add('drag-over');
+  // 자동 스크롤
   updateAutoScrollDir(e.clientY);
-  if(_autoScrollRAF==null)startAutoScroll();
-});
-document.addEventListener('dragend',()=>{
-  if(_mouseDragging){stopAutoScroll();_mouseDragging=false;_mouseDragId=null;}
-});
-document.addEventListener('mouseup',()=>{
-  document.querySelectorAll('.song-card').forEach(c=>c.setAttribute('draggable','false'));
-  if(_mouseDragging){stopAutoScroll();_mouseDragging=false;_mouseDragId=null;deactivateDim();}
+  if(_autoScrollRAF==null) startAutoScroll();
 });
 
-/* 자동 스크롤 공통 */
+document.addEventListener('mouseup', e=>{
+  if(!_mouseDragging) return;
+  // drop
+  if(_mouseGhost) _mouseGhost.style.display='none';
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  if(_mouseGhost) _mouseGhost.style.display='';
+  const overCard=el?.closest('.song-card');
+  if(overCard&&overCard.id!=='card-'+_mouseDragId){
+    reorder(_mouseDragId,+overCard.id.replace('card-',''));
+    autosave();
+  }
+  // 정리
+  _mouseGhost?.remove(); _mouseGhost=null;
+  document.getElementById('card-'+_mouseDragId)?.classList.remove('dragging');
+  document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
+  deactivateDim();
+  stopAutoScroll();
+  _mouseDragging=false; _mouseDragId=null;
+});
+
+/* 자동 스크롤 */
 function updateAutoScrollDir(clientY){
   const vh=window.innerHeight;
   if(clientY<SCROLL_ZONE){
@@ -1225,19 +1207,19 @@ function updateAutoScrollDir(clientY){
     _autoScrollDir=0;
     document.getElementById('scroll-zone-top').classList.remove('visible');
     document.getElementById('scroll-zone-bot').classList.remove('visible');
+    if(_touchDragId==null&&_mouseDragId) stopAutoScroll();
   }
 }
 function startAutoScroll(){
-  if(_autoScrollRAF)return;
-  const speed=_touchDragId!=null?SCROLL_SPEED_TOUCH:SCROLL_SPEED_MOUSE;
+  if(_autoScrollRAF) return;
   function frame(){
-    if(_autoScrollDir!==0)window.scrollBy(0,_autoScrollDir*speed);
+    if(_autoScrollDir!==0) window.scrollBy(0,_autoScrollDir*SCROLL_SPEED);
     _autoScrollRAF=requestAnimationFrame(frame);
   }
   _autoScrollRAF=requestAnimationFrame(frame);
 }
 function stopAutoScroll(){
-  if(_autoScrollRAF){cancelAnimationFrame(_autoScrollRAF);_autoScrollRAF=null;}
+  if(_autoScrollRAF){ cancelAnimationFrame(_autoScrollRAF); _autoScrollRAF=null; }
   _autoScrollDir=0;
   document.getElementById('scroll-zone-top').classList.remove('visible');
   document.getElementById('scroll-zone-bot').classList.remove('visible');
@@ -1247,62 +1229,135 @@ function reorder(srcId,tgtId){
   const ws=document.getElementById('workspace');
   const sc=document.getElementById('card-'+srcId);
   const tc=document.getElementById('card-'+tgtId);
-  if(!sc||!tc)return;
+  if(!sc||!tc) return;
   const all=[...ws.querySelectorAll('.song-card')];
-  ws.insertBefore(sc,all.indexOf(sc)<all.indexOf(tc)?tc.nextSibling:tc);
+  ws.insertBefore(sc, all.indexOf(sc)<all.indexOf(tc) ? tc.nextSibling : tc);
 }
-function activateDim(srcId){
-  document.querySelectorAll('.song-card').forEach(c=>{if(c.id!=='card-'+srcId)c.classList.add('drag-dim');});
+function activateDim(srcId){ document.querySelectorAll('.song-card').forEach(c=>{ if(c.id!=='card-'+srcId) c.classList.add('drag-dim'); }); }
+function deactivateDim(){ document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-dim')); }
+
+/* ══ 이벤트 바인딩 ══ */
+function bindEvents(card,id){
+  // 삭제
+  card.querySelector('.del-btn').addEventListener('click',e=>{
+    e.stopPropagation();
+    const titleEl=document.getElementById('title-'+id);
+    const titleText=titleEl?titleEl.innerText.trim():'이 카드';
+    showConfirm('🗑️','카드를 삭제할까요?',`"${titleText}"\n정말로 삭제하시겠습니까?`,()=>deleteCard(id));
+  });
+  card.querySelector('.copy-btn').addEventListener('click',e=>{ e.stopPropagation(); duplicateCard(id); });
+
+  const minus=card.querySelector('#bpm-minus-'+id);
+  const plus=card.querySelector('#bpm-plus-'+id);
+  minus.addEventListener('pointerdown',e=>onBpmDown(id,-1,e));
+  plus.addEventListener('pointerdown',e=>onBpmDown(id,+1,e));
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>{ minus.addEventListener(ev,onBpmUp); plus.addEventListener(ev,onBpmUp); });
+
+  const bpmEl=card.querySelector('#bpm-'+id);
+  bpmEl.addEventListener('blur',()=>commitBpm(id,bpmEl));
+  bpmEl.addEventListener('input',()=>liveUpdateBpm(id,bpmEl));
+  bpmEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); bpmEl.blur(); } e.stopPropagation(); });
+  bpmEl.addEventListener('pointerdown',e=>e.stopPropagation());
+
+  card.querySelector('#sub-seg-'+id).addEventListener('click',e=>{
+    const b=e.target.closest('.seg-btn'); if(!b) return;
+    setSubDiv(id,+b.dataset.div);
+  });
+  card.querySelector('#beat-seg-'+id).addEventListener('click',e=>{
+    const b=e.target.closest('.seg-btn'); if(!b) return;
+    setBeat(id,+b.dataset.beat,b);
+  });
+  card.querySelector('#sound-seg-'+id).addEventListener('click',e=>{
+    const b=e.target.closest('.seg-btn'); if(!b) return;
+    setSound(id,b.dataset.sound,b);
+  });
+
+  card.querySelector('#vol-'+id).addEventListener('input',e=>{ metros[id].vol=+e.target.value; autosave(); });
+  card.querySelector('#mute-'+id).addEventListener('click',()=>toggleMute(id));
+  card.querySelector('#tap-btn-'+id).addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); tapTempo(id); });
+  card.querySelector('#p-btn-'+id).addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); toggleMetro(id); });
+
+  // info-section 내부 클릭이 드래그 핸들로 전파 안 되도록
+  card.querySelector('.info-section').addEventListener('mousedown',e=>e.stopPropagation());
+  card.querySelector('.info-section').addEventListener('pointerdown',e=>e.stopPropagation());
+  card.querySelector('#thumb-center-'+id).addEventListener('pointerdown',e=>e.stopPropagation());
+  card.querySelector('.thumb-actions').addEventListener('pointerdown',e=>e.stopPropagation());
+  card.querySelector('.thumb-actions').addEventListener('mousedown',e=>e.stopPropagation());
+
+  const titleEl=card.querySelector('#title-'+id);
+  titleEl.addEventListener('input',()=>autosave());
+
+  initDrag(card,id);
 }
-function deactivateDim(){
-  document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-dim'));
+
+/* ══ 삭제/복제 ══ */
+function deleteCard(id){
+  if(metros[id]?.isPlaying) stopMetro(id);
+  delete metros[id]; delete tapTimesMap[id];
+  const el=document.getElementById('card-'+id); if(!el) return;
+  el.style.cssText+='transition:opacity .18s,transform .18s;opacity:0;transform:scale(.92);';
+  setTimeout(()=>{ el.remove(); renderEmptyState(); updatePanelWidth(); autosave(); },200);
+}
+function duplicateCard(srcId){
+  const m=metros[srcId]; if(!m) return;
+  globalSongId++; const nid=globalSongId;
+  createCard(nid,(document.getElementById('title-'+srcId)?.innerText.trim()||'Song')+' (copy)',m.vId||null);
+  const nm=metros[nid];
+  Object.assign(nm,{bpm:m.bpm,sig:m.sig,subDiv:m.subDiv,vol:m.vol,sound:m.sound});
+  nm.blockStates=[...m.blockStates];
+  nm.subStates=m.subStates.map(s=>[...s]);
+  document.getElementById('bpm-'+nid).innerText=nm.bpm;
+  document.getElementById('beat-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===nm.sig));
+  document.getElementById('sound-seg-'+nid).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.sound===nm.sound));
+  document.getElementById('vol-'+nid).value=nm.vol;
+  updateSubIcons(nid); renderViz(nid); autosave();
 }
 
 /* ══ 설정 변경 ══ */
 function setBeat(id,val,btnEl){
-  const m=metros[id];m.sig=val;initStates(id);
+  const m=metros[id]; m.sig=val; initStates(id);
   document.getElementById('beat-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
-  btnEl.classList.add('active');renderViz(id);
-  if(m.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'sig',sig:val});
+  btnEl.classList.add('active');
+  renderViz(id);
+  if(m.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'sig',sig:val});
   autosave();
 }
 
 /*
-  setSubDiv:
-  - sub 변경 시 subStates 초기화 (all on)
-  - blockStates: 첫 박 강조(1)만 유지, 나머지는 normal(0) 으로 리셋
-  - blockStates 유지 안 함 → 초기화하되 첫 박 accent만 보존
+  setSubDiv: sub 변경 시
+  - 모든 블록 기본(normal=0) 상태로 초기화
+  - 첫 박 첫 음만 강조(accent=1)
+  - subStates 전체 초기화 (모두 활성 = 0)
+  - 블록들은 3단계(0=기본/1=강조/2=비활성) 계속 가능
 */
 function setSubDiv(id,div){
-  const m=metros[id];if(!m)return;
-  const oldDiv=m.subDiv;
+  const m=metros[id]; if(!m) return;
   m.subDiv=div;
-  // 블록 상태: 첫 박만 accent, 나머지 normal (서브 변경 시 초기화)
+  // 초기화: 첫 박만 accent
   m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
   m.subStates=Array.from({length:m.sig},()=>new Array(16).fill(0));
   document.getElementById('sub-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sub-seg-'+id).querySelector(`[data-div="${div}"]`)?.classList.add('active');
-  updateSubIcons(id);renderViz(id);
-  if(m.isPlaying&&m.workletNode)m.workletNode.port.postMessage({type:'subDiv',subDiv:div});
+  updateSubIcons(id); renderViz(id);
+  if(m.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'subDiv',subDiv:div});
   autosave();
 }
-
 function setSound(id,val,btnEl){
   metros[id].sound=val;
   document.getElementById('sound-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
-  btnEl.classList.add('active');autosave();
+  btnEl.classList.add('active'); autosave();
 }
 function toggleMute(id){
   metros[id].muted=!metros[id].muted;
   const btn=document.getElementById('mute-'+id);
   btn.classList.toggle('muted',metros[id].muted);
-  btn.innerText=metros[id].muted?'🔇':'🔊';autosave();
+  btn.innerText=metros[id].muted?'🔇':'🔊'; autosave();
 }
 
 /* ══ 비주얼라이저 ══ */
 function renderViz(id){
   const m=metros[id];
-  const viz=document.getElementById('viz-'+id);if(!viz)return;
+  const viz=document.getElementById('viz-'+id); if(!viz) return;
   viz.innerHTML='';
   for(let i=0;i<m.sig;i++){
     const b=document.createElement('div');
@@ -1314,10 +1369,9 @@ function renderViz(id){
       for(let s=0;s<m.subDiv;s++){
         const ss=(m.subStates[i]?.[s])??0;
         const el=document.createElement('div');
-        // 서브슬롯 스타일: 메인 블록 accent이고 첫 슬롯이면 sub-accent
         let slotCls='sub-slot';
-        if(ss===1)slotCls+=' sub-off';
-        else if(s===0&&bs===1)slotCls+=' sub-accent';
+        if(ss===1) slotCls+=' sub-off';
+        else if(s===0&&bs===1) slotCls+=' sub-accent';
         el.className=slotCls;
         el.id='sub-'+id+'-'+i+'-'+s;
         el.style.left=(s/m.subDiv*100)+'%';
@@ -1326,11 +1380,11 @@ function renderViz(id){
         el.addEventListener('click',e=>{
           e.stopPropagation();
           m.subStates[i][_s]=(m.subStates[i][_s]===0)?1:0;
-          renderViz(id);autosave();
+          renderViz(id); autosave();
         });
         b.appendChild(el);
       }
-      b.addEventListener('click',e=>{if(e.target===b){cycleBlockState(id,i);}});
+      b.addEventListener('click',e=>{ if(e.target===b) cycleBlockState(id,i); });
     } else {
       b.addEventListener('click',()=>cycleBlockState(id,i));
     }
@@ -1340,9 +1394,8 @@ function renderViz(id){
 
 function cycleBlockState(id,i){
   metros[id].blockStates[i]=(metros[id].blockStates[i]+1)%3;
-  renderViz(id);autosave();
+  renderViz(id); autosave();
 }
-
 function clearVizFlash(id){
   document.querySelectorAll(`#viz-${id} .beat-block`).forEach(b=>b.classList.remove('flash-blue','flash-red'));
   document.querySelectorAll(`#viz-${id} .sub-slot`).forEach(b=>b.classList.remove('sub-flash'));
@@ -1351,17 +1404,17 @@ function clearVizFlash(id){
 /* ══ 세트리스트 ══ */
 function extractSetlist(){
   const cards=document.getElementById('workspace').querySelectorAll('.song-card');
-  if(!cards.length){document.getElementById('setlist-output').value='카드가 없습니다.';return;}
+  if(!cards.length){ document.getElementById('setlist-output').value='카드가 없습니다.'; return; }
   const bl={1:'1/1',3:'3/4',4:'4/4',6:'6/8'};
   const sl={1:'4분음표',2:'8분음표',3:'셋잇단',4:'16분음표'};
   document.getElementById('setlist-output').value=[...cards].map(c=>{
-    const id=+c.id.replace('card-','');const m=metros[id];if(!m)return'';
+    const id=+c.id.replace('card-',''); const m=metros[id]; if(!m) return'';
     return(document.getElementById('title-'+id)?.innerText||'제목없음').trim()+
       '  —  BPM: '+m.bpm+' | 박자: '+(bl[m.sig]||'4/4')+(m.subDiv>1?' ('+sl[m.subDiv]+')':'');
   }).filter(Boolean).join('\n');
 }
 
-/* ══ 커스텀 Confirm 다이얼로그 ══ */
+/* ══ 커스텀 Confirm ══ */
 function showConfirm(icon,title,msg,onConfirm){
   const overlay=document.createElement('div');
   overlay.className='modal-overlay';
@@ -1377,8 +1430,8 @@ function showConfirm(icon,title,msg,onConfirm){
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.modal-btn-cancel').addEventListener('click',()=>overlay.remove());
-  overlay.querySelector('.modal-btn-confirm').addEventListener('click',()=>{overlay.remove();onConfirm();});
-  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+  overlay.querySelector('.modal-btn-confirm').addEventListener('click',()=>{ overlay.remove(); onConfirm(); });
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
 }
 
 function escHtml(s){
@@ -1386,15 +1439,15 @@ function escHtml(s){
 }
 
 /* ══ 리사이즈 ══ */
-window.addEventListener('resize',updateTextareaLimits);
+window.addEventListener('resize',updatePanelWidth);
 
-/* ══ conti-input 변경 시 저장 ══ */
+/* ══ 입력 변경 저장 ══ */
 document.getElementById('conti-input').addEventListener('input',()=>autosave());
 
 /* ══ 초기화 ══ */
 window.addEventListener('DOMContentLoaded',()=>{
   if(!loadState()){
-    // 저장된 상태 없으면 빈 화면
+    // 빈 화면 유지
   }
 });
 </script>
