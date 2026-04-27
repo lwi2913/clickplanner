@@ -267,12 +267,6 @@
     .empty-state-icon{font-size:2.8rem;margin-bottom:10px;opacity:.4;}
     .empty-state-text{font-size:13px;font-weight:700;opacity:.6;line-height:1.7;}
 
-    @media(max-width:400px){
-      h1{font-size:1.8rem;}
-      .theme-switcher{position:static;margin:0 auto 12px;width:fit-content;}
-      .bpm-val{font-size:2.4rem;}
-      .info-section{padding:10px 8px 8px;}
-    }
   </style>
 </head>
 <body data-theme="dark">
@@ -316,6 +310,7 @@
     <div class="panel-title">📤 Setlist 추출</div>
     <button class="panel-btn" id="copy-setlist-btn" onclick="copySetlist()">클립보드에 복사하기</button>
   </div>
+  <button class="btn-primary" style="width:100%;padding:11px;margin-bottom:12px;" onclick="extractSetlist()">Setlist 텍스트로 요약 추출하기</button>
   <textarea class="setlist-output" id="setlist-output" placeholder="추출된 세트리스트가 여기에 표시됩니다..."></textarea>
 </div>
 
@@ -471,6 +466,23 @@ function copySetlist(){
   setTimeout(()=>{ btn.innerText = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
 }
 
+/* ══ 패널 너비 제한 ══ */
+function updatePanelWidth(){
+  const cards=[...document.querySelectorAll('.song-card')];
+  let maxW = '70%'; 
+  document.documentElement.style.setProperty('--panel-maxw', maxW);
+  ['input-panel'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.style.maxWidth=maxW; }
+  });
+  
+  const setlistPanel = document.getElementById('setlist-panel');
+  if(setlistPanel) setlistPanel.style.maxWidth = '60%';
+  
+  const hdr=document.querySelector('header');
+  if(hdr) hdr.style.maxWidth=maxW;
+}
+
 /* ══════════════════════════════════
    SVG 음표 
 ══════════════════════════════════ */
@@ -587,7 +599,6 @@ function loadState(){
       data.cards.forEach(c=>{ if(c.id>maxId) maxId=c.id; createCardFromData(c); });
       globalSongId=maxId;
       renderEmptyState();
-      extractSetlist();
     }
     return true;
   }catch(e){ 
@@ -981,13 +992,11 @@ function analyzeConti(){
   const items=parseConti(text);
   items.forEach(item=>{ globalSongId++; createCard(globalSongId, item.title, item.vId); });
   renderEmptyState();
-  extractSetlist();
   autosave();
 }
 function addEmptyCard(){
   removeEmptyState(); globalSongId++;
   createCard(globalSongId, 'Song '+globalSongId, null);
-  extractSetlist();
   autosave();
 }
 function removeEmptyState(){ document.querySelector('.empty-state')?.remove(); }
@@ -1218,7 +1227,7 @@ function initDrag(card,id){
     const t=e.changedTouches[0];
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const overCard=el?.closest('.song-card');
-    if(overCard&&overCard.id!=='card-'+id){ reorder(id,+overCard.id.replace('card-','')); extractSetlist(); autosave(); }
+    if(overCard&&overCard.id!=='card-'+id){ reorder(id,+overCard.id.replace('card-','')); autosave(); }
     _touchGhost?.remove(); _touchGhost=null; _touchDragId=null;
     document.getElementById('card-'+id)?.classList.remove('dragging');
     document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
@@ -1248,7 +1257,6 @@ document.addEventListener('mouseup', e=>{
   const overCard=el?.closest('.song-card');
   if(overCard&&overCard.id!=='card-'+_mouseDragId){
     reorder(_mouseDragId,+overCard.id.replace('card-',''));
-    extractSetlist();
     autosave();
   }
   _mouseGhost?.remove(); _mouseGhost=null;
@@ -1337,7 +1345,6 @@ function bindEvents(card,id){
   const titleEl=card.querySelector('#title-'+id);
   titleEl.addEventListener('input',()=> {
     autosave();
-    extractSetlist();
   });
 
   initDrag(card,id);
@@ -1351,7 +1358,6 @@ function deleteCard(id){
   setTimeout(()=>{ 
     el.remove(); 
     renderEmptyState(); 
-    extractSetlist(); 
     autosave(); 
   },200);
 }
@@ -1369,7 +1375,6 @@ function duplicateCard(srcId){
   };
   
   createCardFromData(cData, srcId);
-  extractSetlist();
   autosave();
 }
 
@@ -1378,7 +1383,6 @@ function setBeat(id,val,btnEl){
   document.getElementById('beat-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   btnEl.classList.add('active');
   renderViz(id);
-  extractSetlist();
   if(m.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'sig',sig:val});
   autosave();
 }
@@ -1394,7 +1398,6 @@ function setSubDiv(id,div){
   document.getElementById('sub-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sub-seg-'+id).querySelector(`[data-div="${div}"]`)?.classList.add('active');
   updateSubIcons(id); renderViz(id);
-  extractSetlist();
   if(m.isPlaying&&m.workletNode) m.workletNode.port.postMessage({type:'subDiv',subDiv:div});
   autosave();
 }
@@ -1486,9 +1489,9 @@ function extractSetlist(){
     const id=+c.id.replace('card-',''); const m=metros[id]; if(!m) return'';
     const title = (document.getElementById('title-'+id)?.innerText||'Untitled').trim();
     const subStr = m.subDiv > 1 ? ` (Sub: ${sl[m.subDiv]})` : '';
-    // 지정된 형식대로 생성: "제목\nBPM: 120 | 4/4 (Sub: 8th)"
-    return `${title}\nBPM: ${m.bpm} | ${bl[m.sig]||'4/4'}${subStr}`;
-  }).filter(Boolean).join('\n\n');
+    // 지정된 형식대로 생성: "제목 BPM: 120 | 4/4 (Sub: 8th)"
+    return `${title} BPM: ${m.bpm} | ${bl[m.sig]||'4/4'}${subStr}`;
+  }).filter(Boolean).join('\n');
   
   autoResizeTextarea(outputEl);
 }
