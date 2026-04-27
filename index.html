@@ -378,15 +378,18 @@ const VOICE_SUB = {
   4: ['','ee','ay','nah']// 원 이 애 나
 };
 
-/* ══ Web Speech ══ */
+/* ══ Web Speech (Voice) ══ */
 let speechSynth = window.speechSynthesis || null;
 let voiceCache = null;
+let speechUnlocked = false;
+let uKeeper = []; // 크롬 GC 버그(가비지 컬렉터가 재생 중인 음성을 날려버리는 현상) 방지용 배열
 
 function getVoice(){
   if(voiceCache) return voiceCache;
   if(!speechSynth) return null;
   const voices = speechSynth.getVoices();
-  voiceCache = voices.find(v=>v.lang.startsWith('en-US')) ||
+  voiceCache = voices.find(v=>v.name.includes('Google US English')) ||
+               voices.find(v=>v.lang.startsWith('en-US')) ||
                voices.find(v=>v.lang.startsWith('en')) ||
                (voices.length?voices[0]:null);
   return voiceCache;
@@ -398,19 +401,21 @@ function speakBeat(text, time){
   const delayMs = Math.max(0,(time - audioCtx.currentTime)*1000);
   setTimeout(()=>{
     try {
-      // 큐가 밀려 앱이 다운되는 현상 방지: 재생 중이면 스킵
-      if(speechSynth.speaking && speechSynth.pending) return; 
-      
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.4; // 연음에 적합하도록 속도를 살짝 낮춤
+      u.rate = 1.8; // 연음에 적합한 빠른 속도
       u.pitch = 1.0; 
       u.volume = 1.0;
+      u.lang = 'en-US';
       const v = getVoice();
       if(v) u.voice = v;
-      u.lang = 'en-US';
+      
+      // GC 버그 방지
+      uKeeper.push(u);
+      if(uKeeper.length > 20) uKeeper.shift();
+
       speechSynth.speak(u);
     } catch(e) {
-      console.warn("Speech Engine Error (Ignored):", e);
+      console.warn("Speech Engine Error:", e);
     }
   }, delayMs);
 }
@@ -472,7 +477,6 @@ function svgQuarter(active){
   </svg>`;
 }
 
-/* 8분음표 (꼬리 연결된 ♫ 모양 & 기둥 길이 밸런스) */
 function svgEighth(active){
   const c=nc(active);
   return `<svg width="34" height="36" viewBox="0 0 34 36" xmlns="http://www.w3.org/2000/svg">
@@ -494,7 +498,6 @@ function svgTriplet(active){
     <ellipse cx="3.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 3.5 27.5)"/>
     <ellipse cx="17.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 17.5 27.5)"/>
     <ellipse cx="31.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 31.5 27.5)"/>
-    
     <path d="M 7 6 L 7 3 L 18 3" fill="none" stroke="${c}" stroke-width="1.2"/>
     <path d="M 26 3 L 37 3 L 37 6" fill="none" stroke="${c}" stroke-width="1.2"/>
     <text x="22" y="6" text-anchor="middle" font-size="8.5" font-weight="bold" font-family="sans-serif" fill="${c}">3</text>
@@ -668,7 +671,7 @@ function stopMetro(id){
   if(btn){ btn.innerText='START'; btn.classList.remove('active'); }
   clearVizFlash(id);
   
-  if(speechSynth && speechSynth.speaking) {
+  if(speechSynth) {
       try { speechSynth.cancel(); } catch(e) {}
   }
 }
@@ -677,13 +680,13 @@ function toggleMetro(id){
   if(metros[id]?.isPlaying) {
     stopMetro(id); 
   } else {
-    // [중요] 모바일 Voice 활성화를 위해 '사용자 클릭(User Gesture)' 직후 동기식으로 엔진 Unlock!
+    // Voice 강제 언락 (클릭 이벤트 발생 시 동기식으로 실행)
     if (speechSynth) {
       try {
-        const unlockUtterance = new SpeechSynthesisUtterance('');
-        unlockUtterance.volume = 0;
-        speechSynth.speak(unlockUtterance);
-        speechSynth.cancel(); // 큐를 즉시 비움
+        speechSynth.cancel();
+        const unlockU = new SpeechSynthesisUtterance(' ');
+        unlockU.volume = 0;
+        speechSynth.speak(unlockU);
       } catch (e) {}
     }
     startMetro(id);
@@ -771,21 +774,35 @@ function playSound(type, isHigh, vol, t){
     osc.start(t); osc.stop(t+.07);
 
   } else if(type==='wood'){
-    // 완전 드라이한 명료한 목탁(Temple Block) 소리로 변경
+    // 완전 드라이한 명료한 나무 타격음 (목탁 / Clave)
     const ctx = audioCtx;
-    const dur = 0.04; // 잔향 없이 짧게 끊음
+    const dur = 0.05;
     
+    // 메인 공명 (Sine)
     const osc = ctx.createOscillator();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(isHigh ? 900 : 700, t);
-    osc.frequency.exponentialRampToValueAtTime(isHigh ? 600 : 450, t + dur);
+    osc.frequency.exponentialRampToValueAtTime(isHigh ? 750 : 550, t + dur); 
     
     const og = ctx.createGain();
-    og.gain.setValueAtTime(vol * 2.5, t);
+    og.gain.setValueAtTime(vol * 3.0, t);
     og.gain.exponentialRampToValueAtTime(0.001, t + dur);
     
     osc.connect(og); og.connect(gain);
     osc.start(t); osc.stop(t + dur);
+
+    // 딱! 하는 어택 (짧은 Square 타격음)
+    const atk = ctx.createOscillator();
+    atk.type = 'square';
+    atk.frequency.setValueAtTime(isHigh ? 2000 : 1500, t);
+    atk.frequency.exponentialRampToValueAtTime(100, t + 0.01);
+    
+    const akGain = ctx.createGain();
+    akGain.gain.setValueAtTime(vol * 1.0, t);
+    akGain.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+    
+    atk.connect(akGain); akGain.connect(gain);
+    atk.start(t); atk.stop(t + 0.02);
 
   } else if(type==='beep'){
     const ctx=audioCtx;
@@ -904,7 +921,7 @@ function renderEmptyState(){
     ws.innerHTML='<div class="empty-state"><div class="empty-state-icon">🎹</div><div class="empty-state-text">카드가 없습니다.<br>[+ Add Empty]로 카드를 추가하세요.</div></div>';
 }
 
-/* ══ 썸네일 (우측 버튼 정렬 & 유튜브 꽉 차게) ══ */
+/* ══ 썸네일 (우측 버튼 정렬 순서 변경 및 SVG 아이콘 적용) ══ */
 function buildThumb(id,vId){
   metros[id].vId=vId||null;
   const section=document.getElementById('thumb-'+id); if(!section) return;
@@ -918,24 +935,21 @@ function buildThumb(id,vId){
     img.onerror=function(){ if(++ti<urls.length) this.src=urls[ti]; };
     section.insertBefore(img, section.firstChild);
     
-    // iframe을 thumb-section 공간 전체에 꽉 채워서 추가
     const iframe = document.createElement('iframe');
     iframe.className = 'youtube-iframe';
-    // playsinline=1 추가하여 모바일(카카오톡 등)에서 팝업 안뜨고 카드에서 바로 재생
     iframe.src = `https://www.youtube.com/embed/${vId}?rel=0&playsinline=1`;
     iframe.allowFullscreen = true;
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
     section.insertBefore(iframe, section.querySelector('.drag-handle-zone'));
     
-    // 우측 버튼: 삭제, 복사(깔끔한 SVG), 링크
+    // 우측 버튼: 삭제, 복사(더 예쁜 아이콘), 링크 순서로 변경
     actions.innerHTML = `
-      <button class="thumb-btn del-btn" title="삭제"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
-      <button class="thumb-btn copy-btn" title="복사"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+      <button class="thumb-btn del-btn" title="삭제"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      <button class="thumb-btn copy-btn" title="복사"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm-1 12H6V5h9v8zm4-10v14c0 1.1-.9 2-2 2H7v-2h10V3h2z"/></svg></button>
       <button class="thumb-btn link-btn" title="링크 열기"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button>
     `;
     actions.querySelector('.link-btn').onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
   } else {
-    // 링크가 없을 경우
     const wrap=document.createElement('div'); wrap.className='no-thumb-content';
     wrap.innerHTML=`
       <span class="no-thumb-label">No Link</span>
@@ -948,10 +962,10 @@ function buildThumb(id,vId){
     wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
     section.insertBefore(wrap, section.querySelector('.drag-handle-zone'));
     
-    // 우측 버튼: 삭제, 복사
+    // 링크 없을 때 우측 버튼: 삭제, 복사
     actions.innerHTML = `
-      <button class="thumb-btn del-btn" title="삭제"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
-      <button class="thumb-btn copy-btn" title="복사"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+      <button class="thumb-btn del-btn" title="삭제"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      <button class="thumb-btn copy-btn" title="복사"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm-1 12H6V5h9v8zm4-10v14c0 1.1-.9 2-2 2H7v-2h10V3h2z"/></svg></button>
     `;
   }
 
@@ -983,7 +997,7 @@ function initStates(id){
   });
 }
 
-/* ══ 카드 HTML ══ */
+/* ══ 카드 HTML (디지털,우드,비프,보이스 순서) ══ */
 function cardHTML(id,title){
   return `
     <div class="thumb-section" id="thumb-${id}">
