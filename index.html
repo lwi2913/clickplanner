@@ -32,7 +32,7 @@
     ::-webkit-scrollbar-track{background:transparent;}
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
-    /* ══ 헤더 (깔끔하게 디자인 개선) ══ */
+    /* ══ 헤더 ══ */
     header{
       text-align:center; margin-bottom:24px; position:relative;
       max-width:856px;
@@ -61,8 +61,8 @@
       background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
       padding:16px; width:100%; margin:0 auto 20px;
     }
-    #input-panel { max-width: 856px; } /* 카드 2개 너비 + 여백 16px */
-    #setlist-panel { max-width: 504px; } /* 카드 1.2배 너비 */
+    #input-panel { max-width: 856px; } 
+    #setlist-panel { max-width: 504px; } 
     
     @media(max-width:800px){
       header, #input-panel, #setlist-panel { max-width: 100%; }
@@ -72,16 +72,14 @@
     }
 
     .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    /* 패널 타이틀 크기 키움 (15px) */
     .panel-title { font-size:15px; font-weight:900; letter-spacing:1px; color:var(--accent); text-transform:uppercase; margin-bottom:0; }
     .panel-btn { background: var(--danger); color: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .panel-btn:hover { opacity: 0.8; }
     #copy-setlist-btn { background: var(--seg-bg); color: var(--text); }
     #copy-setlist-btn:hover { background: var(--seg-active); border-color: var(--accent); color: var(--accent); }
 
-    /* Textarea 가변 스크롤 적용 */
     textarea{
-      width:100%; min-height:72px; max-height:400px; /* 400px까지만 늘어나고 스크롤 생성 */
+      width:100%; min-height:72px; max-height:400px; 
       background:var(--input-bg);color:var(--text);
       padding:12px 14px;border-radius:10px;border:1px solid var(--border);
       font-size:13px;font-family:inherit;resize:vertical;overflow-y:auto;line-height:1.6;
@@ -90,7 +88,6 @@
     textarea:focus{outline:none;border-color:var(--accent);}
     textarea::placeholder{color:var(--sub-text);}
 
-    /* Textarea 전용 스크롤바 대폭 확대 및 리사이저 가시성 향상 */
     textarea::-webkit-scrollbar { width: 14px; height: 14px; }
     textarea::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 7px; margin: 4px; }
     textarea::-webkit-scrollbar-thumb { background: var(--border); border-radius: 7px; border: 3px solid var(--input-bg); }
@@ -397,9 +394,9 @@ const VOICE_BEATS = {
 };
 
 const VOICE_SUB = {
-  2: ['','en'],          
-  3: ['','tee','tah'],   
-  4: ['','ee','ay','nah']
+  2: ['','n'],          
+  3: ['','ti','ta'],   
+  4: ['','e','ae','na']
 };
 
 /* ══ Web Speech (Voice) ══ */
@@ -422,10 +419,8 @@ if(speechSynth) speechSynth.onvoiceschanged = ()=>{ voiceCache=null; getVoice();
 function speakBeat(text){
   if(!speechSynth) return;
   try {
-    speechSynth.cancel(); // 이전 큐를 강제 리셋 (크롬 멈춤 현상 우회)
-    
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.6; 
+    u.rate = 2.2; 
     u.pitch = 1.0; 
     u.volume = 1.0;
     u.lang = 'en-US';
@@ -452,31 +447,31 @@ function playVoice(sig, beatIdx, div, subIdx){
     else word='';
   }
   if(!word) return;
-  speakBeat(word); // 타이머 없이 바로 실행
+  speakBeat(word); // 타이머 없이 바로 실행 (겹치더라도 끊기지 않음)
 }
 
-/* ══ 완전 초기화 및 UI 리셋 ══ */
+/* ══ 완전 초기화 및 UI 리셋 (중앙 모달 사용) ══ */
 function initAll() {
-  if(!confirm('모든 데이터(콘티, 세트리스트, 카드)를 초기화하시겠습니까?')) return;
-  
-  localStorage.removeItem(LS_KEY);
-  Object.keys(metros).forEach(id => { if(metros[id].isPlaying) stopMetro(+id); });
-  
-  metros = {};
-  tapTimesMap = {};
-  globalSongId = 0;
-  
-  const contiEl = document.getElementById('conti-input');
-  const setlistEl = document.getElementById('setlist-output');
-  contiEl.value = '';
-  setlistEl.value = '';
-  document.getElementById('workspace').innerHTML = '';
-  
-  renderEmptyState();
-  updatePanelWidth();
-  
-  autoResizeTextarea(contiEl);
-  autoResizeTextarea(setlistEl);
+  showConfirm('⚠️', '전체 초기화', '모든 데이터를 초기화하시겠습니까?\\n(콘티, 세트리스트, 생성된 카드 모두 삭제)', '초기화', () => {
+    localStorage.removeItem(LS_KEY);
+    Object.keys(metros).forEach(id => { if(metros[id].isPlaying) stopMetro(+id); });
+    
+    metros = {};
+    tapTimesMap = {};
+    globalSongId = 0;
+    
+    const contiEl = document.getElementById('conti-input');
+    const setlistEl = document.getElementById('setlist-output');
+    contiEl.value = '';
+    setlistEl.value = '';
+    document.getElementById('workspace').innerHTML = '';
+    
+    renderEmptyState();
+    updatePanelWidth();
+    
+    autoResizeTextarea(contiEl);
+    autoResizeTextarea(setlistEl);
+  });
 }
 
 /* ══ 텍스트 영역 자동 크기 조절 (Auto Resize) ══ */
@@ -1112,7 +1107,7 @@ function buildThumb(id,vId){
     e.stopPropagation();
     const titleEl=document.getElementById('title-'+id);
     const titleText=titleEl?titleEl.innerText.trim():'이 카드';
-    showConfirm('🗑️','카드를 삭제할까요?',`"${titleText}"\n정말로 삭제하시겠습니까?`,()=>deleteCard(id));
+    showConfirm('🗑️','카드를 삭제할까요?',`"${titleText}"\n정말로 삭제하시겠습니까?`, '삭제', ()=>deleteCard(id));
   });
 }
 
@@ -1526,7 +1521,7 @@ function clearVizFlash(id){
   document.querySelectorAll(`#viz-${id} .sub-slot`).forEach(b=>b.classList.remove('sub-flash','sub-flash-accent'));
 }
 
-/* ══ 세트리스트 추출 (간결한 형식 한 줄 표기) ══ */
+/* ══ 세트리스트 추출 ══ */
 function extractSetlist(){
   const cards=document.getElementById('workspace').querySelectorAll('.song-card');
   const outputEl = document.getElementById('setlist-output');
@@ -1543,15 +1538,14 @@ function extractSetlist(){
     const id=+c.id.replace('card-',''); const m=metros[id]; if(!m) return'';
     const title = (document.getElementById('title-'+id)?.innerText||'Untitled').trim();
     const subStr = m.subDiv > 1 ? ` (Sub: ${sl[m.subDiv]})` : '';
-    // 지정된 형식: "제목 BPM: 120 | 4/4 (Sub: 8th)"
     return `${title} BPM: ${m.bpm} | ${bl[m.sig]||'4/4'}${subStr}`;
   }).filter(Boolean).join('\n');
   
   autoResizeTextarea(outputEl);
 }
 
-/* ══ 커스텀 Confirm ══ */
-function showConfirm(icon,title,msg,onConfirm){
+/* ══ 커스텀 Confirm (중앙 팝업) ══ */
+function showConfirm(icon,title,msg,confirmBtnText,onConfirm){
   const overlay=document.createElement('div');
   overlay.className='modal-overlay';
   overlay.innerHTML=`
@@ -1560,8 +1554,8 @@ function showConfirm(icon,title,msg,onConfirm){
       <div class="modal-title">${escHtml(title)}</div>
       <div class="modal-msg">${escHtml(msg)}</div>
       <div class="modal-btns">
-        <button class="modal-btn modal-btn-cancel">Cancel</button>
-        <button class="modal-btn modal-btn-confirm">Delete</button>
+        <button class="modal-btn modal-btn-cancel">취소</button>
+        <button class="modal-btn modal-btn-confirm">${escHtml(confirmBtnText)}</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
