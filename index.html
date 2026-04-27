@@ -55,7 +55,6 @@
       width:100%;
       margin:0 auto 20px;
     }
-    /* 타이틀 및 버튼 헤더 영역 추가 */
     .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .panel-title { font-size:11px; font-weight:800; letter-spacing:1.5px; color:var(--sub-text); text-transform:uppercase; margin-bottom:0; }
     .panel-btn { background: var(--seg-bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; }
@@ -98,35 +97,36 @@
     .song-card.flash-first{background:rgba(255,40,40,.50)!important;border-color:#ff2222!important;box-shadow:0 0 30px rgba(255,40,40,.70)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
     .song-card.flash-tap{background:rgba(255,205,0,.52)!important;border-color:#ffd700!important;box-shadow:0 0 30px rgba(255,205,0,.65)!important;transition:background 0s!important;}
 
-    /* ══ 썸네일 (가로 분할 레이아웃으로 변경 및 16:9 높이 맞춤) ══ */
-    .thumb-section { width: 100%; height: 135px; display: flex; align-items: center; background: #000; border-bottom: 1px solid var(--border); overflow: hidden; position: relative; }
-    
-    .drag-handle-zone { width: 42px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 10; background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2)); flex-shrink: 0; user-select: none; touch-action: none; }
-    .drag-handle-zone:active { cursor: grabbing; }
-    .drag-handle-icon { color: rgba(255,255,255,0.8); font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
-    .drag-handle-zone:hover .drag-handle-icon { color: var(--accent); }
-
-    .thumb-center { flex: 1; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0a0a0a; }
-    .thumb-center img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; z-index: 1; pointer-events: none; }
+    /* ══ 썸네일 (16:9 꽉차게 조정 및 버튼 오버레이 레이아웃) ══ */
+    .thumb-section { width: 100%; aspect-ratio: 16 / 9; position: relative; background: #000; border-bottom: 1px solid var(--border); overflow: hidden; flex-shrink: 0; }
+    .thumb-section > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; z-index: 1; pointer-events: none; }
     .youtube-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 3; pointer-events: auto; }
 
-    /* 우측 액션 버튼 정렬 */
-    .thumb-actions { width: 48px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 10; background: linear-gradient(to left, rgba(0,0,0,0.8), rgba(0,0,0,0.2)); flex-shrink: 0; }
-    .thumb-btn { width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 8px; font-size: 14px; cursor: pointer; transition: 0.15s; line-height: 1; backdrop-filter: blur(4px); }
+    /* 좌측 드래그 핸들 (영상 위 오버레이) */
+    .drag-handle-zone { position: absolute; left: 0; top: 0; bottom: 0; width: 42px; display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 10; background: linear-gradient(to right, rgba(0,0,0,0.8), transparent); user-select: none; touch-action: none; pointer-events: auto; }
+    .drag-handle-zone:active { cursor: grabbing; }
+    .drag-handle-icon { color: rgba(255,255,255,0.8); font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); pointer-events: none; }
+    .drag-handle-zone:hover .drag-handle-icon { color: var(--accent); }
+    [data-theme="light"] .drag-handle-icon { color: rgba(255,255,255,0.9); }
+
+    /* 우측 액션 버튼 정렬 (위에서부터 삭제, 복사, 링크) */
+    .thumb-actions { position: absolute; right: 0; top: 0; bottom: 0; width: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 10; background: linear-gradient(to left, rgba(0,0,0,0.8), transparent); pointer-events: auto; }
+    .thumb-btn { width: 34px; height: 34px; padding: 8px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 8px; cursor: pointer; transition: 0.15s; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+    .thumb-btn svg { width: 100%; height: 100%; fill: currentColor; }
     .thumb-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.25); }
     .thumb-btn.link-btn:hover { background: rgba(0,229,255,0.6); border-color: var(--accent); }
+    .thumb-btn.copy-btn:hover { background: rgba(48,209,88,0.6); border-color: var(--success); }
     .thumb-btn.del-btn:hover { background: rgba(255,69,58,0.7); border-color: var(--danger); }
-    
-    [data-theme="light"] .thumb-section { background: #dcdce0; }
-    [data-theme="light"] .drag-handle-icon { color: rgba(0,0,0,0.6); }
+    [data-theme="light"] .thumb-btn { background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.3); }
 
-    .no-thumb-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;padding:0 10px;z-index:4;}
-    .no-thumb-label{color:var(--text);font-size:11px;font-weight:800;white-space:nowrap;flex-shrink:0;}
-    .link-input-inline{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none;text-align:center;}
-    .link-input-inline:focus{border-color:var(--accent);}
-    [data-theme="light"] .link-input-inline{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.3);color:#111;}
-    .link-apply-btn{background:var(--accent);color:#000;border:none;border-radius:7px;padding:6px 16px;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;}
-    [data-theme="light"] .link-apply-btn{color:#fff;}
+    /* 영상 링크가 없을 때 화면 */
+    .no-thumb-content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 4; background: #111; padding: 0 50px; }
+    .no-thumb-label { color: var(--text); font-size: 11px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+    .link-input-inline { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; border-radius: 8px; padding: 8px 10px; font-size: 12px; font-family: inherit; outline: none; text-align: center; transition: 0.2s; }
+    .link-input-inline:focus { border-color: var(--accent); background: rgba(255,255,255,0.15); }
+    [data-theme="light"] .link-input-inline { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.3); color: #000; }
+    .link-apply-btn { background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12px; font-weight: 900; cursor: pointer; font-family: inherit; transition: 0.2s; }
+    .link-apply-btn:hover { opacity: 0.8; transform: scale(0.96); }
 
     /* ══ 카드 정보 ══ */
     .info-section{padding:12px 12px 10px;}
@@ -381,7 +381,6 @@ const VOICE_SUB = {
 /* ══ Web Speech ══ */
 let speechSynth = window.speechSynthesis || null;
 let voiceCache = null;
-let speechUnlocked = false;
 
 function getVoice(){
   if(voiceCache) return voiceCache;
@@ -403,8 +402,8 @@ function speakBeat(text, time){
       if(speechSynth.speaking && speechSynth.pending) return; 
       
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.8; // 연음에 적합한 속도
-      u.pitch = 1.1; 
+      u.rate = 1.4; // 연음에 적합하도록 속도를 살짝 낮춤
+      u.pitch = 1.0; 
       u.volume = 1.0;
       const v = getVoice();
       if(v) u.voice = v;
@@ -613,7 +612,7 @@ function createCardFromData(c){
   }
 }
 
-/* ══ AudioContext & 모바일 Voice 강제 해제 ══ */
+/* ══ AudioContext ══ */
 async function ensureAudio(){
   if(!audioCtx){
     audioCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -625,15 +624,6 @@ async function ensureAudio(){
     gainMaster.connect(comp); comp.connect(audioCtx.destination);
   }
   if(audioCtx.state==='suspended') await audioCtx.resume();
-
-  if(!speechUnlocked && speechSynth) {
-    try {
-      const u = new SpeechSynthesisUtterance('');
-      u.volume = 0;
-      speechSynth.speak(u);
-      speechUnlocked = true;
-    } catch(e) {}
-  }
 
   if(!workletReady){
     const blob=new Blob([WORKLET_CODE],{type:'application/javascript'});
@@ -677,14 +667,27 @@ function stopMetro(id){
   const btn=document.getElementById('p-btn-'+id);
   if(btn){ btn.innerText='START'; btn.classList.remove('active'); }
   clearVizFlash(id);
-  // 정지 시 꼬여있는 Voice 큐 비우기
+  
   if(speechSynth && speechSynth.speaking) {
       try { speechSynth.cancel(); } catch(e) {}
   }
 }
 
 function toggleMetro(id){
-  if(metros[id]?.isPlaying) stopMetro(id); else startMetro(id);
+  if(metros[id]?.isPlaying) {
+    stopMetro(id); 
+  } else {
+    // [중요] 모바일 Voice 활성화를 위해 '사용자 클릭(User Gesture)' 직후 동기식으로 엔진 Unlock!
+    if (speechSynth) {
+      try {
+        const unlockUtterance = new SpeechSynthesisUtterance('');
+        unlockUtterance.volume = 0;
+        speechSynth.speak(unlockUtterance);
+        speechSynth.cancel(); // 큐를 즉시 비움
+      } catch (e) {}
+    }
+    startMetro(id);
+  }
 }
 
 /* ══ 박자 처리 ══ */
@@ -752,7 +755,7 @@ function handleBeat(id, slotIdx, beatTime){
   },delayMs);
 }
 
-/* ══ 소리 합성 (디지털, 맑은 우드, 비프음) ══ */
+/* ══ 소리 합성 (디지털, 리얼 우드, 비프음) ══ */
 function playSound(type, isHigh, vol, t){
   if(!audioCtx||!gainMaster) return;
   t=t||audioCtx.currentTime;
@@ -768,25 +771,23 @@ function playSound(type, isHigh, vol, t){
     osc.start(t); osc.stop(t+.07);
 
   } else if(type==='wood'){
-    // 합성음 느낌을 빼고 맑은 나무 타격음으로 복구
-    const ctx=audioCtx;
-    const dur=0.08;
+    // 완전 드라이한 명료한 목탁(Temple Block) 소리로 변경
+    const ctx = audioCtx;
+    const dur = 0.04; // 잔향 없이 짧게 끊음
     
-    const osc=ctx.createOscillator();
-    osc.type='sine';
-    // 나무 특유의 공명 대역과 피치 드롭
-    osc.frequency.setValueAtTime(isHigh?1200:800, t);
-    osc.frequency.exponentialRampToValueAtTime(isHigh?900:600, t+0.04);
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isHigh ? 900 : 700, t);
+    osc.frequency.exponentialRampToValueAtTime(isHigh ? 600 : 450, t + dur);
     
-    const og=ctx.createGain();
-    og.gain.setValueAtTime(vol*3.0, t);
-    og.gain.exponentialRampToValueAtTime(0.001, t+dur);
+    const og = ctx.createGain();
+    og.gain.setValueAtTime(vol * 2.5, t);
+    og.gain.exponentialRampToValueAtTime(0.001, t + dur);
     
     osc.connect(og); og.connect(gain);
-    osc.start(t); osc.stop(t+dur);
+    osc.start(t); osc.stop(t + dur);
 
   } else if(type==='beep'){
-    // 선명한 뚜-뚜- 전자음
     const ctx=audioCtx;
     const osc=ctx.createOscillator();
     osc.type='sine';
@@ -799,7 +800,6 @@ function playSound(type, isHigh, vol, t){
     osc.start(t); osc.stop(t+0.06);
     
   } else {
-    // 폴백 기본음
     const osc=audioCtx.createOscillator(); osc.type='sine';
     osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
@@ -908,8 +908,7 @@ function renderEmptyState(){
 function buildThumb(id,vId){
   metros[id].vId=vId||null;
   const section=document.getElementById('thumb-'+id); if(!section) return;
-  section.querySelectorAll('img,.youtube-iframe').forEach(el=>el.remove());
-  const center=section.querySelector('.thumb-center'); if(center) center.innerHTML='';
+  section.querySelectorAll('img,.youtube-iframe,.no-thumb-content').forEach(el=>el.remove());
   const actions=section.querySelector('.thumb-actions'); if(actions) actions.innerHTML='';
   
   if(vId){
@@ -917,47 +916,46 @@ function buildThumb(id,vId){
     const urls=['hqdefault','mqdefault','default'].map(q=>`https://img.youtube.com/vi/${vId}/${q}.jpg`);
     let ti=0; img.src=urls[0]; img.alt=''; img.draggable=false;
     img.onerror=function(){ if(++ti<urls.length) this.src=urls[ti]; };
-    center.appendChild(img);
+    section.insertBefore(img, section.firstChild);
     
-    // iframe을 thumb-center 내부를 꽉 채우도록 삽입
+    // iframe을 thumb-section 공간 전체에 꽉 채워서 추가
     const iframe = document.createElement('iframe');
     iframe.className = 'youtube-iframe';
+    // playsinline=1 추가하여 모바일(카카오톡 등)에서 팝업 안뜨고 카드에서 바로 재생
     iframe.src = `https://www.youtube.com/embed/${vId}?rel=0&playsinline=1`;
     iframe.allowFullscreen = true;
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    center.appendChild(iframe);
+    section.insertBefore(iframe, section.querySelector('.drag-handle-zone'));
     
-    // 우측 버튼: 복사, 링크, 삭제
+    // 우측 버튼: 삭제, 복사(깔끔한 SVG), 링크
     actions.innerHTML = `
-      <button class="thumb-btn copy-btn" title="복사">⎘</button>
-      <button class="thumb-btn link-btn" title="링크 열기">🔗</button>
-      <button class="thumb-btn del-btn" title="삭제">✕</button>
+      <button class="thumb-btn del-btn" title="삭제"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+      <button class="thumb-btn copy-btn" title="복사"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+      <button class="thumb-btn link-btn" title="링크 열기"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button>
     `;
     actions.querySelector('.link-btn').onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
   } else {
     // 링크가 없을 경우
-    if(center){
-      const wrap=document.createElement('div'); wrap.className='no-thumb-content';
-      wrap.innerHTML=`
-        <span class="no-thumb-label">No Link</span>
-        <input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크...">
-        <button class="link-apply-btn">적용</button>
-      `;
-      wrap.querySelector('input').addEventListener('pointerdown',e=>e.stopPropagation());
-      wrap.querySelector('input').addEventListener('keydown',e=>{ if(e.key==='Enter') applyLink(id); e.stopPropagation(); });
-      wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
-      wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
-      center.appendChild(wrap);
-    }
+    const wrap=document.createElement('div'); wrap.className='no-thumb-content';
+    wrap.innerHTML=`
+      <span class="no-thumb-label">No Link</span>
+      <input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크...">
+      <button class="link-apply-btn">적용</button>
+    `;
+    wrap.querySelector('input').addEventListener('pointerdown',e=>e.stopPropagation());
+    wrap.querySelector('input').addEventListener('keydown',e=>{ if(e.key==='Enter') applyLink(id); e.stopPropagation(); });
+    wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
+    wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
+    section.insertBefore(wrap, section.querySelector('.drag-handle-zone'));
     
-    // 우측 버튼: 복사, 삭제 (링크 버튼 생략)
+    // 우측 버튼: 삭제, 복사
     actions.innerHTML = `
-      <button class="thumb-btn copy-btn" title="복사">⎘</button>
-      <button class="thumb-btn del-btn" title="삭제">✕</button>
+      <button class="thumb-btn del-btn" title="삭제"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+      <button class="thumb-btn copy-btn" title="복사"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
     `;
   }
 
-  // 생성된 버튼들에 이벤트 리스너 재부착
+  // 액션 버튼 이벤트 부여
   actions.querySelector('.copy-btn').addEventListener('click', e=>{ e.stopPropagation(); duplicateCard(id); });
   actions.querySelector('.del-btn').addEventListener('click', e=>{
     e.stopPropagation();
@@ -985,14 +983,13 @@ function initStates(id){
   });
 }
 
-/* ══ 카드 HTML (디지털,우드,비프,보이스 순서) ══ */
+/* ══ 카드 HTML ══ */
 function cardHTML(id,title){
   return `
     <div class="thumb-section" id="thumb-${id}">
       <div class="drag-handle-zone" id="handle-${id}">
         <span class="drag-handle-icon">⠿</span>
       </div>
-      <div class="thumb-center" id="thumb-center-${id}"></div>
       <div class="thumb-actions"></div>
     </div>
     <div class="info-section">
@@ -1224,8 +1221,6 @@ function deactivateDim(){ document.querySelectorAll('.song-card').forEach(c=>c.c
 
 /* ══ 이벤트 바인딩 ══ */
 function bindEvents(card,id){
-  // 썸네일 액션버튼 리스너는 buildThumb에서 직접 부착함.
-
   const minus=card.querySelector('#bpm-minus-'+id);
   const plus=card.querySelector('#bpm-plus-'+id);
   minus.addEventListener('pointerdown',e=>onBpmDown(id,-1,e));
@@ -1324,7 +1319,7 @@ function toggleMute(id){
   btn.innerText=metros[id].muted?'🔇':'🔊'; autosave();
 }
 
-/* ══ 비주얼라이저 (메인 블럭 종속성 완전히 제거) ══ */
+/* ══ 비주얼라이저 ══ */
 function renderViz(id){
   const m=metros[id];
   const viz=document.getElementById('viz-'+id); if(!viz) return;
