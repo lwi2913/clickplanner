@@ -265,9 +265,6 @@
     #scroll-zone-bot{bottom:0;background:linear-gradient(to top,rgba(0,229,255,.22),transparent);}
     #scroll-zone-top.visible,#scroll-zone-bot.visible{opacity:1;}
 
-    .setlist-output{width:100%;min-height:90px;max-height:400px;background:var(--input-bg);color:var(--text);padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:12px;font-family:'Malgun Gothic',monospace,sans-serif;resize:vertical;overflow-y:auto;line-height:1.8;margin-top:8px;}
-    .setlist-output:focus{outline:none;border-color:var(--accent);}
-
     .empty-state{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--sub-text);}
     .empty-state-icon{font-size:2.8rem;margin-bottom:10px;opacity:.4;}
     .empty-state-text{font-size:13px;font-weight:700;opacity:.6;line-height:1.7;}
@@ -422,45 +419,53 @@ function getVoice(){
 }
 if(speechSynth) speechSynth.onvoiceschanged = ()=>{ voiceCache=null; getVoice(); };
 
-function speakBeat(text, time){
+function speakBeat(text){
   if(!speechSynth) return;
-  const delayMs = Math.max(0,(time - audioCtx.currentTime)*1000);
-  setTimeout(()=>{
-    try {
-      if(speechSynth.speaking && speechSynth.pending) return; 
-      
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.6; 
-      u.pitch = 1.0; 
-      u.volume = 1.0;
-      u.lang = 'en-US';
-      const v = getVoice();
-      if(v) u.voice = v;
-      
-      uKeeper.push(u);
-      if(uKeeper.length > 20) uKeeper.shift();
+  try {
+    speechSynth.cancel(); // 이전 큐를 강제 리셋 (크롬 멈춤 현상 우회)
+    
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.6; 
+    u.pitch = 1.0; 
+    u.volume = 1.0;
+    u.lang = 'en-US';
+    const v = getVoice();
+    if(v) u.voice = v;
+    
+    uKeeper.push(u);
+    if(uKeeper.length > 20) uKeeper.shift();
 
-      speechSynth.speak(u);
-    } catch(e) {}
-  }, delayMs);
+    speechSynth.speak(u);
+  } catch(e) {}
+}
+
+function playVoice(sig, beatIdx, div, subIdx){
+  if(!speechSynth) return;
+  const beats=VOICE_BEATS[sig]||VOICE_BEATS[4];
+  const beatWord=beats[beatIdx]||('Beat '+(beatIdx+1));
+  let word='';
+  if(subIdx===0){
+    word=beatWord;
+  } else {
+    const subSyls=VOICE_SUB[div];
+    if(subSyls && subSyls[subIdx]) word=subSyls[subIdx];
+    else word='';
+  }
+  if(!word) return;
+  speakBeat(word); // 타이머 없이 바로 실행
 }
 
 /* ══ 완전 초기화 및 UI 리셋 ══ */
 function initAll() {
   if(!confirm('모든 데이터(콘티, 세트리스트, 카드)를 초기화하시겠습니까?')) return;
   
-  // 로컬 저장소 캐시 삭제
   localStorage.removeItem(LS_KEY);
-  
-  // 재생 중인 오디오 정지
   Object.keys(metros).forEach(id => { if(metros[id].isPlaying) stopMetro(+id); });
   
-  // 변수 초기화
   metros = {};
   tapTimesMap = {};
   globalSongId = 0;
   
-  // UI 비우기
   const contiEl = document.getElementById('conti-input');
   const setlistEl = document.getElementById('setlist-output');
   contiEl.value = '';
@@ -508,14 +513,13 @@ function copySetlist(){
 
 function updatePanelWidth(){
   const cards=[...document.querySelectorAll('.song-card')];
-  // 카드가 없을 경우를 대비한 기본값 
   let inputMaxW = '856px'; 
   let setlistMaxW = '504px'; 
 
   if(cards.length > 0){
     const cardW = cards[0].offsetWidth;
-    inputMaxW = (cardW * 2 + 16) + 'px'; // 메트로놈 2개 너비 + 여백
-    setlistMaxW = (cardW * 1.2) + 'px';  // 메트로놈 1.2배 너비
+    inputMaxW = (cardW * 2 + 16) + 'px'; 
+    setlistMaxW = (cardW * 1.2) + 'px';  
   }
 
   const inputPanel = document.getElementById('input-panel');
@@ -776,7 +780,7 @@ function toggleMetro(id){
   if(metros[id]?.isPlaying) {
     stopMetro(id); 
   } else {
-    // Voice 강제 언락 (사용자가 버튼을 클릭하는 즉시 실행해야 브라우저 정책을 통과함)
+    // Voice 모바일/크롬 활성화 트릭 (사용자 클릭 이벤트에서 동기적으로 호출)
     if (speechSynth) {
       try {
         speechSynth.resume();
@@ -814,7 +818,8 @@ function handleBeat(id, slotIdx, beatTime){
 
   if(!m.muted && !isOff){
     if(m.sound==='voice'){
-      playVoice(m.sig, qIdx, div, sIdx, beatTime);
+      // 보이스는 async 지연을 빼고 바로 트리거
+      playVoice(m.sig, qIdx, div, sIdx);
     } else {
       playSound(m.sound, isAccent, vol, beatTime);
     }
@@ -870,7 +875,7 @@ function playSound(type, isHigh, vol, t){
     osc.start(t); osc.stop(t+.07);
 
   } else if(type==='wood'){
-    // 명료하고 맑은 나무 타격음
+    // 명료하고 맑은 나무 타격음 (잔향 제거)
     const ctx = audioCtx;
     const dur = 0.04;
     
