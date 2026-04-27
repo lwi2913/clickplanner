@@ -51,7 +51,6 @@
     .top-panel{
       background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
       padding:16px;
-      /* JS로 max-width 설정 */
       max-width:var(--panel-maxw, 680px);
       width:100%;
       margin:0 auto 20px;
@@ -101,7 +100,7 @@
     .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;}
     .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);}
 
-    /* ★ 드래그 핸들: cursor grab 명확히 */
+    /* ★ 드래그 핸들 */
     .drag-handle-zone{
       flex-shrink:0;display:flex;align-items:center;justify-content:center;
       width:52px;height:100%;z-index:10;
@@ -115,7 +114,9 @@
     [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.55);}
 
     .thumb-center{flex:1;min-width:0;display:flex;align-items:center;padding:0 6px;z-index:2;position:relative;}
-    .thumb-actions{display:flex;gap:5px;z-index:4;padding-right:8px;flex-shrink:0;}
+    .thumb-actions{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;z-index:4;padding-right:8px;flex-shrink:0;}
+    .thumb-actions-row{display:flex;gap:5px;}
+    .youtube-iframe{width:150px;height:84px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);box-shadow:0 4px 12px rgba(0,0,0,0.5);pointer-events:auto;background:#000;}
     .thumb-btn{background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1;}
     .thumb-btn:hover{transform:scale(1.07);}
     .thumb-btn.link-btn:hover{background:rgba(0,229,255,.5);}
@@ -174,7 +175,7 @@
     .beat-block.flash-blue{background:var(--accent)!important;box-shadow:0 0 16px var(--accent)!important;transition:background 0s,box-shadow 0s!important;}
     .beat-block.flash-red{background:#ff3333!important;box-shadow:0 0 16px #ff3333!important;transition:background 0s,box-shadow 0s!important;}
 
-    /* ══ Sub 슬롯 ══ */
+    /* ══ Sub 슬롯 (동기화 수정 부분) ══ */
     .sub-slot{
       position:absolute;top:0;height:100%;cursor:pointer;
       background:rgba(120,120,130,.22);transition:background .08s;
@@ -183,7 +184,10 @@
     .sub-slot.sub-accent{background:rgba(255,55,55,.12)!important;box-shadow:0 0 0 2px #ff3333 inset!important;}
     .sub-slot.sub-off{background:transparent!important;}
     .sub-slot.sub-off::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(45deg,rgba(140,140,150,.18) 0px,rgba(140,140,150,.18) 1.5px,transparent 1.5px,transparent 7px);}
+    
+    /* 서브 박자 깜빡임 효과 (파랑/빨강 분리) */
     .sub-slot.sub-flash{background:var(--accent)!important;box-shadow:0 0 10px var(--accent)!important;transition:background 0s,box-shadow 0s!important;}
+    .sub-slot.sub-flash-accent{background:#ff3333!important;box-shadow:0 0 10px #ff3333!important;transition:background 0s,box-shadow 0s!important;}
 
     /* ══ 설정 ══ */
     .setting-group{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
@@ -365,10 +369,6 @@ const VOICE_BEATS = {
   1:['One'], 2:['One','Two'], 3:['One','Two','Three'],
   4:['One','Two','Three','Four'], 6:['One','Two','Three','Four','Five','Six']
 };
-// sub syllables: [beat_idx][sub_idx] → string to speak
-// div=2 (8th):   "One", "and"
-// div=3 (triplet):"One", "ti", "ta"
-// div=4 (16th):  "One", "e", "and", "a"
 const VOICE_SUB = {
   2: ['','and'],
   3: ['','ti','ta'],
@@ -382,7 +382,6 @@ function getVoice(){
   if(voiceCache) return voiceCache;
   if(!speechSynth) return null;
   const voices = speechSynth.getVoices();
-  // 영어 음성 우선
   voiceCache = voices.find(v=>v.lang.startsWith('en-US')&&v.localService) ||
                voices.find(v=>v.lang.startsWith('en')) ||
                (voices.length?voices[0]:null);
@@ -390,14 +389,7 @@ function getVoice(){
 }
 if(speechSynth) speechSynth.onvoiceschanged = ()=>{ voiceCache=null; getVoice(); };
 
-// 음성 큐 (겹침 방지용 — 메트로놈 박자는 정확한 타이밍 필요하므로 AudioBuffer로 구현)
-// Voice 사운드: TTS 대신 AudioContext로 직접 음절을 합성
-// → 실시간 TTS는 지연이 커서 메트로놈에 부적합.
-// → Web Speech API를 최소 지연으로 사용 (utterance.rate 높임)
-const voiceQueue = [];
-let voicePlaying = false;
 function speakBeat(text, time){
-  // time은 audioCtx currentTime. 딜레이 계산 후 setTimeout
   if(!speechSynth) return;
   const delayMs = Math.max(0,(time - audioCtx.currentTime)*1000);
   setTimeout(()=>{
@@ -411,10 +403,10 @@ function speakBeat(text, time){
   }, delayMs);
 }
 
-/* ══ 패널 너비 제한: 카드 2개 너비 ══ */
+/* ══ 패널 너비 제한 ══ */
 function updatePanelWidth(){
   const cards=[...document.querySelectorAll('.song-card')];
-  let maxW = '680px'; // 기본값
+  let maxW = '680px';
   if(cards.length>=2){
     const w = cards[0].offsetWidth + cards[1].offsetWidth + 16;
     maxW = w+'px';
@@ -423,7 +415,6 @@ function updatePanelWidth(){
     maxW = w+'px';
   }
   document.documentElement.style.setProperty('--panel-maxw', maxW);
-  // header, input-panel, setlist-panel 모두 적용
   ['input-panel','setlist-panel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){ el.style.maxWidth=maxW; }
@@ -437,7 +428,6 @@ function updatePanelWidth(){
 ══════════════════════════════════ */
 function nc(active){ return active?'var(--text)':'var(--sub-text)'; }
 
-/* ♩ 4분음표 */
 function svgQuarter(active){
   const c=nc(active);
   return `<svg width="18" height="36" viewBox="0 0 18 36" xmlns="http://www.w3.org/2000/svg">
@@ -446,7 +436,6 @@ function svgQuarter(active){
   </svg>`;
 }
 
-/* ♪ 8분음표 */
 function svgEighth(active){
   const c=nc(active);
   return `<svg width="26" height="36" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">
@@ -456,74 +445,33 @@ function svgEighth(active){
   </svg>`;
 }
 
-/*
-  ♩♩♩ 셋잇단
-  - 3개 8분음표 (머리+기둥) 균등 배치
-  - 단일 beam (상단 가로)
-  - 브래킷(좌우 수직 꺾임선) + 중앙 숫자 "3"
-*/
 function svgTriplet(active){
   const c=nc(active);
-  // 전체 너비 54, 높이 42
-  // 음표 x: 5, 24, 43 → 기둥 우측 x: 7.2, 26.2, 45.2
-  // 기둥 상단 y=11, 하단 y=27
-  // beam y=11~14
-  // 음표 머리 cy=29
-  // 브래킷: y=4 ~ y=9 (기둥 위에 공간)
   return `<svg width="54" height="42" viewBox="0 0 54 42" xmlns="http://www.w3.org/2000/svg">
-    <!-- beam (8분음표용 단일 보) -->
     <rect x="5" y="11" width="42" height="3" rx="1.5" fill="${c}"/>
-    <!-- 기둥 3개 -->
     <rect x="5"  y="11" width="2.4" height="18" rx="1.2" fill="${c}"/>
     <rect x="24" y="11" width="2.4" height="18" rx="1.2" fill="${c}"/>
     <rect x="43" y="11" width="2.4" height="18" rx="1.2" fill="${c}"/>
-    <!-- 음표 머리 3개 -->
     <ellipse cx="7"  cy="30" rx="6.2" ry="4.3" fill="${c}" transform="rotate(-16 7 30)"/>
     <ellipse cx="26" cy="30" rx="6.2" ry="4.3" fill="${c}" transform="rotate(-16 26 30)"/>
     <ellipse cx="45" cy="30" rx="6.2" ry="4.3" fill="${c}" transform="rotate(-16 45 30)"/>
-    <!-- 브래킷 왼쪽 수직 -->
     <line x1="5" y1="9" x2="5" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- 브래킷 왼쪽 수평 -->
     <line x1="5" y1="5" x2="19" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- 브래킷 오른쪽 수직 -->
     <line x1="47" y1="9" x2="47" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- 브래킷 오른쪽 수평 -->
     <line x1="47" y1="5" x2="33" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- 숫자 "3": 브래킷 중앙 명확히 -->
-    <text x="26" y="5.5"
-      text-anchor="middle"
-      dominant-baseline="middle"
-      font-size="9"
-      font-weight="900"
-      font-family="'Georgia','Times New Roman',serif"
-      fill="${c}"
-      style="paint-order:stroke;stroke:var(--card-bg);stroke-width:3;stroke-linejoin:round;"
-    >3</text>
+    <text x="26" y="5.5" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="900" font-family="'Georgia','Times New Roman',serif" fill="${c}" style="paint-order:stroke;stroke:var(--card-bg);stroke-width:3;stroke-linejoin:round;">3</text>
   </svg>`;
 }
 
-/*
-  ♬♬ 16분음표: 4개 콩나물 + 이중 beam
-  - 정갈하게: 균등 간격, 깔끔한 이중 보
-*/
 function svgSixteenth(active){
   const c=nc(active);
-  // 전체 너비 56, 높이 38
-  // 기둥 x: 4, 18, 32, 46
-  // 기둥 top y=7, bottom y=25
-  // beam1 y=7, beam2 y=12.5
-  // 음표 머리 cy=27
   return `<svg width="56" height="38" viewBox="0 0 56 38" xmlns="http://www.w3.org/2000/svg">
-    <!-- beam 1 (상단) -->
     <rect x="4" y="7"    width="44" height="3"   rx="1.5" fill="${c}"/>
-    <!-- beam 2 (하단) -->
     <rect x="4" y="13.5" width="44" height="3"   rx="1.5" fill="${c}"/>
-    <!-- 기둥 4개 -->
     <rect x="4"  y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
     <rect x="18" y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
     <rect x="32" y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
     <rect x="46" y="7" width="2.2" height="18" rx="1.1" fill="${c}"/>
-    <!-- 음표 머리 4개 -->
     <ellipse cx="6"  cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 6 27)"/>
     <ellipse cx="20" cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 20 27)"/>
     <ellipse cx="34" cy="27" rx="5.8" ry="4.0" fill="${c}" transform="rotate(-15 34 27)"/>
@@ -609,7 +557,7 @@ function createCardFromData(c){
   updateSubIcons(c.id);
   renderViz(c.id);
   bindEvents(card, c.id);
-  // 동기화
+  
   document.getElementById('bpm-'+c.id).innerText=c.bpm;
   document.getElementById('beat-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===c.sig));
   document.getElementById('sub-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.div===c.subDiv));
@@ -663,6 +611,7 @@ async function startMetro(id){
     autosave();
   }catch(err){ console.error('startMetro:',err); alert('오디오 시작 실패: '+err.message); }
 }
+
 function stopMetro(id){
   const m=metros[id]; if(!m) return;
   if(m.workletNode){
@@ -675,11 +624,12 @@ function stopMetro(id){
   if(btn){ btn.innerText='START'; btn.classList.remove('active'); }
   clearVizFlash(id);
 }
+
 function toggleMetro(id){
   if(metros[id]?.isPlaying) stopMetro(id); else startMetro(id);
 }
 
-/* ══ 박자 처리 ══ */
+/* ══ 박자 처리 (서브박자 독립 제어 및 볼륨 상향) ══ */
 function handleBeat(id, slotIdx, beatTime){
   const m=metros[id]; if(!m||!audioCtx) return;
   const ctx=audioCtx;
@@ -687,21 +637,22 @@ function handleBeat(id, slotIdx, beatTime){
   const qIdx=Math.floor(slotIdx/div);
   const sIdx=slotIdx%div;
   const isMain=(sIdx===0);
-  const bs=m.blockStates[qIdx]??0;
 
   let isOff=false, isAccent=false;
-  if(div===1){
-    isOff=(bs===2); isAccent=(bs===1);
+  
+  if(div === 1){
+    const bs=m.blockStates[qIdx]??0;
+    isOff = (bs === 2);
+    isAccent = (bs === 1);
   } else {
-    if(isMain){
-      isOff=(bs===2); isAccent=(bs===1);
-    } else {
-      const ss=(m.subStates[qIdx]?.[sIdx])??0;
-      isOff=(ss===1); isAccent=false;
-    }
+    // 쪼개진 상태에서는 철저히 개별 서브 박자(ss)의 상태만 참조합니다.
+    const ss=(m.subStates[qIdx]?.[sIdx])??0;
+    isOff = (ss === 2);
+    isAccent = (ss === 1);
   }
 
-  const vol=isMain ? m.vol : m.vol*0.40;
+  const vol = isAccent ? m.vol : m.vol * 0.80;
+
   if(!m.muted && !isOff){
     if(m.sound==='voice'){
       playVoice(m.sig, qIdx, div, sIdx, beatTime);
@@ -713,16 +664,19 @@ function handleBeat(id, slotIdx, beatTime){
   const delayMs=Math.max(0,(beatTime-ctx.currentTime)*1000);
   setTimeout(()=>{
     if(!metros[id]?.isPlaying) return;
+    
     if(isMain&&!isOff){
       const card=document.getElementById('card-'+id);
       if(card){
         card.classList.remove('flash-accent','flash-first');
         void card.offsetWidth;
-        card.classList.add(isAccent?'flash-first':'flash-accent');
+        card.classList.add(isAccent ? 'flash-first' : 'flash-accent');
         setTimeout(()=>card.classList.remove('flash-accent','flash-first'),80);
       }
     }
+    
     clearVizFlash(id);
+    
     if(!isOff){
       if(div===1){
         const blk=document.getElementById('block-'+id+'-'+qIdx);
@@ -733,8 +687,8 @@ function handleBeat(id, slotIdx, beatTime){
       } else {
         const subEl=document.getElementById('sub-'+id+'-'+qIdx+'-'+sIdx);
         if(subEl){
-          subEl.classList.add('sub-flash');
-          setTimeout(()=>subEl.classList.remove('sub-flash'),110);
+          subEl.classList.add(isAccent?'sub-flash-accent':'sub-flash');
+          setTimeout(()=>subEl.classList.remove('sub-flash','sub-flash-accent'),110);
         }
       }
     }
@@ -774,16 +728,10 @@ function playSound(type, isHigh, vol, t){
     osc.start(t); osc.stop(t+.07);
 
   } else if(type==='classic'){
-    /* 아날로그 메트로놈 "똑-딱"
-       - 고주파 "딱" 타격음 + 짧은 잔향
-       - 강박(high): 높은 피치 "딱"
-       - 약박(low):  낮은 피치 "똑"
-    */
     const ctx=audioCtx;
     const freq=isHigh?1800:1100;
     const dur=0.055;
 
-    // 타격음 (bandpass noise)
     const bufLen=Math.floor(ctx.sampleRate*dur);
     const buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
     const data=buf.getChannelData(0);
@@ -795,7 +743,6 @@ function playSound(type, isHigh, vol, t){
     bp.frequency.value=freq; bp.Q.value=30;
     noise.connect(bp); bp.connect(gain);
 
-    // 톤 "딱" (짧은 사인파)
     const osc=ctx.createOscillator(); osc.type='sine';
     osc.frequency.setValueAtTime(freq*0.55,t);
     osc.frequency.exponentialRampToValueAtTime(freq*0.3,t+0.03);
@@ -832,7 +779,7 @@ function playSound(type, isHigh, vol, t){
     noise.start(t); noise.stop(t+.07);
     osc.start(t); osc.stop(t+.035);
 
-  } else { // beep → voice에서는 speechSynth 사용, 여기선 sine
+  } else {
     const osc=audioCtx.createOscillator(); osc.type='sine';
     osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
@@ -943,19 +890,31 @@ function buildThumb(id,vId){
   const section=document.getElementById('thumb-'+id); if(!section) return;
   section.querySelectorAll('img,.thumb-overlay').forEach(el=>el.remove());
   const center=section.querySelector('.thumb-center'); if(center) center.innerHTML='';
+  const linkBtn=section.querySelector('.link-btn');
+  
   if(vId){
     const img=document.createElement('img');
     const urls=['hqdefault','mqdefault','default'].map(q=>`https://img.youtube.com/vi/${vId}/${q}.jpg`);
     let ti=0; img.src=urls[0]; img.alt=''; img.draggable=false;
     img.onerror=function(){ if(++ti<urls.length) this.src=urls[ti]; };
     section.insertBefore(img,section.firstChild);
+    
     const ov=document.createElement('div'); ov.className='thumb-overlay';
     section.insertBefore(ov,section.querySelector('.drag-handle-zone'));
+    
     if(center){
-      const lb=document.createElement('button'); lb.className='thumb-btn link-btn'; lb.textContent='▶ Link';
-      lb.onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
-      lb.addEventListener('pointerdown',e=>e.stopPropagation());
-      center.appendChild(lb);
+      const iframe = document.createElement('iframe');
+      iframe.className = 'youtube-iframe';
+      iframe.src = `https://www.youtube.com/embed/${vId}?rel=0`;
+      iframe.allowFullscreen = true;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      center.style.justifyContent = 'center';
+      center.appendChild(iframe);
+    }
+    
+    if(linkBtn){
+      linkBtn.style.display = 'block';
+      linkBtn.onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
     }
   } else {
     if(center){
@@ -965,7 +924,11 @@ function buildThumb(id,vId){
       wrap.querySelector('input').addEventListener('keydown',e=>{ if(e.key==='Enter') applyLink(id); e.stopPropagation(); });
       wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
       wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
+      center.style.justifyContent = 'flex-start';
       center.appendChild(wrap);
+    }
+    if(linkBtn){
+      linkBtn.style.display = 'none';
     }
   }
 }
@@ -980,7 +943,12 @@ function applyLink(id){
 function initStates(id){
   const m=metros[id];
   m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
-  m.subStates=Array.from({length:m.sig},()=>new Array(16).fill(0));
+  m.subStates=Array.from({length:m.sig},(_,i)=>{
+    const arr = new Array(16).fill(0);
+    // 첫번째 마디의 첫 박자만 기본적으로 엑센트 적용
+    if (i===0) arr[0] = 1;
+    return arr;
+  });
 }
 
 /* ══ 카드 HTML ══ */
@@ -992,8 +960,11 @@ function cardHTML(id,title){
       </div>
       <div class="thumb-center" id="thumb-center-${id}"></div>
       <div class="thumb-actions">
-        <button class="thumb-btn copy-btn">⎘</button>
-        <button class="thumb-btn del-btn">✕</button>
+        <div class="thumb-actions-row">
+          <button class="thumb-btn copy-btn">⎘</button>
+          <button class="thumb-btn del-btn">✕</button>
+        </div>
+        <button class="thumb-btn link-btn" style="display:none; width:100%; padding:4px 0;">▶ Link</button>
       </div>
     </div>
     <div class="info-section">
@@ -1081,20 +1052,15 @@ function updateSubIcons(id){
 
 /* ══════════════════════════════════════════
    드래그 & 드롭 (마우스 완전 재구현)
-   ★ mousedown on handle → mousemove로 ghost 이동
-   ★ mouseup → drop 위치 재정렬
-   ★ 가장자리 → 자동 스크롤
 ══════════════════════════════════════════ */
 function initDrag(card,id){
   const handle=document.getElementById('handle-'+id);
 
-  /* ── 마우스 드래그 (HTML5 drag API 대신 직접 구현) ── */
   handle.addEventListener('mousedown', e=>{
     if(e.button!==0) return;
     e.preventDefault(); e.stopPropagation();
     _mouseDragId=id; _mouseDragging=true;
 
-    // ghost 생성
     const rect=card.getBoundingClientRect();
     _mouseGhostOffX=e.clientX-rect.left;
     _mouseGhostOffY=e.clientY-rect.top;
@@ -1114,7 +1080,6 @@ function initDrag(card,id){
     activateDim(id);
   });
 
-  /* ── 터치 드래그 ── */
   handle.addEventListener('touchstart', e=>{
     e.stopPropagation(); if(_touchDragId!=null) return;
     _touchDragId=id;
@@ -1154,27 +1119,22 @@ function initDrag(card,id){
   },{passive:true});
 }
 
-/* 마우스 전역 이벤트 */
 document.addEventListener('mousemove', e=>{
   if(!_mouseDragging||!_mouseGhost) return;
-  // ghost 이동
   _mouseGhost.style.left=(e.clientX-_mouseGhostOffX)+'px';
   _mouseGhost.style.top=(e.clientY-_mouseGhostOffY)+'px';
-  // drag-over 표시
   _mouseGhost.style.display='none';
   const el=document.elementFromPoint(e.clientX,e.clientY);
   _mouseGhost.style.display='';
   document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
   const overCard=el?.closest('.song-card');
   if(overCard&&overCard.id!=='card-'+_mouseDragId) overCard.classList.add('drag-over');
-  // 자동 스크롤
   updateAutoScrollDir(e.clientY);
   if(_autoScrollRAF==null) startAutoScroll();
 });
 
 document.addEventListener('mouseup', e=>{
   if(!_mouseDragging) return;
-  // drop
   if(_mouseGhost) _mouseGhost.style.display='none';
   const el=document.elementFromPoint(e.clientX,e.clientY);
   if(_mouseGhost) _mouseGhost.style.display='';
@@ -1183,7 +1143,6 @@ document.addEventListener('mouseup', e=>{
     reorder(_mouseDragId,+overCard.id.replace('card-',''));
     autosave();
   }
-  // 정리
   _mouseGhost?.remove(); _mouseGhost=null;
   document.getElementById('card-'+_mouseDragId)?.classList.remove('dragging');
   document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('drag-over'));
@@ -1192,7 +1151,6 @@ document.addEventListener('mouseup', e=>{
   _mouseDragging=false; _mouseDragId=null;
 });
 
-/* 자동 스크롤 */
 function updateAutoScrollDir(clientY){
   const vh=window.innerHeight;
   if(clientY<SCROLL_ZONE){
@@ -1238,7 +1196,6 @@ function deactivateDim(){ document.querySelectorAll('.song-card').forEach(c=>c.c
 
 /* ══ 이벤트 바인딩 ══ */
 function bindEvents(card,id){
-  // 삭제
   card.querySelector('.del-btn').addEventListener('click',e=>{
     e.stopPropagation();
     const titleEl=document.getElementById('title-'+id);
@@ -1277,7 +1234,6 @@ function bindEvents(card,id){
   card.querySelector('#tap-btn-'+id).addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); tapTempo(id); });
   card.querySelector('#p-btn-'+id).addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); toggleMetro(id); });
 
-  // info-section 내부 클릭이 드래그 핸들로 전파 안 되도록
   card.querySelector('.info-section').addEventListener('mousedown',e=>e.stopPropagation());
   card.querySelector('.info-section').addEventListener('pointerdown',e=>e.stopPropagation());
   card.querySelector('#thumb-center-'+id).addEventListener('pointerdown',e=>e.stopPropagation());
@@ -1323,19 +1279,15 @@ function setBeat(id,val,btnEl){
   autosave();
 }
 
-/*
-  setSubDiv: sub 변경 시
-  - 모든 블록 기본(normal=0) 상태로 초기화
-  - 첫 박 첫 음만 강조(accent=1)
-  - subStates 전체 초기화 (모두 활성 = 0)
-  - 블록들은 3단계(0=기본/1=강조/2=비활성) 계속 가능
-*/
 function setSubDiv(id,div){
   const m=metros[id]; if(!m) return;
   m.subDiv=div;
-  // 초기화: 첫 박만 accent
-  m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
-  m.subStates=Array.from({length:m.sig},()=>new Array(16).fill(0));
+  // 박자를 쪼갤 때, 기존 메인 박자(blockStates)의 상태를 첫 번째 서브박자(arr[0])에만 전달하고 나머지는 기본(0)으로 초기화합니다.
+  m.subStates=Array.from({length:m.sig},(_,i)=>{
+    const arr = new Array(16).fill(0);
+    arr[0] = m.blockStates[i] ?? 0;
+    return arr;
+  });
   document.getElementById('sub-seg-'+id).querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sub-seg-'+id).querySelector(`[data-div="${div}"]`)?.classList.add('active');
   updateSubIcons(id); renderViz(id);
@@ -1354,7 +1306,7 @@ function toggleMute(id){
   btn.innerText=metros[id].muted?'🔇':'🔊'; autosave();
 }
 
-/* ══ 비주얼라이저 ══ */
+/* ══ 비주얼라이저 (메인 블럭 종속성 완전히 제거) ══ */
 function renderViz(id){
   const m=metros[id];
   const viz=document.getElementById('viz-'+id); if(!viz) return;
@@ -1362,16 +1314,23 @@ function renderViz(id){
   for(let i=0;i<m.sig;i++){
     const b=document.createElement('div');
     b.id='block-'+id+'-'+i;
-    const bs=m.blockStates[i]??0;
-    b.className='beat-block '+(bs===0?'state-normal':bs===1?'state-accent':'state-off');
+
+    // 쪼개진 상태(subDiv > 1)에서는 부모 블록(b)이 엑센트(빨강) 등의 배경을 가지지 않게 하여 시각적 간섭을 막습니다.
+    let parentState = 0;
+    if (m.subDiv === 1) {
+      parentState = m.blockStates[i] ?? 0;
+    }
+    b.className='beat-block '+(parentState===0?'state-normal':parentState===1?'state-accent':'state-off');
 
     if(m.subDiv>1){
       for(let s=0;s<m.subDiv;s++){
         const ss=(m.subStates[i]?.[s])??0;
         const el=document.createElement('div');
         let slotCls='sub-slot';
-        if(ss===1) slotCls+=' sub-off';
-        else if(s===0&&bs===1) slotCls+=' sub-accent';
+        
+        if(ss===2) slotCls+=' sub-off';
+        else if(ss===1) slotCls+=' sub-accent';
+        
         el.className=slotCls;
         el.id='sub-'+id+'-'+i+'-'+s;
         el.style.left=(s/m.subDiv*100)+'%';
@@ -1379,12 +1338,15 @@ function renderViz(id){
         const _s=s;
         el.addEventListener('click',e=>{
           e.stopPropagation();
-          m.subStates[i][_s]=(m.subStates[i][_s]===0)?1:0;
+          m.subStates[i][_s]=(m.subStates[i][_s]+1)%3;
+          // 첫 번째 서브 박자의 상태를 바꾸면 메인 박자 상태에도 동기화 시켜줍니다.
+          if (_s === 0) {
+            m.blockStates[i] = m.subStates[i][0];
+          }
           renderViz(id); autosave();
         });
         b.appendChild(el);
       }
-      b.addEventListener('click',e=>{ if(e.target===b) cycleBlockState(id,i); });
     } else {
       b.addEventListener('click',()=>cycleBlockState(id,i));
     }
@@ -1393,12 +1355,17 @@ function renderViz(id){
 }
 
 function cycleBlockState(id,i){
-  metros[id].blockStates[i]=(metros[id].blockStates[i]+1)%3;
+  const m = metros[id];
+  m.blockStates[i]=(m.blockStates[i]+1)%3;
+  if (m.subStates && m.subStates[i]) {
+    m.subStates[i][0] = m.blockStates[i];
+  }
   renderViz(id); autosave();
 }
+
 function clearVizFlash(id){
   document.querySelectorAll(`#viz-${id} .beat-block`).forEach(b=>b.classList.remove('flash-blue','flash-red'));
-  document.querySelectorAll(`#viz-${id} .sub-slot`).forEach(b=>b.classList.remove('sub-flash'));
+  document.querySelectorAll(`#viz-${id} .sub-slot`).forEach(b=>b.classList.remove('sub-flash','sub-flash-accent'));
 }
 
 /* ══ 세트리스트 ══ */
