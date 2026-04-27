@@ -55,7 +55,11 @@
       width:100%;
       margin:0 auto 20px;
     }
-    .panel-title{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sub-text);text-transform:uppercase;margin-bottom:8px;}
+    /* 타이틀 및 버튼 헤더 영역 추가 */
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .panel-title { font-size:11px; font-weight:800; letter-spacing:1.5px; color:var(--sub-text); text-transform:uppercase; margin-bottom:0; }
+    .panel-btn { background: var(--seg-bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .panel-btn:hover { background: var(--seg-active); border-color: var(--accent); color: var(--accent); }
 
     textarea{
       width:100%;min-height:72px;
@@ -94,48 +98,34 @@
     .song-card.flash-first{background:rgba(255,40,40,.50)!important;border-color:#ff2222!important;box-shadow:0 0 30px rgba(255,40,40,.70)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
     .song-card.flash-tap{background:rgba(255,205,0,.52)!important;border-color:#ffd700!important;box-shadow:0 0 30px rgba(255,205,0,.65)!important;transition:background 0s!important;}
 
-    /* ══ 썸네일 (영상이 가득 차도록 높이 확장 및 구조 최적화) ══ */
-    .thumb-section{width:100%;height:160px;position:relative;background:#0a0a0a;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
-    [data-theme="light"] .thumb-section{background:#c8c8d0;}
-    .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;z-index:1;}
-    .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);z-index:2;}
-
-    /* ★ 드래그 핸들: 영상 위에서도 잘 보이도록 그라데이션 배경 추가 */
-    .drag-handle-zone{
-      flex-shrink:0;display:flex;align-items:center;justify-content:center;
-      width:52px;height:100%;z-index:10; position:relative;
-      cursor:grab; pointer-events:auto;
-      background:linear-gradient(to right, rgba(0,0,0,0.6), transparent);
-      user-select:none;-webkit-user-select:none; touch-action:none;
-    }
-    .drag-handle-zone:active{cursor:grabbing;}
-    .drag-handle-icon{color:rgba(255,255,255,.9);font-size:28px;user-select:none;pointer-events:none;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
-    .drag-handle-zone:hover .drag-handle-icon{color:var(--accent);}
-    [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.7);}
-
-    /* 유튜브 iframe 영역 (가득 채움) */
-    .youtube-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:auto;background:#000;z-index:3;}
-
-    .thumb-center{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:0 6px;height:100%;z-index:4;position:relative;pointer-events:none;}
-    .thumb-center > * { pointer-events: auto; }
+    /* ══ 썸네일 (가로 분할 레이아웃으로 변경 및 16:9 높이 맞춤) ══ */
+    .thumb-section { width: 100%; height: 135px; display: flex; align-items: center; background: #000; border-bottom: 1px solid var(--border); overflow: hidden; position: relative; }
     
-    .thumb-actions{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;z-index:10;padding-right:8px;flex-shrink:0;position:relative;pointer-events:none;}
-    .thumb-actions > * { pointer-events: auto; }
-    .thumb-actions-row{display:flex;gap:5px;}
-    
-    .thumb-btn{background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,0.5);}
-    .thumb-btn:hover{transform:scale(1.07);}
-    .thumb-btn.link-btn:hover{background:rgba(0,229,255,.6);}
-    .thumb-btn.copy-btn:hover{background:rgba(48,209,88,.6);}
-    .thumb-btn.del-btn:hover{background:rgba(255,69,58,.7);}
-    [data-theme="light"] .thumb-btn{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.3);color:#111;}
+    .drag-handle-zone { width: 42px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 10; background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2)); flex-shrink: 0; user-select: none; touch-action: none; }
+    .drag-handle-zone:active { cursor: grabbing; }
+    .drag-handle-icon { color: rgba(255,255,255,0.8); font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
+    .drag-handle-zone:hover .drag-handle-icon { color: var(--accent); }
 
-    .no-thumb-content{display:flex;align-items:center;gap:6px;width:100%;padding:0 6px;}
-    .no-thumb-label{color:var(--text);font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
-    .link-input-inline{flex:1;min-width:0;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none;}
+    .thumb-center { flex: 1; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0a0a0a; }
+    .thumb-center img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; z-index: 1; pointer-events: none; }
+    .youtube-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 3; pointer-events: auto; }
+
+    /* 우측 액션 버튼 정렬 */
+    .thumb-actions { width: 48px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 10; background: linear-gradient(to left, rgba(0,0,0,0.8), rgba(0,0,0,0.2)); flex-shrink: 0; }
+    .thumb-btn { width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 8px; font-size: 14px; cursor: pointer; transition: 0.15s; line-height: 1; backdrop-filter: blur(4px); }
+    .thumb-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.25); }
+    .thumb-btn.link-btn:hover { background: rgba(0,229,255,0.6); border-color: var(--accent); }
+    .thumb-btn.del-btn:hover { background: rgba(255,69,58,0.7); border-color: var(--danger); }
+    
+    [data-theme="light"] .thumb-section { background: #dcdce0; }
+    [data-theme="light"] .drag-handle-icon { color: rgba(0,0,0,0.6); }
+
+    .no-thumb-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;padding:0 10px;z-index:4;}
+    .no-thumb-label{color:var(--text);font-size:11px;font-weight:800;white-space:nowrap;flex-shrink:0;}
+    .link-input-inline{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none;text-align:center;}
     .link-input-inline:focus{border-color:var(--accent);}
     [data-theme="light"] .link-input-inline{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.3);color:#111;}
-    .link-apply-btn{flex-shrink:0;background:var(--accent);color:#000;border:none;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;}
+    .link-apply-btn{background:var(--accent);color:#000;border:none;border-radius:7px;padding:6px 16px;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;}
     [data-theme="light"] .link-apply-btn{color:#fff;}
 
     /* ══ 카드 정보 ══ */
@@ -279,7 +269,10 @@
 </header>
 
 <div class="top-panel" id="input-panel">
-  <div class="panel-title">📋 콘티 입력</div>
+  <div class="panel-header">
+    <div class="panel-title">📋 콘티 입력</div>
+    <button class="panel-btn" onclick="clearConti()">초기화</button>
+  </div>
   <textarea id="conti-input" placeholder="예시:&#10;1. 그 이름&#10;https://youtu.be/xxxxx&#10;2. 살아계신 주 https://youtu.be/yyyyy&#10;3. Way Maker + 나의 주&#10;https://youtu.be/aaaaaa&#10;https://youtu.be/bbbbbb"></textarea>
   <div class="btn-row">
     <button class="btn-primary" onclick="analyzeConti()">🎼 플래너 생성</button>
@@ -297,8 +290,10 @@
 
 <!-- ══ 세트리스트 패널 ══ -->
 <div class="top-panel" id="setlist-panel" style="margin-top:28px;">
-  <div class="panel-title">📤 세트리스트 추출</div>
-  <button class="btn-primary" style="width:100%;padding:11px;" onclick="extractSetlist()">Setlist 텍스트로 요약 추출하기</button>
+  <div class="panel-header">
+    <div class="panel-title">📤 세트리스트 추출</div>
+    <button class="panel-btn" id="copy-setlist-btn" onclick="copySetlist()">클립보드에 복사하기</button>
+  </div>
   <textarea class="setlist-output" id="setlist-output" readonly placeholder="추출된 세트리스트가 여기에 표시됩니다..."></textarea>
 </div>
 
@@ -376,11 +371,11 @@ const VOICE_BEATS = {
   4:['One','Two','Three','Four'], 6:['One','Two','Three','Four','Five','Six']
 };
 
-// 연음이 자연스럽게 이어지도록 영어 발음 기호 기반으로 변경 ("원 앤", "원 티 타", "원 이 애 나")
+// 연음이 부드럽게 이어지도록 영어 발음 기호 맵핑
 const VOICE_SUB = {
-  2: ['','en'],
-  3: ['','tee','tah'],
-  4: ['','ee','ay','nah']
+  2: ['','en'],          // 원 앤
+  3: ['','tee','tah'],   // 원 티 타
+  4: ['','ee','ay','nah']// 원 이 애 나
 };
 
 /* ══ Web Speech ══ */
@@ -392,7 +387,7 @@ function getVoice(){
   if(voiceCache) return voiceCache;
   if(!speechSynth) return null;
   const voices = speechSynth.getVoices();
-  voiceCache = voices.find(v=>v.lang.startsWith('en-US')&&v.localService) ||
+  voiceCache = voices.find(v=>v.lang.startsWith('en-US')) ||
                voices.find(v=>v.lang.startsWith('en')) ||
                (voices.length?voices[0]:null);
   return voiceCache;
@@ -404,20 +399,45 @@ function speakBeat(text, time){
   const delayMs = Math.max(0,(time - audioCtx.currentTime)*1000);
   setTimeout(()=>{
     try {
+      // 큐가 밀려 앱이 다운되는 현상 방지: 재생 중이면 스킵
+      if(speechSynth.speaking && speechSynth.pending) return; 
+      
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.8; // 발음이 뚝 끊기지 않게 속도 최적화
+      u.rate = 1.8; // 연음에 적합한 속도
       u.pitch = 1.1; 
-      u.volume = 1;
+      u.volume = 1.0;
       const v = getVoice();
       if(v) u.voice = v;
       u.lang = 'en-US';
-      speechSynth.cancel();
       speechSynth.speak(u);
     } catch(e) {
-      // 보이스 엔진이 막힌 경우 조용히 에러를 무시 (전체 다운 방지)
-      console.warn("Speech API Blocked:", e);
+      console.warn("Speech Engine Error (Ignored):", e);
     }
   }, delayMs);
+}
+
+/* ══ 텍스트 패널 컨트롤 ══ */
+function clearConti(){
+  document.getElementById('conti-input').value = '';
+  autosave();
+}
+function copySetlist(){
+  const text = document.getElementById('setlist-output').value;
+  if(!text) return;
+  const copyHelper = function(e) {
+    e.clipboardData.setData('text/plain', text);
+    e.preventDefault();
+  };
+  document.addEventListener('copy', copyHelper);
+  document.execCommand('copy');
+  document.removeEventListener('copy', copyHelper);
+  
+  const btn = document.getElementById('copy-setlist-btn');
+  const orig = btn.innerText;
+  btn.innerText = '복사완료!';
+  btn.style.color = 'var(--success)';
+  btn.style.borderColor = 'var(--success)';
+  setTimeout(()=>{ btn.innerText = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
 }
 
 /* ══ 패널 너비 제한 ══ */
@@ -441,56 +461,60 @@ function updatePanelWidth(){
 }
 
 /* ══════════════════════════════════
-   SVG 음표
+   SVG 음표 (머리와 막대가 정교하게 이어지고 밸런스 잡힌 버전)
 ══════════════════════════════════ */
 function nc(active){ return active?'var(--text)':'var(--sub-text)'; }
 
 function svgQuarter(active){
   const c=nc(active);
-  return `<svg width="18" height="36" viewBox="0 0 18 36" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="7" cy="29" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 7 29)"/>
-    <rect x="12.5" y="5" width="2.4" height="24" rx="1.2" fill="${c}"/>
+  return `<svg width="20" height="36" viewBox="0 0 20 36" xmlns="http://www.w3.org/2000/svg">
+    <rect x="11" y="6" width="2.2" height="22" fill="${c}"/>
+    <ellipse cx="7.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 7.5 27.5)"/>
   </svg>`;
 }
 
+/* 8분음표 (꼬리 연결된 ♫ 모양 & 기둥 길이 밸런스) */
 function svgEighth(active){
   const c=nc(active);
-  return `<svg width="26" height="36" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="7" cy="29" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-16 7 29)"/>
-    <rect x="12.5" y="5" width="2.4" height="24" rx="1.2" fill="${c}"/>
-    <path d="M14.9 5 C14.9 5 24 8.5 22.5 19 C20 14.5 14.9 13 14.9 13 Z" fill="${c}"/>
+  return `<svg width="34" height="36" viewBox="0 0 34 36" xmlns="http://www.w3.org/2000/svg">
+    <rect x="9" y="6" width="18.2" height="2.8" fill="${c}"/>
+    <rect x="9" y="6" width="2.2" height="22" fill="${c}"/>
+    <rect x="25" y="6" width="2.2" height="22" fill="${c}"/>
+    <ellipse cx="5.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 5.5 27.5)"/>
+    <ellipse cx="21.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 21.5 27.5)"/>
   </svg>`;
 }
 
 function svgTriplet(active){
   const c=nc(active);
   return `<svg width="44" height="36" viewBox="0 0 44 36" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="10" width="30.4" height="2.5" rx="0.5" fill="${c}"/>
-    <rect x="8" y="10" width="2.4" height="18" fill="${c}"/>
-    <rect x="22" y="10" width="2.4" height="18" fill="${c}"/>
-    <rect x="36" y="10" width="2.4" height="18" fill="${c}"/>
-    <ellipse cx="5.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 5.5 27)"/>
-    <ellipse cx="19.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 19.5 27)"/>
-    <ellipse cx="33.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 33.5 27)"/>
-    <path d="M 7 7 L 7 4 L 18 4" fill="none" stroke="${c}" stroke-width="1.2"/>
-    <path d="M 28 4 L 39 4 L 39 7" fill="none" stroke="${c}" stroke-width="1.2"/>
-    <text x="23" y="7.5" text-anchor="middle" font-size="9" font-weight="bold" font-family="sans-serif" fill="${c}">3</text>
+    <rect x="7" y="9" width="30.2" height="2.5" fill="${c}"/>
+    <rect x="7" y="9" width="2.2" height="19" fill="${c}"/>
+    <rect x="21" y="9" width="2.2" height="19" fill="${c}"/>
+    <rect x="35" y="9" width="2.2" height="19" fill="${c}"/>
+    <ellipse cx="3.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 3.5 27.5)"/>
+    <ellipse cx="17.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 17.5 27.5)"/>
+    <ellipse cx="31.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 31.5 27.5)"/>
+    
+    <path d="M 7 6 L 7 3 L 18 3" fill="none" stroke="${c}" stroke-width="1.2"/>
+    <path d="M 26 3 L 37 3 L 37 6" fill="none" stroke="${c}" stroke-width="1.2"/>
+    <text x="22" y="6" text-anchor="middle" font-size="8.5" font-weight="bold" font-family="sans-serif" fill="${c}">3</text>
   </svg>`;
 }
 
 function svgSixteenth(active){
   const c=nc(active);
   return `<svg width="56" height="36" viewBox="0 0 56 36" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="8" width="41.4" height="2.5" rx="0.5" fill="${c}"/>
-    <rect x="8" y="13.5" width="41.4" height="2.5" rx="0.5" fill="${c}"/>
-    <rect x="8" y="8" width="2.4" height="20" fill="${c}"/>
-    <rect x="21" y="8" width="2.4" height="20" fill="${c}"/>
-    <rect x="34" y="8" width="2.4" height="20" fill="${c}"/>
-    <rect x="47" y="8" width="2.4" height="20" fill="${c}"/>
-    <ellipse cx="5.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 5.5 27)"/>
-    <ellipse cx="18.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 18.5 27)"/>
-    <ellipse cx="31.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 31.5 27)"/>
-    <ellipse cx="44.5" cy="27" rx="5" ry="3.5" fill="${c}" transform="rotate(-15 44.5 27)"/>
+    <rect x="7" y="6" width="41.2" height="2.5" fill="${c}"/>
+    <rect x="7" y="11" width="41.2" height="2.5" fill="${c}"/>
+    <rect x="7" y="6" width="2.2" height="22" fill="${c}"/>
+    <rect x="20" y="6" width="2.2" height="22" fill="${c}"/>
+    <rect x="33" y="6" width="2.2" height="22" fill="${c}"/>
+    <rect x="46" y="6" width="2.2" height="22" fill="${c}"/>
+    <ellipse cx="3.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 3.5 27.5)"/>
+    <ellipse cx="16.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 16.5 27.5)"/>
+    <ellipse cx="29.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 29.5 27.5)"/>
+    <ellipse cx="42.5" cy="27.5" rx="5.5" ry="3.8" fill="${c}" transform="rotate(-15 42.5 27.5)"/>
   </svg>`;
 }
 
@@ -513,7 +537,6 @@ function saveState(){
       cards:cards.map(card=>{
         const id=+card.id.replace('card-','');
         const m=metros[id]; if(!m) return null;
-        // 기존 classic 데이터를 beep로 마이그레이션
         let snd = m.sound;
         if(snd === 'classic') snd = 'beep';
         return{
@@ -603,7 +626,6 @@ async function ensureAudio(){
   }
   if(audioCtx.state==='suspended') await audioCtx.resume();
 
-  // 모바일 환경 Voice 활성화를 위한 트릭
   if(!speechUnlocked && speechSynth) {
     try {
       const u = new SpeechSynthesisUtterance('');
@@ -641,7 +663,7 @@ async function startMetro(id){
     const btn=document.getElementById('p-btn-'+id);
     if(btn){ btn.innerText='STOP'; btn.classList.add('active'); }
     autosave();
-  }catch(err){ console.error('startMetro:',err); alert('오디오 시작 실패: '+err.message); }
+  }catch(err){ console.error('startMetro:',err); }
 }
 
 function stopMetro(id){
@@ -655,6 +677,10 @@ function stopMetro(id){
   const btn=document.getElementById('p-btn-'+id);
   if(btn){ btn.innerText='START'; btn.classList.remove('active'); }
   clearVizFlash(id);
+  // 정지 시 꼬여있는 Voice 큐 비우기
+  if(speechSynth && speechSynth.speaking) {
+      try { speechSynth.cancel(); } catch(e) {}
+  }
 }
 
 function toggleMetro(id){
@@ -726,7 +752,7 @@ function handleBeat(id, slotIdx, beatTime){
   },delayMs);
 }
 
-/* ══ 소리 합성 (디지털, 리얼 우드, 선명한 비프) ══ */
+/* ══ 소리 합성 (디지털, 맑은 우드, 비프음) ══ */
 function playSound(type, isHigh, vol, t){
   if(!audioCtx||!gainMaster) return;
   t=t||audioCtx.currentTime;
@@ -742,53 +768,38 @@ function playSound(type, isHigh, vol, t){
     osc.start(t); osc.stop(t+.07);
 
   } else if(type==='wood'){
-    // 완전 공명있는 진짜 목탁(Temple Block) 소리
+    // 합성음 느낌을 빼고 맑은 나무 타격음으로 복구
     const ctx=audioCtx;
-    const dur=0.15; // 울림 지속시간 길게
+    const dur=0.08;
     
-    // 내부 공명음 (사인파 + 삼각파 혼합)
     const osc=ctx.createOscillator();
     osc.type='sine';
-    osc.frequency.setValueAtTime(isHigh?800:600, t);
-    osc.frequency.exponentialRampToValueAtTime(isHigh?700:500, t+0.05); // 자연스러운 피치 드롭
+    // 나무 특유의 공명 대역과 피치 드롭
+    osc.frequency.setValueAtTime(isHigh?1200:800, t);
+    osc.frequency.exponentialRampToValueAtTime(isHigh?900:600, t+0.04);
+    
     const og=ctx.createGain();
-    og.gain.setValueAtTime(vol*3.5, t); // 울림통 볼륨 강력하게
+    og.gain.setValueAtTime(vol*3.0, t);
     og.gain.exponentialRampToValueAtTime(0.001, t+dur);
+    
     osc.connect(og); og.connect(gain);
-
-    // 날카로운 나무 타격음 (짧은 밴드패스 노이즈)
-    const bufLen=Math.floor(ctx.sampleRate*0.01); // 10ms 짧은 타격
-    const buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
-    const data=buf.getChannelData(0);
-    for(let k=0;k<bufLen;k++) data[k]=(Math.random()*2-1);
-    const noise=ctx.createBufferSource(); noise.buffer=buf;
-    const bp=ctx.createBiquadFilter(); 
-    bp.type='bandpass';
-    bp.frequency.value=isHigh?1200:900;
-    bp.Q.value=5;
-    const ng=ctx.createGain();
-    ng.gain.setValueAtTime(vol*2.0, t);
-    ng.gain.exponentialRampToValueAtTime(0.001, t+0.015);
-    noise.connect(bp); bp.connect(ng); ng.connect(gain);
-
     osc.start(t); osc.stop(t+dur);
-    noise.start(t); noise.stop(t+0.02);
 
   } else if(type==='beep'){
-    // 확실한 뚜- 뚜- 전자음
+    // 선명한 뚜-뚜- 전자음
     const ctx=audioCtx;
     const osc=ctx.createOscillator();
     osc.type='sine';
     osc.frequency.setValueAtTime(isHigh?1200:800, t);
     const og=ctx.createGain();
     og.gain.setValueAtTime(vol*1.5, t);
-    og.gain.setValueAtTime(vol*1.5, t+0.03); // 볼륨을 일정하게 유지하다가
-    og.gain.exponentialRampToValueAtTime(0.001, t+0.05); // 끝에서 끊음
+    og.gain.setValueAtTime(vol*1.5, t+0.03); 
+    og.gain.exponentialRampToValueAtTime(0.001, t+0.05);
     osc.connect(og); og.connect(gain);
     osc.start(t); osc.stop(t+0.06);
     
   } else {
-    // 안전장치
+    // 폴백 기본음
     const osc=audioCtx.createOscillator(); osc.type='sine';
     osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
@@ -893,49 +904,69 @@ function renderEmptyState(){
     ws.innerHTML='<div class="empty-state"><div class="empty-state-icon">🎹</div><div class="empty-state-text">카드가 없습니다.<br>[+ Add Empty]로 카드를 추가하세요.</div></div>';
 }
 
-/* ══ 썸네일 (영상이 꽉 차도록 생성 위치 및 속성 수정) ══ */
+/* ══ 썸네일 (우측 버튼 정렬 & 유튜브 꽉 차게) ══ */
 function buildThumb(id,vId){
   metros[id].vId=vId||null;
   const section=document.getElementById('thumb-'+id); if(!section) return;
-  section.querySelectorAll('img,.thumb-overlay,.youtube-iframe').forEach(el=>el.remove());
+  section.querySelectorAll('img,.youtube-iframe').forEach(el=>el.remove());
   const center=section.querySelector('.thumb-center'); if(center) center.innerHTML='';
-  const linkBtn=section.querySelector('.link-btn');
+  const actions=section.querySelector('.thumb-actions'); if(actions) actions.innerHTML='';
   
   if(vId){
     const img=document.createElement('img');
     const urls=['hqdefault','mqdefault','default'].map(q=>`https://img.youtube.com/vi/${vId}/${q}.jpg`);
     let ti=0; img.src=urls[0]; img.alt=''; img.draggable=false;
     img.onerror=function(){ if(++ti<urls.length) this.src=urls[ti]; };
-    section.insertBefore(img,section.firstChild);
+    center.appendChild(img);
     
-    // iframe을 thumb-section 공간 전체에 꽉 채워서 추가
+    // iframe을 thumb-center 내부를 꽉 채우도록 삽입
     const iframe = document.createElement('iframe');
     iframe.className = 'youtube-iframe';
-    // playsinline=1 추가하여 모바일 환경에서 인라인 재생 지원
     iframe.src = `https://www.youtube.com/embed/${vId}?rel=0&playsinline=1`;
     iframe.allowFullscreen = true;
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    section.appendChild(iframe);
+    center.appendChild(iframe);
     
-    if(linkBtn){
-      linkBtn.style.display = 'block';
-      linkBtn.onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
-    }
+    // 우측 버튼: 복사, 링크, 삭제
+    actions.innerHTML = `
+      <button class="thumb-btn copy-btn" title="복사">⎘</button>
+      <button class="thumb-btn link-btn" title="링크 열기">🔗</button>
+      <button class="thumb-btn del-btn" title="삭제">✕</button>
+    `;
+    actions.querySelector('.link-btn').onclick=e=>{ e.stopPropagation(); window.open('https://www.youtube.com/watch?v='+vId,'_blank'); };
   } else {
+    // 링크가 없을 경우
     if(center){
       const wrap=document.createElement('div'); wrap.className='no-thumb-content';
-      wrap.innerHTML=`<span class="no-thumb-label">No Link</span><input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크..."><button class="link-apply-btn">적용</button>`;
+      wrap.innerHTML=`
+        <span class="no-thumb-label">No Link</span>
+        <input class="link-input-inline" id="linkinput-${id}" type="text" placeholder="유튜브 링크...">
+        <button class="link-apply-btn">적용</button>
+      `;
       wrap.querySelector('input').addEventListener('pointerdown',e=>e.stopPropagation());
       wrap.querySelector('input').addEventListener('keydown',e=>{ if(e.key==='Enter') applyLink(id); e.stopPropagation(); });
       wrap.querySelector('button').addEventListener('pointerdown',e=>e.stopPropagation());
       wrap.querySelector('button').addEventListener('click',()=>applyLink(id));
       center.appendChild(wrap);
     }
-    if(linkBtn){
-      linkBtn.style.display = 'none';
-    }
+    
+    // 우측 버튼: 복사, 삭제 (링크 버튼 생략)
+    actions.innerHTML = `
+      <button class="thumb-btn copy-btn" title="복사">⎘</button>
+      <button class="thumb-btn del-btn" title="삭제">✕</button>
+    `;
   }
+
+  // 생성된 버튼들에 이벤트 리스너 재부착
+  actions.querySelector('.copy-btn').addEventListener('click', e=>{ e.stopPropagation(); duplicateCard(id); });
+  actions.querySelector('.del-btn').addEventListener('click', e=>{
+    e.stopPropagation();
+    const titleEl=document.getElementById('title-'+id);
+    const titleText=titleEl?titleEl.innerText.trim():'이 카드';
+    showConfirm('🗑️','카드를 삭제할까요?',`"${titleText}"\n정말로 삭제하시겠습니까?`,()=>deleteCard(id));
+  });
 }
+
 function applyLink(id){
   const inp=document.getElementById('linkinput-'+id); if(!inp) return;
   const vId=extractVid(inp.value.trim());
@@ -954,7 +985,7 @@ function initStates(id){
   });
 }
 
-/* ══ 카드 HTML (사운드 버튼 순서 변경) ══ */
+/* ══ 카드 HTML (디지털,우드,비프,보이스 순서) ══ */
 function cardHTML(id,title){
   return `
     <div class="thumb-section" id="thumb-${id}">
@@ -962,13 +993,7 @@ function cardHTML(id,title){
         <span class="drag-handle-icon">⠿</span>
       </div>
       <div class="thumb-center" id="thumb-center-${id}"></div>
-      <div class="thumb-actions">
-        <div class="thumb-actions-row">
-          <button class="thumb-btn copy-btn">⎘</button>
-          <button class="thumb-btn del-btn">✕</button>
-        </div>
-        <button class="thumb-btn link-btn" style="display:none; width:100%; padding:4px 0;">▶ Link</button>
-      </div>
+      <div class="thumb-actions"></div>
     </div>
     <div class="info-section">
       <div class="editable-title" contenteditable="true" id="title-${id}" spellcheck="false">${escHtml(title)}</div>
@@ -1199,13 +1224,7 @@ function deactivateDim(){ document.querySelectorAll('.song-card').forEach(c=>c.c
 
 /* ══ 이벤트 바인딩 ══ */
 function bindEvents(card,id){
-  card.querySelector('.del-btn').addEventListener('click',e=>{
-    e.stopPropagation();
-    const titleEl=document.getElementById('title-'+id);
-    const titleText=titleEl?titleEl.innerText.trim():'이 카드';
-    showConfirm('🗑️','카드를 삭제할까요?',`"${titleText}"\n정말로 삭제하시겠습니까?`,()=>deleteCard(id));
-  });
-  card.querySelector('.copy-btn').addEventListener('click',e=>{ e.stopPropagation(); duplicateCard(id); });
+  // 썸네일 액션버튼 리스너는 buildThumb에서 직접 부착함.
 
   const minus=card.querySelector('#bpm-minus-'+id);
   const plus=card.querySelector('#bpm-plus-'+id);
@@ -1239,9 +1258,6 @@ function bindEvents(card,id){
 
   card.querySelector('.info-section').addEventListener('mousedown',e=>e.stopPropagation());
   card.querySelector('.info-section').addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('#thumb-center-'+id).addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('.thumb-actions').addEventListener('pointerdown',e=>e.stopPropagation());
-  card.querySelector('.thumb-actions').addEventListener('mousedown',e=>e.stopPropagation());
 
   const titleEl=card.querySelector('#title-'+id);
   titleEl.addEventListener('input',()=>autosave());
