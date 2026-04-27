@@ -94,42 +94,48 @@
     .song-card.flash-first{background:rgba(255,40,40,.50)!important;border-color:#ff2222!important;box-shadow:0 0 30px rgba(255,40,40,.70)!important;transition:background 0s,box-shadow 0s,border-color 0s!important;}
     .song-card.flash-tap{background:rgba(255,205,0,.52)!important;border-color:#ffd700!important;box-shadow:0 0 30px rgba(255,205,0,.65)!important;transition:background 0s!important;}
 
-    /* ══ 썸네일 ══ */
-    .thumb-section{width:100%;height:108px;position:relative;background:#0a0a0a;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
+    /* ══ 썸네일 (영상이 가득 차도록 높이 확장 및 구조 최적화) ══ */
+    .thumb-section{width:100%;height:160px;position:relative;background:#0a0a0a;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
     [data-theme="light"] .thumb-section{background:#c8c8d0;}
-    .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;}
-    .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);}
+    .thumb-section>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72;pointer-events:none;z-index:1;}
+    .thumb-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.72) 100%);z-index:2;}
 
-    /* ★ 드래그 핸들 */
+    /* ★ 드래그 핸들: 영상 위에서도 잘 보이도록 그라데이션 배경 추가 */
     .drag-handle-zone{
       flex-shrink:0;display:flex;align-items:center;justify-content:center;
-      width:52px;height:100%;z-index:10;
-      cursor:grab;
-      user-select:none;-webkit-user-select:none;
-      touch-action:none;
+      width:52px;height:100%;z-index:10; position:relative;
+      cursor:grab; pointer-events:auto;
+      background:linear-gradient(to right, rgba(0,0,0,0.6), transparent);
+      user-select:none;-webkit-user-select:none; touch-action:none;
     }
     .drag-handle-zone:active{cursor:grabbing;}
-    .drag-handle-icon{color:rgba(255,255,255,.75);font-size:28px;user-select:none;pointer-events:none;line-height:1;}
+    .drag-handle-icon{color:rgba(255,255,255,.9);font-size:28px;user-select:none;pointer-events:none;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
     .drag-handle-zone:hover .drag-handle-icon{color:var(--accent);}
-    [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.55);}
+    [data-theme="light"] .drag-handle-icon{color:rgba(0,0,0,.7);}
 
-    /* 영상이 위아래 가득 차도록 패딩 제거, 높이 100% 맞춤 */
-    .thumb-center{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:0;height:108px;z-index:2;position:relative;}
-    .thumb-actions{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;z-index:4;padding-right:8px;flex-shrink:0;}
+    /* 유튜브 iframe 영역 (가득 채움) */
+    .youtube-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:auto;background:#000;z-index:3;}
+
+    .thumb-center{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:0 6px;height:100%;z-index:4;position:relative;pointer-events:none;}
+    .thumb-center > * { pointer-events: auto; }
+    
+    .thumb-actions{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;z-index:10;padding-right:8px;flex-shrink:0;position:relative;pointer-events:none;}
+    .thumb-actions > * { pointer-events: auto; }
     .thumb-actions-row{display:flex;gap:5px;}
-    .youtube-iframe{width:100%;height:100%;border:none;pointer-events:auto;background:#000;}
-    .thumb-btn{background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1;}
+    
+    .thumb-btn{background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;font-family:inherit;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,0.5);}
     .thumb-btn:hover{transform:scale(1.07);}
-    .thumb-btn.link-btn:hover{background:rgba(0,229,255,.5);}
-    .thumb-btn.copy-btn:hover{background:rgba(48,209,88,.5);}
-    .thumb-btn.del-btn:hover{background:rgba(255,69,58,.6);}
-    [data-theme="light"] .thumb-btn{background:rgba(255,255,255,.8);border-color:rgba(0,0,0,.2);color:#111;}
+    .thumb-btn.link-btn:hover{background:rgba(0,229,255,.6);}
+    .thumb-btn.copy-btn:hover{background:rgba(48,209,88,.6);}
+    .thumb-btn.del-btn:hover{background:rgba(255,69,58,.7);}
+    [data-theme="light"] .thumb-btn{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.3);color:#111;}
+
     .no-thumb-content{display:flex;align-items:center;gap:6px;width:100%;padding:0 6px;}
-    .no-thumb-label{color:var(--sub-text);font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;}
-    .link-input-inline{flex:1;min-width:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:7px;padding:5px 8px;font-size:11px;font-family:inherit;outline:none;}
+    .no-thumb-label{color:var(--text);font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
+    .link-input-inline{flex:1;min-width:0;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 8px;font-size:11px;font-family:inherit;outline:none;}
     .link-input-inline:focus{border-color:var(--accent);}
-    [data-theme="light"] .link-input-inline{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.2);color:#111;}
-    .link-apply-btn{flex-shrink:0;background:var(--accent);color:#000;border:none;border-radius:7px;padding:5px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:inherit;}
+    [data-theme="light"] .link-input-inline{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.3);color:#111;}
+    .link-apply-btn{flex-shrink:0;background:var(--accent);color:#000;border:none;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;}
     [data-theme="light"] .link-apply-btn{color:#fff;}
 
     /* ══ 카드 정보 ══ */
@@ -369,9 +375,10 @@ const VOICE_BEATS = {
   1:['One'], 2:['One','Two'], 3:['One','Two','Three'],
   4:['One','Two','Three','Four'], 6:['One','Two','Three','Four','Five','Six']
 };
-// 요청하신 "원 n", "원 ti ta", "원 e ae na" 발음을 영어 발음기호로 유사하게 연음 처리
+
+// 연음이 자연스럽게 이어지도록 영어 발음 기호 기반으로 변경 ("원 앤", "원 티 타", "원 이 애 나")
 const VOICE_SUB = {
-  2: ['','and'],
+  2: ['','en'],
   3: ['','tee','tah'],
   4: ['','ee','ay','nah']
 };
@@ -396,15 +403,20 @@ function speakBeat(text, time){
   if(!speechSynth) return;
   const delayMs = Math.max(0,(time - audioCtx.currentTime)*1000);
   setTimeout(()=>{
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.8; // 발음이 부드럽게 이어지도록 속도 조절
-    u.pitch = 1.1; 
-    u.volume = 1;
-    const v = getVoice();
-    if(v) u.voice = v;
-    u.lang = 'en-US';
-    speechSynth.cancel();
-    speechSynth.speak(u);
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.8; // 발음이 뚝 끊기지 않게 속도 최적화
+      u.pitch = 1.1; 
+      u.volume = 1;
+      const v = getVoice();
+      if(v) u.voice = v;
+      u.lang = 'en-US';
+      speechSynth.cancel();
+      speechSynth.speak(u);
+    } catch(e) {
+      // 보이스 엔진이 막힌 경우 조용히 에러를 무시 (전체 다운 방지)
+      console.warn("Speech API Blocked:", e);
+    }
   }, delayMs);
 }
 
@@ -501,11 +513,14 @@ function saveState(){
       cards:cards.map(card=>{
         const id=+card.id.replace('card-','');
         const m=metros[id]; if(!m) return null;
+        // 기존 classic 데이터를 beep로 마이그레이션
+        let snd = m.sound;
+        if(snd === 'classic') snd = 'beep';
         return{
           id,
           title:document.getElementById('title-'+id)?.innerText||'',
           bpm:m.bpm, sig:m.sig, subDiv:m.subDiv,
-          vol:m.vol, muted:m.muted, sound:m.sound,
+          vol:m.vol, muted:m.muted, sound:snd,
           vId:m.vId||null,
           blockStates:[...m.blockStates],
           subStates:m.subStates.map(a=>[...a])
@@ -544,9 +559,12 @@ function loadState(){
 
 function createCardFromData(c){
   removeEmptyState();
+  let snd = c.sound;
+  if(snd === 'classic') snd = 'beep';
+
   metros[c.id]={
     isPlaying:false, bpm:c.bpm, sig:c.sig, subDiv:c.subDiv,
-    vol:c.vol, muted:c.muted, sound:c.sound,
+    vol:c.vol, muted:c.muted, sound:snd,
     workletNode:null, vId:c.vId||null,
     blockStates:[...c.blockStates],
     subStates:c.subStates.map(a=>[...a])
@@ -564,7 +582,7 @@ function createCardFromData(c){
   document.getElementById('bpm-'+c.id).innerText=c.bpm;
   document.getElementById('beat-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.beat===c.sig));
   document.getElementById('sub-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',+b.dataset.div===c.subDiv));
-  document.getElementById('sound-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.sound===c.sound));
+  document.getElementById('sound-seg-'+c.id).querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.sound===snd));
   document.getElementById('vol-'+c.id).value=c.vol;
   if(c.muted){
     const btn=document.getElementById('mute-'+c.id);
@@ -587,10 +605,12 @@ async function ensureAudio(){
 
   // 모바일 환경 Voice 활성화를 위한 트릭
   if(!speechUnlocked && speechSynth) {
-    const u = new SpeechSynthesisUtterance('');
-    u.volume = 0;
-    speechSynth.speak(u);
-    speechUnlocked = true;
+    try {
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      speechSynth.speak(u);
+      speechUnlocked = true;
+    } catch(e) {}
   }
 
   if(!workletReady){
@@ -706,7 +726,7 @@ function handleBeat(id, slotIdx, beatTime){
   },delayMs);
 }
 
-/* ══ 소리 합성 (기계식 메트로놈 및 우드 소리 강력하게 개선) ══ */
+/* ══ 소리 합성 (디지털, 리얼 우드, 선명한 비프) ══ */
 function playSound(type, isHigh, vol, t){
   if(!audioCtx||!gainMaster) return;
   t=t||audioCtx.currentTime;
@@ -721,62 +741,54 @@ function playSound(type, isHigh, vol, t){
     gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
     osc.start(t); osc.stop(t+.07);
 
-  } else if(type==='classic'){
-    // 아날로그 메트로놈의 기계식 "똑-딱" 소리 (타격음 + 나무 울림통)
+  } else if(type==='wood'){
+    // 완전 공명있는 진짜 목탁(Temple Block) 소리
     const ctx=audioCtx;
-    const dur=0.08;
-
-    // 울림통 소리 (공명)
+    const dur=0.15; // 울림 지속시간 길게
+    
+    // 내부 공명음 (사인파 + 삼각파 혼합)
     const osc=ctx.createOscillator();
-    osc.type='triangle';
-    osc.frequency.setValueAtTime(isHigh ? 800 : 500, t);
-    osc.frequency.exponentialRampToValueAtTime(100, t+0.05);
+    osc.type='sine';
+    osc.frequency.setValueAtTime(isHigh?800:600, t);
+    osc.frequency.exponentialRampToValueAtTime(isHigh?700:500, t+0.05); // 자연스러운 피치 드롭
     const og=ctx.createGain();
-    og.gain.setValueAtTime(vol * 2.0, t);
+    og.gain.setValueAtTime(vol*3.5, t); // 울림통 볼륨 강력하게
     og.gain.exponentialRampToValueAtTime(0.001, t+dur);
     osc.connect(og); og.connect(gain);
 
-    // 톱니가 걸리는 짧고 날카로운 기계 타격음
-    const bufLen=Math.floor(ctx.sampleRate * 0.02);
+    // 날카로운 나무 타격음 (짧은 밴드패스 노이즈)
+    const bufLen=Math.floor(ctx.sampleRate*0.01); // 10ms 짧은 타격
     const buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
     const data=buf.getChannelData(0);
     for(let k=0;k<bufLen;k++) data[k]=(Math.random()*2-1);
     const noise=ctx.createBufferSource(); noise.buffer=buf;
     const bp=ctx.createBiquadFilter(); 
     bp.type='bandpass';
-    bp.frequency.value=isHigh ? 6000 : 3500;
-    bp.Q.value=1.5;
+    bp.frequency.value=isHigh?1200:900;
+    bp.Q.value=5;
     const ng=ctx.createGain();
-    ng.gain.setValueAtTime(vol * 3.5, t); // 임팩트 볼륨 상향
-    ng.gain.exponentialRampToValueAtTime(0.001, t+0.02);
+    ng.gain.setValueAtTime(vol*2.0, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t+0.015);
     noise.connect(bp); bp.connect(ng); ng.connect(gain);
 
     osc.start(t); osc.stop(t+dur);
     noise.start(t); noise.stop(t+0.02);
 
-  } else if(type==='wood'){
-    const bufLen=Math.floor(audioCtx.sampleRate*.07);
-    const buf=audioCtx.createBuffer(1,bufLen,audioCtx.sampleRate);
-    const data=buf.getChannelData(0);
-    for(let k=0;k<bufLen;k++) data[k]=(Math.random()*2-1)*Math.exp(-k/(bufLen*.15));
-    const noise=audioCtx.createBufferSource(); noise.buffer=buf;
-    const bp=audioCtx.createBiquadFilter(); bp.type='bandpass';
-    bp.frequency.value=isHigh?1600:1100; bp.Q.value=18;
-    const hp=audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=800;
-    const osc=audioCtx.createOscillator(); osc.type='triangle';
-    osc.frequency.setValueAtTime(isHigh?1400:950,t);
-    osc.frequency.exponentialRampToValueAtTime(200,t+.025);
-    const og=audioCtx.createGain();
-    og.gain.setValueAtTime(vol*4.0,t); // 기존 1.4에서 4.0으로 상향
-    og.gain.exponentialRampToValueAtTime(0.001,t+.03);
-    noise.connect(bp); bp.connect(hp); hp.connect(gain);
+  } else if(type==='beep'){
+    // 확실한 뚜- 뚜- 전자음
+    const ctx=audioCtx;
+    const osc=ctx.createOscillator();
+    osc.type='sine';
+    osc.frequency.setValueAtTime(isHigh?1200:800, t);
+    const og=ctx.createGain();
+    og.gain.setValueAtTime(vol*1.5, t);
+    og.gain.setValueAtTime(vol*1.5, t+0.03); // 볼륨을 일정하게 유지하다가
+    og.gain.exponentialRampToValueAtTime(0.001, t+0.05); // 끝에서 끊음
     osc.connect(og); og.connect(gain);
-    gain.gain.setValueAtTime(vol*5.0,t); // 기존 2.5에서 5.0으로 상향
-    gain.gain.exponentialRampToValueAtTime(0.001,t+.06);
-    noise.start(t); noise.stop(t+.07);
-    osc.start(t); osc.stop(t+.035);
-
+    osc.start(t); osc.stop(t+0.06);
+    
   } else {
+    // 안전장치
     const osc=audioCtx.createOscillator(); osc.type='sine';
     osc.frequency.value=isHigh?1320:880;
     osc.connect(gain);
@@ -881,11 +893,11 @@ function renderEmptyState(){
     ws.innerHTML='<div class="empty-state"><div class="empty-state-icon">🎹</div><div class="empty-state-text">카드가 없습니다.<br>[+ Add Empty]로 카드를 추가하세요.</div></div>';
 }
 
-/* ══ 썸네일 (유튜브 영상 바로 재생되도록 확장) ══ */
+/* ══ 썸네일 (영상이 꽉 차도록 생성 위치 및 속성 수정) ══ */
 function buildThumb(id,vId){
   metros[id].vId=vId||null;
   const section=document.getElementById('thumb-'+id); if(!section) return;
-  section.querySelectorAll('img,.thumb-overlay').forEach(el=>el.remove());
+  section.querySelectorAll('img,.thumb-overlay,.youtube-iframe').forEach(el=>el.remove());
   const center=section.querySelector('.thumb-center'); if(center) center.innerHTML='';
   const linkBtn=section.querySelector('.link-btn');
   
@@ -896,18 +908,14 @@ function buildThumb(id,vId){
     img.onerror=function(){ if(++ti<urls.length) this.src=urls[ti]; };
     section.insertBefore(img,section.firstChild);
     
-    const ov=document.createElement('div'); ov.className='thumb-overlay';
-    section.insertBefore(ov,section.querySelector('.drag-handle-zone'));
-    
-    if(center){
-      const iframe = document.createElement('iframe');
-      iframe.className = 'youtube-iframe';
-      // playsinline=1 을 넣어야 카카오톡 등에서 강제 전체화면 되지 않고 인라인 재생 가능
-      iframe.src = `https://www.youtube.com/embed/${vId}?rel=0&playsinline=1`;
-      iframe.allowFullscreen = true;
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      center.appendChild(iframe);
-    }
+    // iframe을 thumb-section 공간 전체에 꽉 채워서 추가
+    const iframe = document.createElement('iframe');
+    iframe.className = 'youtube-iframe';
+    // playsinline=1 추가하여 모바일 환경에서 인라인 재생 지원
+    iframe.src = `https://www.youtube.com/embed/${vId}?rel=0&playsinline=1`;
+    iframe.allowFullscreen = true;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    section.appendChild(iframe);
     
     if(linkBtn){
       linkBtn.style.display = 'block';
@@ -941,13 +949,12 @@ function initStates(id){
   m.blockStates=Array.from({length:m.sig},(_,i)=>i===0?1:0);
   m.subStates=Array.from({length:m.sig},(_,i)=>{
     const arr = new Array(16).fill(0);
-    // 첫번째 마디의 첫 박자만 기본적으로 엑센트 적용
     if (i===0) arr[0] = 1;
     return arr;
   });
 }
 
-/* ══ 카드 HTML ══ */
+/* ══ 카드 HTML (사운드 버튼 순서 변경) ══ */
 function cardHTML(id,title){
   return `
     <div class="thumb-section" id="thumb-${id}">
@@ -997,8 +1004,8 @@ function cardHTML(id,title){
           <span class="setting-label">Sound</span>
           <div class="segmented-control" id="sound-seg-${id}">
             <button class="seg-btn active" data-sound="digital">Digital</button>
-            <button class="seg-btn" data-sound="classic">Classic</button>
             <button class="seg-btn" data-sound="wood">Wood</button>
+            <button class="seg-btn" data-sound="beep">Beep</button>
             <button class="seg-btn" data-sound="voice">Voice</button>
           </div>
         </div>
@@ -1278,7 +1285,6 @@ function setBeat(id,val,btnEl){
 function setSubDiv(id,div){
   const m=metros[id]; if(!m) return;
   m.subDiv=div;
-  // 박자를 쪼갤 때, 기존 메인 박자(blockStates)의 상태를 첫 번째 서브박자(arr[0])에만 전달하고 나머지는 기본(0)으로 초기화합니다.
   m.subStates=Array.from({length:m.sig},(_,i)=>{
     const arr = new Array(16).fill(0);
     arr[0] = m.blockStates[i] ?? 0;
@@ -1311,7 +1317,6 @@ function renderViz(id){
     const b=document.createElement('div');
     b.id='block-'+id+'-'+i;
 
-    // 쪼개진 상태(subDiv > 1)에서는 부모 블록(b)이 엑센트(빨강) 등의 배경을 가지지 않게 하여 시각적 간섭을 막습니다.
     let parentState = 0;
     if (m.subDiv === 1) {
       parentState = m.blockStates[i] ?? 0;
@@ -1335,7 +1340,6 @@ function renderViz(id){
         el.addEventListener('click',e=>{
           e.stopPropagation();
           m.subStates[i][_s]=(m.subStates[i][_s]+1)%3;
-          // 첫 번째 서브 박자의 상태를 바꾸면 메인 박자 상태에도 동기화 시켜줍니다.
           if (_s === 0) {
             m.blockStates[i] = m.subStates[i][0];
           }
